@@ -8,10 +8,10 @@ const identityBodyTwo =
   "His work aims to reduce friction and create systems that feel calm, precise, and easy to use. Influenced by the internet and contemporary visual culture, he is interested in how details shape understanding over time, and how consistency can make something feel more coherent the longer it is experienced.";
 
 const externalLinks = [
-  { label: "LINKEDIN", disabled: false },
-  { label: "EMAIL", disabled: false },
-  { label: "X", disabled: false },
-  { label: "UNORDINARY", disabled: true },
+  { label: "LINKEDIN", href: "https://linkedin.com/in/rghv-agrwl", disabled: false },
+  { label: "EMAIL", href: "mailto:rghvagwl@gmail.com", disabled: false },
+  { label: "X", href: "https://x.com/raghaav", disabled: false },
+  { label: "UNORDINARY", href: "#", disabled: true },
 ] as const;
 
 const locations = {
@@ -222,6 +222,7 @@ const workProjects = [
   },
 ] as const;
 const workLoadMoreThreshold = 6;
+const workLoadMoreThresholdMobile = 3;
 const identityScaleClass = "text-[clamp(16px,1.35vw,20px)]";
 const entryTitle = "LIVING WITHOUT REGRETS";
 const entryYear = "2025";
@@ -561,6 +562,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [cursorBadgeMode, setCursorBadgeMode] = useState<CursorBadgeMode>(null);
   const [cursorBadgePosition, setCursorBadgePosition] = useState({ x: 0, y: 0 });
   const [hoveredControl, setHoveredControl] = useState<HoveredControl>(null);
+  const [hoveredSelectorTab, setHoveredSelectorTab] = useState<PanelTabId | null>(
+    null,
+  );
+  const [autoHoverSelectorTab, setAutoHoverSelectorTab] =
+    useState<PanelTabId | null>(null);
+  const [isSelectorGroupHovered, setIsSelectorGroupHovered] = useState(false);
   const [hoveredLocationToggle, setHoveredLocationToggle] = useState(false);
   const [hoveredProfileImage, setHoveredProfileImage] = useState(false);
   const [profileTooltipFlip, setProfileTooltipFlip] = useState(false);
@@ -606,17 +613,18 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         ]),
       ),
     );
-  const [mixedWorkEntriesOrder] = useState(() =>
-    shuffleArray([...workProjects.map((project) => `work:${project.id}`), "entries"]),
+  const [mixedWorkEntriesOrder, setMixedWorkEntriesOrder] = useState(() => [
+    ...workProjects.map((project) => `work:${project.id}`),
+    "entries",
+  ]);
+  const [workImageOrderByProject, setWorkImageOrderByProject] = useState<
+    Record<string, string[]>
+  >(() =>
+    Object.fromEntries(workProjects.map((project) => [project.id, [...project.images]])),
   );
-  const [workImageOrderByProject] = useState<Record<string, string[]>>(() =>
-    Object.fromEntries(
-      workProjects.map((project) => [project.id, shuffleArray(project.images)]),
-    ),
-  );
-  const [contextSectionOrder] = useState<("identity" | "external")[]>(() =>
-    Math.random() < 0.5 ? ["identity", "external"] : ["external", "identity"],
-  );
+  const [contextSectionOrder, setContextSectionOrder] = useState<
+    ("identity" | "external")[]
+  >(["identity", "external"]);
   const lastTrailTimeRef = useRef(0);
   const lastTrailPointRef = useRef({ x: 0, y: 0 });
   const trailIdRef = useRef(0);
@@ -639,6 +647,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const homeEntryDividerRef = useRef<HTMLDivElement | null>(null);
   const homeIdentityDividerRef = useRef<HTMLDivElement | null>(null);
   const entryOverlayHeaderRef = useRef<HTMLDivElement | null>(null);
+  const entryOverlayScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const captureDividerBaseline = () => {
@@ -683,6 +692,48 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   useEffect(() => {
     const timeoutId = window.setTimeout(() => setIsLoaded(true), 40);
     return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      if (!window.matchMedia("(max-width: 767px)").matches) {
+        return;
+      }
+      setVisibleWorkImageCountByProject(
+        Object.fromEntries(
+          workProjects.map((project) => [
+            project.id,
+            project.images.length > workLoadMoreThresholdMobile
+              ? workLoadMoreThresholdMobile
+              : project.images.length,
+          ]),
+        ),
+      );
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setMixedWorkEntriesOrder(
+        shuffleArray([...workProjects.map((project) => `work:${project.id}`), "entries"]),
+      );
+      setWorkImageOrderByProject(
+        Object.fromEntries(
+          workProjects.map((project) => [project.id, shuffleArray(project.images)]),
+        ),
+      );
+      setContextSectionOrder(
+        Math.random() < 0.5 ? ["identity", "external"] : ["external", "identity"],
+      );
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {
@@ -1054,6 +1105,36 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   };
 
   useEffect(() => {
+    if (isSelectorGroupHovered || hoveredSelectorTab !== null) {
+      return;
+    }
+
+    let cycleInterval: number | null = null;
+    const idleTimeout = window.setTimeout(() => {
+      let nextIndex = 0;
+      setAutoHoverSelectorTab(panelTabs[nextIndex]?.id ?? null);
+      cycleInterval = window.setInterval(() => {
+        nextIndex += 1;
+        if (nextIndex >= panelTabs.length) {
+          setAutoHoverSelectorTab(null);
+          if (cycleInterval !== null) {
+            window.clearInterval(cycleInterval);
+          }
+          return;
+        }
+        setAutoHoverSelectorTab(panelTabs[nextIndex]?.id ?? null);
+      }, 620);
+    }, 8000);
+
+    return () => {
+      window.clearTimeout(idleTimeout);
+      if (cycleInterval !== null) {
+        window.clearInterval(cycleInterval);
+      }
+    };
+  }, [hoveredSelectorTab, isSelectorGroupHovered]);
+
+  useEffect(() => {
     return () => {
       if (selectorBounceTimeoutRef.current !== null) {
         window.clearTimeout(selectorBounceTimeoutRef.current);
@@ -1076,6 +1157,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const openEntry = () => {
     if (entryPhase !== "closed") {
       return;
+    }
+    if (entryOverlayScrollRef.current) {
+      entryOverlayScrollRef.current.scrollTo({ top: 0, behavior: "auto" });
     }
     setCursorBadgeMode(null);
     if (homeEntryDividerRef.current) {
@@ -1178,7 +1262,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           : "BRING TO TOP"
         : hoveredControl === "truncate"
           ? canUseTruncateControl
-            ? "TRUNCATE"
+            ? truncateModeActive
+              ? "EXTEND"
+              : "TRUNCATE"
             : null
         : showOnlySelected
           ? "SHOW ALL"
@@ -1451,6 +1537,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       ) : null}
 
       <div
+        ref={entryOverlayScrollRef}
         className={`fixed inset-0 z-[85] overflow-y-auto transition-opacity duration-360 ease-out ${
           isEntryOverlayVisible
             ? "pointer-events-auto opacity-100"
@@ -1558,7 +1645,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           entryPhase === "closed" ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
-        <section className="grid gap-10 min-[940px]:grid-cols-3 xl:gap-20">
+        <section className="grid gap-6 min-[940px]:grid-cols-3 xl:gap-20">
           <div
             className={`w-full max-w-[480px] min-[940px]:order-3 ${reveal(0).className}`}
             style={reveal(0).style}
@@ -1636,33 +1723,41 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 <p className="mt-2 text-[12px] leading-[1.5] text-black/40 text-justify">
                   Inspired by the works of{" "}
                   <a
-                    href="#"
+                    href="https://adamho.com"
                     className="text-black/60 underline decoration-dotted underline-offset-2"
                     style={authorLinkStyle}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Adam Ho
                   </a>
                   ,{" "}
                   <a
-                    href="#"
+                    href="https://frankchimero.com"
                     className="text-black/60 underline decoration-dotted underline-offset-2"
                     style={authorLinkStyle}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Frank Chimero
                   </a>
                   ,{" "}
                   <a
-                    href="#"
+                    href="https://benji.org"
                     className="text-black/60 underline decoration-dotted underline-offset-2"
                     style={authorLinkStyle}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Benji Taylor
                   </a>{" "}
                   and{" "}
                   <a
-                    href="#"
+                    href="https://ryanyan.ca"
                     className="text-black/60 underline decoration-dotted underline-offset-2"
                     style={authorLinkStyle}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Ryan Yan
                   </a>
@@ -1677,9 +1772,29 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             style={reveal(90).style}
           >
             <div className="flex items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div
+                className="flex flex-wrap items-center gap-1.5"
+                onMouseEnter={() => {
+                  setIsSelectorGroupHovered(true);
+                  setAutoHoverSelectorTab(null);
+                }}
+                onMouseMove={() => {
+                  if (!isSelectorGroupHovered) {
+                    setIsSelectorGroupHovered(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  setIsSelectorGroupHovered(false);
+                  setHoveredSelectorTab(null);
+                }}
+              >
                 {panelTabs.map((tab, index) => {
                   const isSelected = activePanelTab === tab.id;
+                  const isHoverPreview =
+                    hoveredSelectorTab === tab.id || autoHoverSelectorTab === tab.id;
+                  const isAutoCyclePreview =
+                    hoveredSelectorTab === null && autoHoverSelectorTab === tab.id;
+                  const isIdleCycleActive = autoHoverSelectorTab !== null;
                   const hasAnySelected = activePanelTab !== null;
                   const sideShift =
                     hasAnySelected && !isSelected ? (index === 0 ? -1 : index === 2 ? 1 : 0) : 0;
@@ -1691,41 +1806,53 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       onClick={() => togglePanelTab(tab.id)}
                       className={`inline-flex h-6 items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2 py-[2px] text-[clamp(11px,0.76vw,12px)] font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] ${
                         isSelectorBouncing ? "selector-jolt" : ""
-                      }`}
+                      } ${isAutoCyclePreview ? "selector-auto-bob" : ""}`}
                       style={
                         isSelected
                           ? {
                               backgroundColor: tab.color,
                               borderColor: "#000000",
                               color: "#000000",
-                              boxShadow: "none",
+                              boxShadow: isHoverPreview
+                                ? isAutoCyclePreview
+                                  ? `1px 1px 0 0 ${tab.color}`
+                                  : "1px 1px 0 0 #000000"
+                                : "none",
                               transform: "translateX(0px) scale(1.01)",
                             }
                           : {
+                              borderColor: isHoverPreview ? "#000000" : "rgba(0,0,0,0.5)",
+                              color: "rgb(0,0,0)",
+                              boxShadow: isHoverPreview
+                                ? isAutoCyclePreview
+                                  ? `1px 1px 0 0 ${tab.color}`
+                                  : "1px 1px 0 0 #000000"
+                                : "none",
                               transform: `translateX(${sideShift}px) scale(1)`,
                             }
                       }
-                      onMouseEnter={(event) => {
-                        event.currentTarget.style.borderColor = "#000000";
-                        event.currentTarget.style.color = "#000000";
-                        event.currentTarget.style.boxShadow = "1px 1px 0 0 #000000";
+                      onMouseEnter={() => {
+                        setHoveredSelectorTab(tab.id);
+                        setAutoHoverSelectorTab(null);
                       }}
-                      onMouseLeave={(event) => {
-                        if (isSelected) {
-                          event.currentTarget.style.borderColor = "#000000";
-                          event.currentTarget.style.color = "#000000";
-                          event.currentTarget.style.boxShadow = "none";
-                          return;
+                      onMouseMove={() => {
+                        if (!isSelectorGroupHovered) {
+                          setIsSelectorGroupHovered(true);
                         }
-                        event.currentTarget.style.borderColor = "rgba(0,0,0,0.5)";
-                        event.currentTarget.style.color = "rgb(0,0,0)";
-                        event.currentTarget.style.boxShadow = "none";
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredSelectorTab((prev) =>
+                          prev === tab.id ? null : prev,
+                        );
                       }}
                     >
                       {isSelected ? (
                         <span
                           aria-hidden="true"
-                          className="inline-block h-[5px] w-[5px] bg-black"
+                          className="inline-block h-[5px] w-[5px]"
+                          style={{
+                            backgroundColor: isIdleCycleActive ? tab.color : "#000000",
+                          }}
                         />
                       ) : null}
                       <span>{tab.label}</span>
@@ -1769,9 +1896,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       : activePanelTab
                       ? undefined
                       : {
-                          borderColor: "rgba(0, 0, 0, 0.4)",
+                          borderColor: "rgba(0, 0, 0, 0.2)",
                           backgroundColor: "#F7F7F7",
-                          color: "rgba(0, 0, 0, 0.4)",
+                          color: "rgba(0, 0, 0, 0.2)",
                           cursor: "not-allowed",
                         }
                   }
@@ -1830,9 +1957,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       : activePanelTab
                       ? undefined
                       : {
-                          borderColor: "rgba(0, 0, 0, 0.4)",
+                          borderColor: "rgba(0, 0, 0, 0.2)",
                           backgroundColor: "#F7F7F7",
-                          color: "rgba(0, 0, 0, 0.4)",
+                          color: "rgba(0, 0, 0, 0.2)",
                           cursor: "not-allowed",
                         }
                   }
@@ -1886,9 +2013,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       : canUseTruncateControl
                         ? undefined
                         : {
-                            borderColor: "rgba(0, 0, 0, 0.4)",
+                            borderColor: "rgba(0, 0, 0, 0.2)",
                             backgroundColor: "#F7F7F7",
-                            color: "rgba(0, 0, 0, 0.4)",
+                            color: "rgba(0, 0, 0, 0.2)",
                             cursor: "not-allowed",
                           }
                   }
@@ -1929,14 +2056,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           }`}
         />
 
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
         {!(showOnlySelected && activePanelTab !== "context") ? (
         <div className="flex flex-col" style={{ order: getSectionOrder("context") }}>
           {contextSectionOrder.map((sectionKey, index) =>
             sectionKey === "identity" ? (
               <section
                 key="context-identity"
-                className={`${index === 0 ? "" : "mt-8"} ${reveal(160).className}`}
+                className={`${index === 0 ? "" : "mt-6"} ${reveal(160).className}`}
                 style={reveal(160).style}
               >
                 <div ref={homeIdentityDividerRef}>
@@ -1974,7 +2101,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             ) : (
               <section
                 key="context-external"
-                className={`${index === 0 ? "" : "mt-8"} ${reveal(240).className}`}
+                className={`${index === 0 ? "" : "mt-6"} ${reveal(240).className}`}
                 style={reveal(240).style}
               >
                 <SectionHeader
@@ -1988,17 +2115,17 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     {externalLinks.map((link) => (
                       <a
                         key={link.label}
-                        href="#"
+                        href={link.href}
                         className={`group inline-flex items-center gap-2 border px-3 py-1.5 ${identityScaleClass} font-medium leading-none whitespace-nowrap ${
                           link.disabled
-                            ? "border-black/50 text-black/50"
+                            ? "border-black/20 text-black/20"
                             : "border-black/50 text-black transition-[color,border-color,box-shadow,padding-right] duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] hover:pr-4"
                         }`}
                         style={
                           link.disabled
                             ? {
-                                color: "rgba(0, 0, 0, 0.4)",
-                                borderColor: "rgba(0, 0, 0, 0.4)",
+                                color: "rgba(0, 0, 0, 0.2)",
+                                borderColor: "rgba(0, 0, 0, 0.2)",
                                 boxShadow: "none",
                                 cursor: "wait",
                                 fontWeight: 400,
@@ -2022,6 +2149,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           event.currentTarget.style.boxShadow = "none";
                         }}
                         aria-disabled={link.disabled}
+                        target={link.disabled || link.href.startsWith("mailto:") ? undefined : "_blank"}
+                        rel={link.disabled || link.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
                         onClick={(event) => {
                           if (link.disabled) {
                             event.preventDefault();
@@ -2056,7 +2185,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 return (
                   <section
                     key="entries"
-                    className={`${index === 0 ? "" : "mt-8"} ${entriesReveal.className}`}
+                    className={`${index === 0 ? "" : "mt-6"} ${entriesReveal.className}`}
                     style={{
                       ...entriesReveal.style,
                       cursor:
@@ -2176,7 +2305,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               return (
                 <section
                   key={project.id}
-                  className={`${index === 0 ? "" : "mt-8"} ${workReveal.className}`}
+                  className={`${index === 0 ? "" : "mt-6"} ${workReveal.className}`}
                   style={workReveal.style}
                 >
                   <HeaderWithDivider className="mb-2">
@@ -2232,9 +2361,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     </div>
                   ) : null}
 
-                  {isExpanded &&
-                  project.images.length > workLoadMoreThreshold &&
-                  visibleCount < project.images.length ? (
+                  {isExpanded && visibleCount < project.images.length ? (
                     <div className="mt-2 flex justify-end">
                       <button
                         type="button"
