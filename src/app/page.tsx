@@ -2,26 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const identityColumns = [
-  {
-    id: "identity-1",
-    content: (
-      <>
-        <NameHighlight>Raghav Agarwal</NameHighlight> is a designer working
-        across product, brand, and digital interfaces. His practice is shaped
-        by observation, with a focus on micro interactions, emotional friction,
-        and inconsistencies in how people experience interfaces. He believes
-        design should feel clear and intuitive, where the decisions do not
-        require explanation.
-      </>
-    ),
-  },
-  {
-    id: "identity-2",
-    content:
-      "His work aims to reduce friction and create systems that feel calm, precise, and easy to use. Influenced by the internet and contemporary visual culture, he is interested in how details shape understanding over time, and how consistency can make something feel more coherent the longer it is experienced.",
-  },
-] as const;
+const identityBodyOne =
+  " is a designer working across product, brand, and digital interfaces. His practice is shaped by observation, with a focus on micro interactions, emotional friction, and inconsistencies in how people experience interfaces. He believes design should feel clear and intuitive, where the decisions do not require explanation.";
+const identityBodyTwo =
+  "His work aims to reduce friction and create systems that feel calm, precise, and easy to use. Influenced by the internet and contemporary visual culture, he is interested in how details shape understanding over time, and how consistency can make something feel more coherent the longer it is experienced.";
 
 const externalLinks = [
   { label: "LINKEDIN", disabled: false },
@@ -59,14 +43,32 @@ type DividerRect = {
   width: number;
 };
 type CursorBadgeMode = "read-more" | "close-entry" | null;
-type HoveredControl = "bring" | "show" | null;
+type HoveredControl = "bring" | "show" | "truncate" | null;
 type TrailSquare = {
   id: number;
   x: number;
   y: number;
   color: string;
   size: number;
+  lockedColor?: boolean;
 };
+type Point = {
+  x: number;
+  y: number;
+};
+type ResizeHandle =
+  | "n"
+  | "e"
+  | "s"
+  | "w"
+  | "ne"
+  | "nw"
+  | "se"
+  | "sw";
+
+const PROFILE_ASPECT_RATIO = 4 / 3;
+const PROFILE_MIN_WIDTH = 180;
+const PROFILE_MAX_WIDTH = 860;
 
 const panelTabs: ReadonlyArray<{
   id: PanelTabId;
@@ -80,11 +82,11 @@ const panelTabs: ReadonlyArray<{
 
 const panelCopyByTab: Record<PanelTabId, string> = {
   context:
-    "Context notes live here. This is placeholder copy describing references, influences, and framing details that help ground each section before diving deeper.",
+    "Contextualizing my work along with selected links and background. This includes experience, education, and what I’m currently focused on. Not everything here is part of the work itself, but it helps frame how and why it is made.",
   work:
-    "Work highlights appear here. Placeholder copy for selected projects, process snapshots, and quick outcomes that can be expanded as we add more modules.",
+    "A selection of visual work across product, brand, and digital interfaces. Including client projects, rejected directions, and personal explorations. Some pieces were developed for real use, while others remain as concepts or unused paths. All work is presented without explanation, leaving space for interpretation.",
   entries:
-    "A running collection of thoughts. fragments, notes, and ideas that don't belong anywhere else. some unfinished, some unresolved. mostly just things that don't need to be finished to be worth keeping.",
+    "A running collection of thoughts. Fragments, notes, and ideas that don't belong anywhere else. Some unfinished, some unresolved. Mostly just things that don't need to be finished to be worth keeping.",
 };
 const authorLinkStyle = {
   color: "rgba(0, 0, 0, 0.6)",
@@ -98,14 +100,128 @@ const cursorTrailPalette = [
   "#4B68FF",
   "#FF8A00",
 ];
-const workImageUrls = [
-  "https://www.figma.com/api/mcp/asset/1f578917-2b9f-4975-ade0-5f8f453478e7",
-  "https://www.figma.com/api/mcp/asset/6d463607-4c27-4209-a8e7-7f3b3e4a506f",
-  "https://www.figma.com/api/mcp/asset/024ca564-a714-4508-86e6-95eed25798a9",
-  "https://www.figma.com/api/mcp/asset/267463e7-99d8-47ee-9630-df66a3c93c2d",
-  "https://www.figma.com/api/mcp/asset/16964407-64d7-4d77-8796-790c50687672",
-];
-const workLoadMoreThreshold = 5;
+const workProjects = [
+  {
+    id: "unordinary",
+    title: "UNORDINARY",
+    year: "2024",
+    images: [
+      "/unordinary/Unordinary 1.png",
+      "/unordinary/Unordinary 2.png",
+      "/unordinary/Unordinary 3.png",
+      "/unordinary/Unordinary 4.png",
+      "/unordinary/Unordinary 5.png",
+      "/unordinary/Unordinary 6.png",
+      "/unordinary/Unordinary 7.png",
+      "/unordinary/Unordinary 8.png",
+    ],
+  },
+  {
+    id: "minimum",
+    title: "MINIMUM",
+    year: "2024",
+    images: [
+      "/minimum/Minimum 1.png",
+      "/minimum/Minimum 2.png",
+      "/minimum/Minimum 3.png",
+      "/minimum/Minimum 4.png",
+      "/minimum/Minimum 5.png",
+      "/minimum/Minimum 6.png",
+    ],
+  },
+  {
+    id: "chrono",
+    title: "CHRONO",
+    year: "2024",
+    images: ["/chrono/Chrono 1.png", "/chrono/Chrono 2.png"],
+  },
+  {
+    id: "context",
+    title: "CONTEXT",
+    year: "2024",
+    images: [
+      "/context/Context 1.png",
+      "/context/Context 2.png",
+      "/context/Context 3.png",
+      "/context/Context 4.png",
+      "/context/Context 5.png",
+      "/context/Context 6.png",
+    ],
+  },
+  {
+    id: "crisped",
+    title: "CRISPED",
+    year: "2024",
+    images: [
+      "/crisped/Crisped 1.png",
+      "/crisped/Crisped 2.png",
+      "/crisped/Crisped 3.png",
+    ],
+  },
+  {
+    id: "faktor",
+    title: "FAKTOR",
+    year: "2024",
+    images: ["/faktor/Name.png", "/faktor/Name-1.png", "/faktor/Name-2.png"],
+  },
+  {
+    id: "instafleet",
+    title: "INSTAFLEET",
+    year: "2024",
+    images: [
+      "/instafleet/Instafleet 1.png",
+      "/instafleet/Instafleet 2.png",
+      "/instafleet/Instafleet 3.png",
+    ],
+  },
+  {
+    id: "merge-club",
+    title: "MERGE CLUB",
+    year: "2024",
+    images: [
+      "/merge club/Merge 1.png",
+      "/merge club/Merge 2.png",
+      "/merge club/Merge 3.png",
+      "/merge club/Merge 4.png",
+    ],
+  },
+  {
+    id: "on-deck-founders",
+    title: "ON DECK FOUNDERS",
+    year: "2024",
+    images: [
+      "/on deck founders/ODF 1.png",
+      "/on deck founders/ODF 2.png",
+      "/on deck founders/ODF 3.png",
+      "/on deck founders/ODF 4.png",
+    ],
+  },
+  {
+    id: "para",
+    title: "PARA",
+    year: "2024",
+    images: ["/para/Para 1.png", "/para/Para 2.png"],
+  },
+  {
+    id: "prism-collective",
+    title: "PRISM COLLECTIVE",
+    year: "2024",
+    images: ["/prism collective/Prism 1.png", "/prism collective/Prism 2.png"],
+  },
+  {
+    id: "socratica",
+    title: "SOCRATICA",
+    year: "2024",
+    images: ["/socratica/Socratica 1.png", "/socratica/Socratica 2.png"],
+  },
+  {
+    id: "zero-email",
+    title: "ZERO EMAIL",
+    year: "2024",
+    images: ["/zero email/Zero 1.png", "/zero email/Zero 2.png"],
+  },
+] as const;
+const workLoadMoreThreshold = 6;
 const identityScaleClass = "text-[clamp(16px,1.35vw,20px)]";
 const entryTitle = "LIVING WITHOUT REGRETS";
 const entryYear = "2025";
@@ -210,6 +326,15 @@ function ArrowIcon() {
   );
 }
 
+function shuffleArray<T>(items: readonly T[]): T[] {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
 function hslToRgb(hue: number, saturation: number, lightness: number) {
   const s = saturation / 100;
   const l = lightness / 100;
@@ -259,7 +384,15 @@ function pickRandomNameHighlight() {
   };
 }
 
-function NameHighlight({ children }: { children: React.ReactNode }) {
+function NameHighlight({
+  children,
+  onActivate,
+  isActive = false,
+}: {
+  children: React.ReactNode;
+  onActivate?: () => void;
+  isActive?: boolean;
+}) {
   const defaultStyles = {
     background: "rgba(0, 0, 0, 0.05)",
     text: "rgba(0, 0, 0, 0.5)",
@@ -267,18 +400,39 @@ function NameHighlight({ children }: { children: React.ReactNode }) {
   const [styles, setStyles] = useState(defaultStyles);
 
   return (
-    <span
-      className="cursor-cell px-0.5 transition-colors duration-220 ease-out"
-      style={{ backgroundColor: styles.background, color: styles.text }}
+    <button
+      type="button"
+      onClick={onActivate}
+      className="m-0 inline-flex appearance-none items-center gap-1 border-0 bg-transparent p-0 px-0.5 transition-colors duration-220 ease-out"
+      style={
+        isActive
+          ? { backgroundColor: "#000000", color: "#FFFFFF", cursor: "crosshair" }
+          : {
+              backgroundColor: styles.background,
+              color: styles.text,
+              cursor: "crosshair",
+            }
+      }
       onMouseEnter={() => {
+        if (isActive) {
+          return;
+        }
         setStyles(pickRandomNameHighlight());
       }}
       onMouseLeave={() => {
+        if (isActive) {
+          return;
+        }
         setStyles(defaultStyles);
       }}
     >
-      {children}
-    </span>
+      <span>{children}</span>
+      {isActive ? (
+        <span aria-hidden="true" className="text-[24px] leading-none text-white">
+          ×
+        </span>
+      ) : null}
+    </button>
   );
 }
 
@@ -301,7 +455,7 @@ function BringToTopIcon({
       aria-hidden="true"
     >
       <path
-        d="M7 14L12 9L17 14H7Z"
+        d="M7 15L12 9L17 15H7Z"
         fill={
           error
             ? "#DC2626"
@@ -352,6 +506,34 @@ function ShowHideIcon({
   );
 }
 
+function TruncateIcon({
+  disabled = false,
+  error = false,
+}: {
+  disabled?: boolean;
+  error?: boolean;
+}) {
+  const fill = error
+    ? "#DC2626"
+    : disabled
+      ? "rgba(0,0,0,0.2)"
+      : "black";
+
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path d="M8 14H16" stroke={fill} strokeWidth="2" />
+      <path d="M8 10H16" stroke={fill} strokeWidth="2" />
+    </svg>
+  );
+}
+
 type SitePageProps = {
   defaultTab?: PanelTabId | null;
 };
@@ -380,6 +562,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [cursorBadgePosition, setCursorBadgePosition] = useState({ x: 0, y: 0 });
   const [hoveredControl, setHoveredControl] = useState<HoveredControl>(null);
   const [hoveredLocationToggle, setHoveredLocationToggle] = useState(false);
+  const [hoveredProfileImage, setHoveredProfileImage] = useState(false);
+  const [profileTooltipFlip, setProfileTooltipFlip] = useState(false);
   const [isEntriesHeaderHovered, setIsEntriesHeaderHovered] = useState(false);
   const [sectionPriority, setSectionPriority] = useState<PanelTabId | null>(
     initialTab,
@@ -390,10 +574,48 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [invalidControlFlash, setInvalidControlFlash] = useState<HoveredControl>(
     null,
   );
-  const [visibleWorkImageCount, setVisibleWorkImageCount] = useState(
-    workImageUrls.length > workLoadMoreThreshold
-      ? workLoadMoreThreshold
-      : workImageUrls.length,
+  const [isTruncateMode, setIsTruncateMode] = useState(false);
+  const [expandedInTruncate, setExpandedInTruncate] = useState<Record<string, boolean>>({
+    contextIdentity: false,
+    contextExternal: false,
+    ...Object.fromEntries(workProjects.map((project) => [`work:${project.id}`, false])),
+    entries: false,
+  });
+  const [isProfileWindowOpen, setIsProfileWindowOpen] = useState(false);
+  const [isProfileWindowSelected, setIsProfileWindowSelected] = useState(false);
+  const [isProfileWindowDragging, setIsProfileWindowDragging] = useState(false);
+  const [isProfileWindowResizing, setIsProfileWindowResizing] = useState(false);
+  const [activeResizeHandle, setActiveResizeHandle] = useState<ResizeHandle | null>(
+    null,
+  );
+  const [profileWindowPosition, setProfileWindowPosition] = useState<Point | null>(
+    null,
+  );
+  const [profileWindowSize, setProfileWindowSize] = useState({
+    width: 520,
+    height: Math.round(520 / PROFILE_ASPECT_RATIO),
+  });
+  const [visibleWorkImageCountByProject, setVisibleWorkImageCountByProject] =
+    useState<Record<string, number>>(
+      Object.fromEntries(
+        workProjects.map((project) => [
+          project.id,
+          project.images.length > workLoadMoreThreshold
+            ? workLoadMoreThreshold
+            : project.images.length,
+        ]),
+      ),
+    );
+  const [mixedWorkEntriesOrder] = useState(() =>
+    shuffleArray([...workProjects.map((project) => `work:${project.id}`), "entries"]),
+  );
+  const [workImageOrderByProject] = useState<Record<string, string[]>>(() =>
+    Object.fromEntries(
+      workProjects.map((project) => [project.id, shuffleArray(project.images)]),
+    ),
+  );
+  const [contextSectionOrder] = useState<("identity" | "external")[]>(() =>
+    Math.random() < 0.5 ? ["identity", "external"] : ["external", "identity"],
   );
   const lastTrailTimeRef = useRef(0);
   const lastTrailPointRef = useRef({ x: 0, y: 0 });
@@ -403,6 +625,17 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const previewTimeoutRef = useRef<number | null>(null);
   const entryPhaseTimeoutRef = useRef<number | null>(null);
   const invalidControlFlashTimeoutRef = useRef<number | null>(null);
+  const profileWindowRef = useRef<HTMLDivElement | null>(null);
+  const profileWindowDragOffsetRef = useRef<Point>({ x: 0, y: 0 });
+  const profileWindowResizeStartRef = useRef<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    left: number;
+    top: number;
+    handle: ResizeHandle;
+  } | null>(null);
   const homeEntryDividerRef = useRef<HTMLDivElement | null>(null);
   const homeIdentityDividerRef = useRef<HTMLDivElement | null>(null);
   const entryOverlayHeaderRef = useRef<HTMLDivElement | null>(null);
@@ -456,7 +689,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     const spawnTrailSquare = (
       clientX: number,
       clientY: number,
-      options?: { color?: string; size?: number },
+      options?: { color?: string; size?: number; lockedColor?: boolean },
     ) => {
       trailIdRef.current += 1;
       const id = trailIdRef.current;
@@ -476,6 +709,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             y: clientY - 2,
             color,
             size,
+            lockedColor: options?.lockedColor ?? false,
           },
         ];
         return next.length > 14 ? next.slice(next.length - 14) : next;
@@ -506,18 +740,265 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       spawnTrailSquare(event.clientX, event.clientY, {
         color: "#000000",
         size: 8,
+        lockedColor: true,
       });
     };
+
+    const recolorInterval = window.setInterval(() => {
+      setTrailSquares((prev) =>
+        prev.map((square) =>
+          square.lockedColor
+            ? square
+            : {
+                ...square,
+                color:
+                  cursorTrailPalette[
+                    Math.floor(Math.random() * cursorTrailPalette.length)
+                  ],
+              },
+        ),
+      );
+    }, 500);
 
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
     window.addEventListener("pointerdown", handlePointerDown, { passive: true });
     return () => {
+      window.clearInterval(recolorInterval);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerdown", handlePointerDown);
     };
   }, []);
 
+  useEffect(() => {
+    if (!isProfileWindowOpen) {
+      return;
+    }
+
+    const handleOutsideSelect = (event: PointerEvent) => {
+      if (!profileWindowRef.current) {
+        return;
+      }
+      if (!profileWindowRef.current.contains(event.target as Node)) {
+        setIsProfileWindowSelected(false);
+      }
+    };
+
+    window.addEventListener("pointerdown", handleOutsideSelect);
+    return () => {
+      window.removeEventListener("pointerdown", handleOutsideSelect);
+    };
+  }, [isProfileWindowOpen]);
+
+  useEffect(() => {
+    if (!isProfileWindowOpen || !isProfileWindowSelected) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Backspace" && event.key !== "Delete") {
+        return;
+      }
+      event.preventDefault();
+      setIsProfileWindowOpen(false);
+      setIsProfileWindowSelected(false);
+      setIsProfileWindowDragging(false);
+      setIsProfileWindowResizing(false);
+      setActiveResizeHandle(null);
+      setHoveredProfileImage(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isProfileWindowOpen, isProfileWindowSelected]);
+
+  useEffect(() => {
+    if (!isProfileWindowOpen || !hoveredProfileImage) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setProfileTooltipFlip((prev) => !prev);
+    }, 3000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [hoveredProfileImage, isProfileWindowOpen]);
+
   const activeLocation = locations[locationKey];
+
+  const openProfileWindow = () => {
+    if (isProfileWindowOpen) {
+      setIsProfileWindowOpen(false);
+      setIsProfileWindowSelected(false);
+      setIsProfileWindowDragging(false);
+      setIsProfileWindowResizing(false);
+      setActiveResizeHandle(null);
+      setHoveredProfileImage(false);
+      return;
+    }
+
+    if (typeof window === "undefined") {
+      return;
+    }
+    const cardWidth = Math.min(520, Math.round(window.innerWidth * 0.72));
+    const cardHeight = Math.round(cardWidth / PROFILE_ASPECT_RATIO);
+    setProfileWindowSize({ width: cardWidth, height: cardHeight });
+    setProfileWindowPosition({
+      x: Math.max(16, Math.round((window.innerWidth - cardWidth) / 2)),
+      y: Math.max(24, Math.round((window.innerHeight - cardHeight) / 2)),
+    });
+    setIsProfileWindowOpen(true);
+    setIsProfileWindowSelected(true);
+  };
+
+  const handleProfileWindowPointerDown = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (!isProfileWindowOpen || !profileWindowPosition || isProfileWindowResizing) {
+      return;
+    }
+    if ((event.target as HTMLElement).closest("[data-drag-ignore='true']")) {
+      return;
+    }
+
+    event.preventDefault();
+    setIsProfileWindowSelected(true);
+    setIsProfileWindowDragging(true);
+    profileWindowDragOffsetRef.current = {
+      x: event.clientX - profileWindowPosition.x,
+      y: event.clientY - profileWindowPosition.y,
+    };
+
+    const handleMove = (moveEvent: PointerEvent) => {
+      const maxX = Math.max(16, window.innerWidth - profileWindowSize.width - 16);
+      const maxY = Math.max(16, window.innerHeight - profileWindowSize.height - 16);
+      setProfileWindowPosition({
+        x: Math.min(
+          maxX,
+          Math.max(16, moveEvent.clientX - profileWindowDragOffsetRef.current.x),
+        ),
+        y: Math.min(
+          maxY,
+          Math.max(16, moveEvent.clientY - profileWindowDragOffsetRef.current.y),
+        ),
+      });
+    };
+
+    const handleUp = () => {
+      setIsProfileWindowDragging(false);
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+    };
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp, { once: true });
+  };
+
+  const handleProfileResizeStart = (
+    handle: ResizeHandle,
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (!profileWindowPosition) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    setIsProfileWindowSelected(true);
+    setIsProfileWindowResizing(true);
+    setActiveResizeHandle(handle);
+
+    profileWindowResizeStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      width: profileWindowSize.width,
+      height: profileWindowSize.height,
+      left: profileWindowPosition.x,
+      top: profileWindowPosition.y,
+      handle,
+    };
+
+    const clamp = (value: number, min: number, max: number) =>
+      Math.min(max, Math.max(min, value));
+
+    const handleMove = (moveEvent: PointerEvent) => {
+      const start = profileWindowResizeStartRef.current;
+      if (!start) {
+        return;
+      }
+
+      const dx = moveEvent.clientX - start.x;
+      const dy = moveEvent.clientY - start.y;
+      const h = start.handle;
+      const maxWidth = Math.min(PROFILE_MAX_WIDTH, window.innerWidth - 32);
+      const minWidth = Math.min(PROFILE_MIN_WIDTH, maxWidth);
+
+      let nextWidth = start.width;
+      let nextHeight = start.height;
+      let nextLeft = start.left;
+      let nextTop = start.top;
+
+      if ((h === "ne" || h === "nw" || h === "se" || h === "sw")) {
+        const deltaFromX = h.includes("e") ? dx : -dx;
+        const deltaFromY = h.includes("s") ? dy * PROFILE_ASPECT_RATIO : -dy * PROFILE_ASPECT_RATIO;
+        const deltaWidth =
+          Math.abs(deltaFromX) > Math.abs(deltaFromY) ? deltaFromX : deltaFromY;
+        nextWidth = clamp(start.width + deltaWidth, minWidth, maxWidth);
+        nextHeight = nextWidth / PROFILE_ASPECT_RATIO;
+        if (h.includes("w")) {
+          nextLeft = start.left + (start.width - nextWidth);
+        }
+        if (h.includes("n")) {
+          nextTop = start.top + (start.height - nextHeight);
+        }
+      } else if (h === "e" || h === "w") {
+        const deltaWidth = h === "e" ? dx : -dx;
+        nextWidth = clamp(start.width + deltaWidth, minWidth, maxWidth);
+        nextHeight = nextWidth / PROFILE_ASPECT_RATIO;
+        if (h === "w") {
+          nextLeft = start.left + (start.width - nextWidth);
+        }
+        nextTop = start.top - (nextHeight - start.height) / 2;
+      } else {
+        const deltaHeight = h === "s" ? dy : -dy;
+        const rawHeight = start.height + deltaHeight;
+        const rawWidth = rawHeight * PROFILE_ASPECT_RATIO;
+        nextWidth = clamp(rawWidth, minWidth, maxWidth);
+        nextHeight = nextWidth / PROFILE_ASPECT_RATIO;
+        if (h === "n") {
+          nextTop = start.top + (start.height - nextHeight);
+        }
+        nextLeft = start.left - (nextWidth - start.width) / 2;
+      }
+
+      const margin = 8;
+      nextLeft = clamp(nextLeft, margin, window.innerWidth - nextWidth - margin);
+      nextTop = clamp(nextTop, margin, window.innerHeight - nextHeight - margin);
+
+      setProfileWindowSize({
+        width: Math.round(nextWidth),
+        height: Math.round(nextHeight),
+      });
+      setProfileWindowPosition({
+        x: Math.round(nextLeft),
+        y: Math.round(nextTop),
+      });
+    };
+
+    const handleUp = () => {
+      setIsProfileWindowResizing(false);
+      setActiveResizeHandle(null);
+      profileWindowResizeStartRef.current = null;
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+    };
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp, { once: true });
+  };
 
   const handleLocationToggle = () => {
     setLocationKey((prev) => (prev === "waterloo" ? "calgary" : "waterloo"));
@@ -543,6 +1024,13 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       setActivePanelTab(null);
       setSectionPriority(null);
       setShowOnlySelected(false);
+      setIsTruncateMode(false);
+      setExpandedInTruncate({
+        contextIdentity: false,
+        contextExternal: false,
+        ...Object.fromEntries(workProjects.map((project) => [`work:${project.id}`, false])),
+        entries: false,
+      });
       displayClearTimeoutRef.current = window.setTimeout(
         () => setDisplayPanelTab(null),
         320,
@@ -552,6 +1040,17 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
     setDisplayPanelTab(tabId);
     setActivePanelTab(tabId);
+  };
+
+  const toggleSectionContent = (sectionKey: string, tab: PanelTabId) => {
+    if (truncateModeActive) {
+      setExpandedInTruncate((prev) => ({
+        ...prev,
+        [sectionKey]: !prev[sectionKey],
+      }));
+      return;
+    }
+    togglePanelTab(tab);
   };
 
   useEffect(() => {
@@ -641,7 +1140,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   };
 
   const updateCursorBadgePosition = (event: React.MouseEvent<HTMLElement>) => {
-    setCursorBadgePosition({ x: event.clientX + 14, y: event.clientY + 14 });
+    setCursorBadgePosition({ x: event.clientX, y: event.clientY });
   };
 
   const handleBringSelectedToTop = () => {
@@ -667,6 +1166,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     }, 420);
   };
 
+  const canUseTruncateControl = activePanelTab !== null && showOnlySelected;
+  const truncateModeActive = isTruncateMode && canUseTruncateControl;
+
   const cursorControlLabel =
     !hoveredControl || !activePanelTab
       ? null
@@ -674,29 +1176,90 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         ? isBringToTopActive
           ? "RETURN TO DEFAULT"
           : "BRING TO TOP"
+        : hoveredControl === "truncate"
+          ? canUseTruncateControl
+            ? "TRUNCATE"
+            : null
         : showOnlySelected
           ? "SHOW ALL"
           : `SHOW ${activePanelTab.toUpperCase()} ONLY`;
+
   const cursorLocationLabel = hoveredLocationToggle
     ? locationKey === "waterloo"
       ? "SHOW CALGARY"
       : "SHOW WATERLOO"
     : null;
+  const cursorProfileImageLabel = hoveredProfileImage
+    ? profileTooltipFlip
+      ? "DEL/BACKSPACE TO CLOSE"
+      : "MAR 29 2026 8:04PM"
+    : null;
+  const activeCursorBadgeText = cursorControlLabel
+    ? cursorControlLabel
+    : cursorLocationLabel
+      ? cursorLocationLabel
+      : cursorProfileImageLabel
+        ? cursorProfileImageLabel
+        : cursorBadgeMode === "read-more"
+          ? "READ MORE"
+          : cursorBadgeMode === "close-entry"
+            ? "CLOSE ENTRY"
+            : "";
+
+  const badgeOffset = 14;
+  const estimatedBadgeWidth = Math.max(88, activeCursorBadgeText.length * 7.1 + 18);
+  const estimatedBadgeHeight = 26;
+  const viewportWidth =
+    typeof window !== "undefined" ? window.innerWidth : Number.POSITIVE_INFINITY;
+  const viewportHeight =
+    typeof window !== "undefined" ? window.innerHeight : Number.POSITIVE_INFINITY;
+  const flipX =
+    cursorBadgePosition.x + badgeOffset + estimatedBadgeWidth > viewportWidth - 8;
+  const flipY =
+    cursorBadgePosition.y + badgeOffset + estimatedBadgeHeight > viewportHeight - 8;
 
   const getSectionOrder = (group: PanelTabId) => {
-    const baseOrder: Record<PanelTabId, number> = {
-      context: 0,
-      work: 1,
-      entries: 2,
-    };
-    if (!sectionPriority) {
-      return baseOrder[group];
-    }
-    if (group === sectionPriority) {
+    if (group === "context") {
       return 0;
     }
-    return baseOrder[group] + 1;
+    if (sectionPriority === "work") {
+      return group === "work" ? 1 : 2;
+    }
+    if (sectionPriority === "entries") {
+      return group === "entries" ? 1 : 2;
+    }
+    return group === "work" ? 1 : 2;
   };
+  const orderedMixedWorkEntries = (() => {
+    if (sectionPriority === "work") {
+      return [
+        ...mixedWorkEntriesOrder.filter((item) => item.startsWith("work:")),
+        ...mixedWorkEntriesOrder.filter((item) => item === "entries"),
+      ];
+    }
+    if (sectionPriority === "entries") {
+      return [
+        ...mixedWorkEntriesOrder.filter((item) => item === "entries"),
+        ...mixedWorkEntriesOrder.filter((item) => item.startsWith("work:")),
+      ];
+    }
+    return mixedWorkEntriesOrder;
+  })();
+  const visibleMixedWorkEntries = orderedMixedWorkEntries.filter((item) => {
+    if (!(showOnlySelected && activePanelTab)) {
+      return true;
+    }
+    if (activePanelTab === "work") {
+      return item.startsWith("work:");
+    }
+    if (activePanelTab === "entries") {
+      return item === "entries";
+    }
+    return false;
+  });
+  const workProjectById = Object.fromEntries(
+    workProjects.map((project) => [project.id, project]),
+  );
 
   const isEntryOverlayVisible =
     entryPhase === "entry-visible" ||
@@ -716,35 +1279,135 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
   return (
     <main className="relative min-h-screen bg-background pb-20 pt-4">
-      {cursorControlLabel || cursorLocationLabel || cursorBadgeMode ? (
+      {cursorControlLabel ||
+      cursorLocationLabel ||
+      cursorProfileImageLabel ||
+      cursorBadgeMode ? (
         <div
           className="pointer-events-none fixed z-[120]"
           style={{
-            left: cursorBadgePosition.x,
-            top: cursorBadgePosition.y,
-            transform: "translate3d(0,0,0)",
+            left: cursorBadgePosition.x + (flipX ? -badgeOffset : badgeOffset),
+            top: cursorBadgePosition.y + (flipY ? -badgeOffset : badgeOffset),
+            transform: `translate3d(${flipX ? "-100%" : "0"},${flipY ? "-100%" : "0"},0)`,
           }}
         >
           {cursorControlLabel ? (
-            <span className="inline-flex items-center bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               {cursorControlLabel}
             </span>
           ) : cursorLocationLabel ? (
-            <span className="inline-flex items-center bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               {cursorLocationLabel}
             </span>
+          ) : cursorProfileImageLabel ? (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              {cursorProfileImageLabel}
+            </span>
           ) : cursorBadgeMode === "read-more" ? (
-            <span className="inline-flex items-center bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               READ MORE
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center gap-1 whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               <span aria-hidden="true" className="text-[11px] leading-none">
                 ×
               </span>
               CLOSE ENTRY
             </span>
           )}
+        </div>
+      ) : null}
+
+      {isProfileWindowOpen && profileWindowPosition ? (
+        <div
+          ref={profileWindowRef}
+          className={`fixed z-[95] transition-[box-shadow,border-color] duration-180 ease-out ${
+            isProfileWindowSelected
+              ? "border-2 border-[#00A1FF]"
+              : "border-2 border-transparent"
+          } ${
+            isProfileWindowResizing
+              ? activeResizeHandle === "nw" || activeResizeHandle === "se"
+                ? "cursor-nwse-resize"
+                : activeResizeHandle === "ne" || activeResizeHandle === "sw"
+                  ? "cursor-nesw-resize"
+                  : activeResizeHandle === "n" || activeResizeHandle === "s"
+                    ? "cursor-ns-resize"
+                    : activeResizeHandle === "e" || activeResizeHandle === "w"
+                      ? "cursor-ew-resize"
+                      : "cursor-default"
+              : isProfileWindowDragging
+                ? "cursor-grabbing"
+                : "cursor-grab"
+          } profile-window-pop`}
+          style={{
+            left: profileWindowPosition.x,
+            top: profileWindowPosition.y,
+            width: profileWindowSize.width,
+            height: profileWindowSize.height,
+          }}
+          onPointerDown={handleProfileWindowPointerDown}
+          onClick={() => setIsProfileWindowSelected(true)}
+        >
+          <img
+            src="/profile.png"
+            alt="Raghav portrait"
+            className="block h-full w-full select-none object-cover"
+            draggable={false}
+            onMouseEnter={(event) => {
+              setProfileTooltipFlip(false);
+              setHoveredProfileImage(true);
+              updateCursorBadgePosition(event);
+            }}
+            onMouseMove={updateCursorBadgePosition}
+            onMouseLeave={() => {
+              setHoveredProfileImage(false);
+            }}
+          />
+          {isProfileWindowSelected ? (
+            <>
+              <div
+                data-drag-ignore="true"
+                className="absolute -left-1.5 -top-1.5 h-3 w-3 cursor-nwse-resize border-2 border-[#00A1FF] bg-white"
+                onPointerDown={(event) => handleProfileResizeStart("nw", event)}
+              />
+              <div
+                data-drag-ignore="true"
+                className="absolute -right-1.5 -top-1.5 h-3 w-3 cursor-nesw-resize border-2 border-[#00A1FF] bg-white"
+                onPointerDown={(event) => handleProfileResizeStart("ne", event)}
+              />
+              <div
+                data-drag-ignore="true"
+                className="absolute -right-1.5 -bottom-1.5 h-3 w-3 cursor-nwse-resize border-2 border-[#00A1FF] bg-white"
+                onPointerDown={(event) => handleProfileResizeStart("se", event)}
+              />
+              <div
+                data-drag-ignore="true"
+                className="absolute -bottom-1.5 -left-1.5 h-3 w-3 cursor-nesw-resize border-2 border-[#00A1FF] bg-white"
+                onPointerDown={(event) => handleProfileResizeStart("sw", event)}
+              />
+              <div
+                data-drag-ignore="true"
+                className="absolute left-3 right-3 -top-1 h-2 cursor-ns-resize"
+                onPointerDown={(event) => handleProfileResizeStart("n", event)}
+              />
+              <div
+                data-drag-ignore="true"
+                className="absolute left-3 right-3 -bottom-1 h-2 cursor-ns-resize"
+                onPointerDown={(event) => handleProfileResizeStart("s", event)}
+              />
+              <div
+                data-drag-ignore="true"
+                className="absolute -left-1 top-3 bottom-3 w-2 cursor-ew-resize"
+                onPointerDown={(event) => handleProfileResizeStart("w", event)}
+              />
+              <div
+                data-drag-ignore="true"
+                className="absolute -right-1 top-3 bottom-3 w-2 cursor-ew-resize"
+                onPointerDown={(event) => handleProfileResizeStart("e", event)}
+              />
+            </>
+          ) : null}
         </div>
       ) : null}
 
@@ -959,7 +1622,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   isIntroOpen ? "opacity-100 delay-320" : "opacity-0 delay-0"
                 }`}
               >
-                <p className="text-[12px] leading-[1.5] text-black/40 text-left">
+                <p className="text-[12px] leading-[1.5] text-black/40 text-justify">
                   The idea for this version of the website began in March of
                   2025, then was paused due to a lack of creative vision. It
                   was revisited a few weeks later following a shift in
@@ -970,7 +1633,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   making.
                 </p>
 
-                <p className="mt-2 text-[12px] leading-[1.5] text-black/40 text-left">
+                <p className="mt-2 text-[12px] leading-[1.5] text-black/40 text-justify">
                   Inspired by the works of{" "}
                   <a
                     href="#"
@@ -1135,7 +1798,21 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       triggerDisabledControlFeedback("show");
                       return;
                     }
-                    setShowOnlySelected((prev) => !prev);
+                    setShowOnlySelected((prev) => {
+                      const next = !prev;
+                      if (!next) {
+                        setIsTruncateMode(false);
+                        setExpandedInTruncate({
+                          contextIdentity: false,
+                          contextExternal: false,
+                          ...Object.fromEntries(
+                            workProjects.map((project) => [`work:${project.id}`, false]),
+                          ),
+                          entries: false,
+                        });
+                      }
+                      return next;
+                    });
                   }}
                   onMouseEnter={(event) => {
                     setHoveredControl("show");
@@ -1166,6 +1843,61 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     error={invalidControlFlash === "show"}
                   />
                 </button>
+                <button
+                  type="button"
+                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border transition-colors ${
+                    invalidControlFlash === "truncate"
+                      ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
+                      : "border-black/50 bg-[#F7F7F7]"
+                  }`}
+                  onClick={() => {
+                    if (!canUseTruncateControl) {
+                      triggerDisabledControlFeedback("truncate");
+                      return;
+                    }
+                    setIsTruncateMode((prev) => {
+                      const next = !prev;
+                      if (next) {
+                        setExpandedInTruncate({
+                          contextIdentity: false,
+                          contextExternal: false,
+                          ...Object.fromEntries(
+                            workProjects.map((project) => [`work:${project.id}`, false]),
+                          ),
+                          entries: false,
+                        });
+                      }
+                      return next;
+                    });
+                  }}
+                  onMouseEnter={(event) => {
+                    setHoveredControl("truncate");
+                    updateCursorBadgePosition(event);
+                  }}
+                  onMouseMove={updateCursorBadgePosition}
+                  onMouseLeave={() => {
+                    setHoveredControl(null);
+                  }}
+                  aria-label="Truncate visible section content"
+                  aria-disabled={!canUseTruncateControl}
+                  style={
+                    invalidControlFlash === "truncate"
+                      ? { cursor: "not-allowed" }
+                      : canUseTruncateControl
+                        ? undefined
+                        : {
+                            borderColor: "rgba(0, 0, 0, 0.4)",
+                            backgroundColor: "#F7F7F7",
+                            color: "rgba(0, 0, 0, 0.4)",
+                            cursor: "not-allowed",
+                          }
+                  }
+                >
+                  <TruncateIcon
+                    disabled={!canUseTruncateControl}
+                    error={invalidControlFlash === "truncate"}
+                  />
+                </button>
               </div>
             </div>
 
@@ -1181,7 +1913,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   activePanelTab ? "opacity-100 delay-140" : "opacity-0 delay-0"
                 } ${isSelectorBouncing && activePanelTab ? "selector-jolt" : ""}`}
               >
-                <p className="text-[12px] leading-[1.5] text-black/40 text-left">
+                <p className="text-[12px] leading-[1.5] text-black/40 text-justify">
                   {displayPanelTab ? panelCopyByTab[displayPanelTab] : ""}
                 </p>
               </div>
@@ -1200,268 +1932,331 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         <div className="flex flex-col gap-8">
         {!(showOnlySelected && activePanelTab !== "context") ? (
         <div className="flex flex-col" style={{ order: getSectionOrder("context") }}>
-          <section className={reveal(160).className} style={reveal(160).style}>
-          <div ref={homeIdentityDividerRef}>
-            <SectionHeader
-              activeTab={activePanelTab}
-              secondary="IDENTITY"
-              onClick={() => togglePanelTab("context")}
-            />
-          </div>
-
-          <div className="mt-2 grid gap-6 md:grid-cols-2 xl:gap-6">
-            {identityColumns.map((column) => (
-              <p
-                key={column.id}
-                className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/80 text-justify`}
-                style={{ fontFeatureSettings: "'salt' 1" }}
+          {contextSectionOrder.map((sectionKey, index) =>
+            sectionKey === "identity" ? (
+              <section
+                key="context-identity"
+                className={`${index === 0 ? "" : "mt-8"} ${reveal(160).className}`}
+                style={reveal(160).style}
               >
-                {column.content}
-              </p>
-            ))}
-          </div>
-          </section>
-
-          <section className={`mt-8 ${reveal(240).className}`} style={reveal(240).style}>
-            <SectionHeader
-              activeTab={activePanelTab}
-              secondary="EXTERNAL"
-              onClick={() => togglePanelTab("context")}
-            />
-
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {externalLinks.map((link) => (
-                <a
-                key={link.label}
-                href="#"
-                className={`group inline-flex items-center gap-2 border px-3 py-1.5 ${identityScaleClass} font-medium leading-none whitespace-nowrap ${
-                  link.disabled
-                    ? "border-black/50 text-black/50"
-                    : "border-black/50 text-black transition-[color,border-color,box-shadow,padding-right] duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] hover:pr-4"
-                }`}
-                style={
-                  link.disabled
-                    ? {
-                        color: "rgba(0, 0, 0, 0.4)",
-                        borderColor: "rgba(0, 0, 0, 0.4)",
-                        boxShadow: "none",
-                        cursor: "wait",
-                        fontWeight: 400,
-                      }
-                    : { boxShadow: "none" }
-                }
-                onMouseEnter={(event) => {
-                  if (link.disabled) {
-                    return;
-                  }
-                  event.currentTarget.style.color = "#003CFF";
-                  event.currentTarget.style.borderColor = "#003CFF";
-                  event.currentTarget.style.boxShadow = "2px 2px 0 0 #003CFF";
-                }}
-                onMouseLeave={(event) => {
-                  if (link.disabled) {
-                    return;
-                  }
-                  event.currentTarget.style.color = "#000000";
-                  event.currentTarget.style.borderColor = "rgba(0,0,0,0.5)";
-                  event.currentTarget.style.boxShadow = "none";
-                }}
-                aria-disabled={link.disabled}
-                onClick={(event) => {
-                  if (link.disabled) {
-                    event.preventDefault();
-                  }
-                }}
-              >
-                <span className="text-current transition-colors duration-260">
-                  {link.label}
-                </span>
-                <span
-                  className={`inline-flex h-5 w-5 items-center justify-center shrink-0 transition-transform duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                    link.disabled ? "" : "group-hover:translate-x-1"
-                  }`}
-                >
-                  <ArrowIcon />
-                </span>
-                </a>
-              ))}
-            </div>
-          </section>
-        </div>
-        ) : null}
-
-        {!(showOnlySelected && activePanelTab !== "work") ? (
-        <div className="flex flex-col" style={{ order: getSectionOrder("work") }}>
-          <section className={reveal(300).className} style={reveal(300).style}>
-          <HeaderWithDivider className="mb-2">
-            <button
-              type="button"
-              className="flex w-full items-center justify-between text-[12px] font-medium tracking-[0.05em] text-muted text-left"
-              onClick={() => togglePanelTab("work")}
-              aria-label="Show work section"
-            >
-              <div className="flex items-center gap-2">
-                <span
-                  className="px-1.5 py-0.5"
-                  style={
-                    activePanelTab === "work"
-                      ? { backgroundColor: "#FF4FD9", color: "#000000" }
-                      : { backgroundColor: "rgba(0,0,0,0.05)" }
-                  }
-                >
-                  WORK
-                </span>
-                <span
-                  className={`font-medium ${
-                    activePanelTab === "work" ? "text-black/80" : ""
-                  }`}
-                >
-                  UNORDINARY
-                </span>
-              </div>
-
-              <span className="font-medium">2024</span>
-            </button>
-          </HeaderWithDivider>
-
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {workImageUrls.slice(0, visibleWorkImageCount).map((src) => (
-              <button
-                key={src}
-                type="button"
-                className="relative w-full overflow-hidden bg-black/5 text-left"
-                onClick={() => handleWorkImageClick(src)}
-                aria-label="Preview work image"
-              >
-                <img
-                  src={src}
-                  alt=""
-                  className="aspect-[16/9] h-auto w-full select-none object-cover"
-                  draggable={false}
-                />
-              </button>
-            ))}
-          </div>
-
-          {workImageUrls.length > workLoadMoreThreshold &&
-          visibleWorkImageCount < workImageUrls.length ? (
-            <div className="mt-2 flex justify-end">
-              <button
-                type="button"
-                className="bg-black/10 px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black"
-                onClick={() =>
-                  setVisibleWorkImageCount((count) =>
-                    Math.min(count + 2, workImageUrls.length),
-                  )
-                }
-              >
-                LOAD MORE
-              </button>
-            </div>
-          ) : null}
-          </section>
-        </div>
-        ) : null}
-
-        {!(showOnlySelected && activePanelTab !== "entries") ? (
-        <div className="flex flex-col" style={{ order: getSectionOrder("entries") }}>
-          {(() => {
-            const entriesReveal = reveal(340);
-            return (
-          <section
-          className={entriesReveal.className}
-          style={{
-            ...entriesReveal.style,
-            cursor:
-              entryPhase === "closed" && cursorBadgeMode === "read-more"
-                ? "nesw-resize"
-                : "pointer",
-          }}
-          onMouseEnter={(event) => {
-            if (entryPhase === "closed" && !isEntriesHeaderHovered) {
-              setCursorBadgeMode("read-more");
-              updateCursorBadgePosition(event);
-            }
-          }}
-          onMouseMove={(event) => {
-            if (entryPhase === "closed" && !isEntriesHeaderHovered) {
-              updateCursorBadgePosition(event);
-            }
-          }}
-          onMouseLeave={() => {
-            if (cursorBadgeMode === "read-more") {
-              setCursorBadgeMode(null);
-            }
-          }}
-          onClick={() => {
-            if (entryPhase === "closed") {
-              openEntry();
-            }
-          }}
-        >
-          <div ref={homeEntryDividerRef}>
-            <HeaderWithDivider
-              className="mb-2"
-              dividerClassName={
-                activePanelTab === "entries" ? "bg-[#FFE500]" : ""
-              }
-            >
-              <button
-                type="button"
-                className="flex w-full items-center justify-between text-[12px] font-medium tracking-[0.05em] text-muted text-left"
-                onMouseEnter={() => {
-                  setIsEntriesHeaderHovered(true);
-                  if (cursorBadgeMode === "read-more") {
-                    setCursorBadgeMode(null);
-                  }
-                }}
-                onMouseLeave={() => {
-                  setIsEntriesHeaderHovered(false);
-                }}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  togglePanelTab("entries");
-                }}
-                aria-label="Show entries section"
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className="px-1.5 py-0.5"
-                    style={
-                      activePanelTab === "entries"
-                        ? { backgroundColor: "#FFE500", color: "#000000" }
-                        : { backgroundColor: "rgba(0,0,0,0.05)" }
-                    }
-                  >
-                    ENTRIES
-                  </span>
-                  <span
-                    className={`font-medium ${
-                      activePanelTab === "entries" ? "text-black/80" : ""
-                    }`}
-                  >
-                    {entryTitle}
-                  </span>
+                <div ref={homeIdentityDividerRef}>
+                  <SectionHeader
+                    activeTab={activePanelTab}
+                    secondary="IDENTITY"
+                    onClick={() => toggleSectionContent("contextIdentity", "context")}
+                  />
                 </div>
 
-                <span className="font-medium">{entryYear}</span>
-              </button>
-            </HeaderWithDivider>
-          </div>
+                {!truncateModeActive || expandedInTruncate.contextIdentity ? (
+                  <div className="mt-2 grid gap-6 md:grid-cols-2 xl:gap-6">
+                    <p
+                      className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/80 text-justify`}
+                      style={{ fontFeatureSettings: "'salt' 1" }}
+                    >
+                      <NameHighlight
+                        key={isProfileWindowOpen ? "name-active" : "name-default"}
+                        onActivate={openProfileWindow}
+                        isActive={isProfileWindowOpen}
+                      >
+                        Raghav Agarwal
+                      </NameHighlight>
+                      {identityBodyOne}
+                    </p>
+                    <p
+                      className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/80 text-justify`}
+                      style={{ fontFeatureSettings: "'salt' 1" }}
+                    >
+                      {identityBodyTwo}
+                    </p>
+                  </div>
+                ) : null}
+              </section>
+            ) : (
+              <section
+                key="context-external"
+                className={`${index === 0 ? "" : "mt-8"} ${reveal(240).className}`}
+                style={reveal(240).style}
+              >
+                <SectionHeader
+                  activeTab={activePanelTab}
+                  secondary="EXTERNAL"
+                  onClick={() => toggleSectionContent("contextExternal", "context")}
+                />
 
-          <div className="mt-2 grid gap-6 md:grid-cols-2">
-            <p
-              className="text-[16px] leading-[1.5] text-black/40 text-justify"
-              style={{ fontFeatureSettings: "'salt' 1" }}
-            >
-              {entryExcerpt}
-            </p>
-            <div className="hidden md:block" aria-hidden="true" />
-          </div>
-          </section>
-            );
-          })()}
+                {!truncateModeActive || expandedInTruncate.contextExternal ? (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {externalLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href="#"
+                        className={`group inline-flex items-center gap-2 border px-3 py-1.5 ${identityScaleClass} font-medium leading-none whitespace-nowrap ${
+                          link.disabled
+                            ? "border-black/50 text-black/50"
+                            : "border-black/50 text-black transition-[color,border-color,box-shadow,padding-right] duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] hover:pr-4"
+                        }`}
+                        style={
+                          link.disabled
+                            ? {
+                                color: "rgba(0, 0, 0, 0.4)",
+                                borderColor: "rgba(0, 0, 0, 0.4)",
+                                boxShadow: "none",
+                                cursor: "wait",
+                                fontWeight: 400,
+                              }
+                            : { boxShadow: "none" }
+                        }
+                        onMouseEnter={(event) => {
+                          if (link.disabled) {
+                            return;
+                          }
+                          event.currentTarget.style.color = "#003CFF";
+                          event.currentTarget.style.borderColor = "#003CFF";
+                          event.currentTarget.style.boxShadow = "2px 2px 0 0 #003CFF";
+                        }}
+                        onMouseLeave={(event) => {
+                          if (link.disabled) {
+                            return;
+                          }
+                          event.currentTarget.style.color = "#000000";
+                          event.currentTarget.style.borderColor = "rgba(0,0,0,0.5)";
+                          event.currentTarget.style.boxShadow = "none";
+                        }}
+                        aria-disabled={link.disabled}
+                        onClick={(event) => {
+                          if (link.disabled) {
+                            event.preventDefault();
+                          }
+                        }}
+                      >
+                        <span className="text-current transition-colors duration-260">
+                          {link.label}
+                        </span>
+                        <span
+                          className={`inline-flex h-5 w-5 items-center justify-center shrink-0 transition-transform duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                            link.disabled ? "" : "group-hover:translate-x-1"
+                          }`}
+                        >
+                          <ArrowIcon />
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
+              </section>
+            ),
+          )}
         </div>
+        ) : null}
+
+        {!(showOnlySelected && activePanelTab === "context") ? (
+          <div className="flex flex-col" style={{ order: 1 }}>
+            {visibleMixedWorkEntries.map((item, index) => {
+              if (item === "entries") {
+                const entriesReveal = reveal(340);
+                return (
+                  <section
+                    key="entries"
+                    className={`${index === 0 ? "" : "mt-8"} ${entriesReveal.className}`}
+                    style={{
+                      ...entriesReveal.style,
+                      cursor:
+                        !truncateModeActive &&
+                        entryPhase === "closed" &&
+                        cursorBadgeMode === "read-more"
+                          ? "nesw-resize"
+                          : "pointer",
+                    }}
+                    onMouseEnter={(event) => {
+                      if (
+                        !truncateModeActive &&
+                        entryPhase === "closed" &&
+                        !isEntriesHeaderHovered
+                      ) {
+                        setCursorBadgeMode("read-more");
+                        updateCursorBadgePosition(event);
+                      }
+                    }}
+                    onMouseMove={(event) => {
+                      if (
+                        !truncateModeActive &&
+                        entryPhase === "closed" &&
+                        !isEntriesHeaderHovered
+                      ) {
+                        updateCursorBadgePosition(event);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (cursorBadgeMode === "read-more") {
+                        setCursorBadgeMode(null);
+                      }
+                    }}
+                    onClick={() => {
+                      if (!truncateModeActive && entryPhase === "closed") {
+                        openEntry();
+                      }
+                    }}
+                  >
+                    <div ref={homeEntryDividerRef}>
+                      <HeaderWithDivider
+                        className="mb-2"
+                        dividerClassName={
+                          activePanelTab === "entries" ? "bg-[#FFE500]" : ""
+                        }
+                      >
+                        <button
+                          type="button"
+                          className="flex w-full items-center justify-between text-[12px] font-medium tracking-[0.05em] text-muted text-left"
+                          onMouseEnter={() => {
+                            setIsEntriesHeaderHovered(true);
+                            if (cursorBadgeMode === "read-more") {
+                              setCursorBadgeMode(null);
+                            }
+                          }}
+                          onMouseLeave={() => {
+                            setIsEntriesHeaderHovered(false);
+                          }}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleSectionContent("entries", "entries");
+                          }}
+                          aria-label="Show entries section"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="px-1.5 py-0.5"
+                              style={
+                                activePanelTab === "entries"
+                                  ? { backgroundColor: "#FFE500", color: "#000000" }
+                                  : { backgroundColor: "rgba(0,0,0,0.05)" }
+                              }
+                            >
+                              ENTRIES
+                            </span>
+                            <span
+                              className={`font-medium ${
+                                activePanelTab === "entries" ? "text-black/80" : ""
+                              }`}
+                            >
+                              {entryTitle}
+                            </span>
+                          </div>
+
+                          <span className="font-medium">{entryYear}</span>
+                        </button>
+                      </HeaderWithDivider>
+                    </div>
+
+                    {!truncateModeActive || expandedInTruncate.entries ? (
+                      <div className="mt-2 grid gap-6 md:grid-cols-2">
+                        <p
+                          className="text-[16px] leading-[1.5] text-black/40 text-justify"
+                          style={{ fontFeatureSettings: "'salt' 1" }}
+                        >
+                          {entryExcerpt}
+                        </p>
+                        <div className="hidden md:block" aria-hidden="true" />
+                      </div>
+                    ) : null}
+                  </section>
+                );
+              }
+
+              const projectId = item.replace("work:", "");
+              const project = workProjectById[projectId];
+              if (!project) {
+                return null;
+              }
+
+              const key = `work:${project.id}`;
+              const visibleCount = visibleWorkImageCountByProject[project.id] ?? 0;
+              const isExpanded = !truncateModeActive || expandedInTruncate[key];
+              const orderedImages = workImageOrderByProject[project.id] ?? project.images;
+              const workReveal = reveal(300);
+
+              return (
+                <section
+                  key={project.id}
+                  className={`${index === 0 ? "" : "mt-8"} ${workReveal.className}`}
+                  style={workReveal.style}
+                >
+                  <HeaderWithDivider className="mb-2">
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between text-[12px] font-medium tracking-[0.05em] text-muted text-left"
+                      onClick={() => toggleSectionContent(key, "work")}
+                      aria-label={`Show ${project.title.toLowerCase()} work section`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="px-1.5 py-0.5"
+                          style={
+                            activePanelTab === "work"
+                              ? { backgroundColor: "#FF4FD9", color: "#000000" }
+                              : { backgroundColor: "rgba(0,0,0,0.05)" }
+                          }
+                        >
+                          WORK
+                        </span>
+                        <span
+                          className={`font-medium ${
+                            activePanelTab === "work" ? "text-black/80" : ""
+                          }`}
+                        >
+                          {project.title}
+                        </span>
+                      </div>
+
+                      <span className="font-medium">{project.year}</span>
+                    </button>
+                  </HeaderWithDivider>
+
+                  {isExpanded ? (
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      {orderedImages.slice(0, visibleCount).map((src) => (
+                        <button
+                          key={src}
+                          type="button"
+                          className="relative w-full cursor-crosshair overflow-hidden bg-black/5 text-left"
+                          style={{ cursor: "crosshair" }}
+                          onClick={() => handleWorkImageClick(src)}
+                          aria-label={`Preview ${project.title.toLowerCase()} work image`}
+                        >
+                          <img
+                            src={src}
+                            alt=""
+                            className="aspect-[16/9] h-auto w-full cursor-crosshair select-none object-cover"
+                            draggable={false}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {isExpanded &&
+                  project.images.length > workLoadMoreThreshold &&
+                  visibleCount < project.images.length ? (
+                    <div className="mt-2 flex justify-end">
+                      <button
+                        type="button"
+                        className="bg-black/10 px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black"
+                        onClick={() =>
+                          setVisibleWorkImageCountByProject((prev) => ({
+                            ...prev,
+                            [project.id]: Math.min(
+                              (prev[project.id] ?? workLoadMoreThreshold) + 2,
+                              project.images.length,
+                            ),
+                          }))
+                        }
+                      >
+                        LOAD MORE
+                      </button>
+                    </div>
+                  ) : null}
+                </section>
+              );
+            })}
+          </div>
         ) : null}
         </div>
       </div>
