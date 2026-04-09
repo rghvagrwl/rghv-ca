@@ -1612,6 +1612,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   });
 
   const handleWorkImageClick = (src: string) => {
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
+      return;
+    }
     if (previewTimeoutRef.current !== null) {
       window.clearTimeout(previewTimeoutRef.current);
     }
