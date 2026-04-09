@@ -342,3 +342,12 @@ a[aria-disabled="true"] {
   will-change: transform, color;
   margin-right: 0.075em;
 }
+
+.ui-wide-letter-spacing {
+  letter-spacing: 0.075em;
+}
+
+.location-switch-content,
+.location-switch-content > span {
+  letter-spacing: 0.075em;
+}

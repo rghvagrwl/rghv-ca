@@ -3475,7 +3475,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
         <div
           ref={footerRef}
-          className="order-last mt-6 border-t border-black/10 pt-2 text-[12px] leading-[1.5] text-black/40"
+          className="ui-wide-letter-spacing order-last mt-6 border-t border-black/10 pt-2 text-[12px] leading-[1.5] text-black/40"
         >
           <div className="grid gap-6 min-[940px]:grid-cols-3 xl:gap-20">
           <div className="flex items-center justify-between">
