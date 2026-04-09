@@ -20,9 +20,24 @@ const switzer = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "rghv.ca",
+  title: "raghav agarwal",
   description:
-    "A one-page personal website built section by section from Figma.",
+    "Raghav Agarwal is a designer working across product, brand, and digital interfaces. His practice is shaped by observation, with a focus on micro interactions, emotional friction, and inconsistencies in how people experience interfaces. He believes design should feel clear and intuitive, where the decisions do not require explanation.",
+  openGraph: {
+    title: "raghav agarwal",
+    description:
+      "Raghav Agarwal is a designer working across product, brand, and digital interfaces. His practice is shaped by observation, with a focus on micro interactions, emotional friction, and inconsistencies in how people experience interfaces. He believes design should feel clear and intuitive, where the decisions do not require explanation.",
+  },
+  twitter: {
+    title: "raghav agarwal",
+    description:
+      "Raghav Agarwal is a designer working across product, brand, and digital interfaces. His practice is shaped by observation, with a focus on micro interactions, emotional friction, and inconsistencies in how people experience interfaces. He believes design should feel clear and intuitive, where the decisions do not require explanation.",
+  },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
