@@ -41,7 +41,12 @@ const locations = {
 
 type LocationKey = keyof typeof locations;
 type PanelTabId = "context" | "work" | "entries";
-type CursorBadgeMode = "read-more" | "close-entry" | null;
+type CursorBadgeMode =
+  | "read-more"
+  | "close-entry"
+  | "show-all-time"
+  | "show-today"
+  | null;
 type HoveredControl = "bring" | "show" | "truncate" | null;
 type TrailSquare = {
   id: number;
@@ -51,6 +56,22 @@ type TrailSquare = {
   size: number;
   lockedColor?: boolean;
 };
+type FooterRippleLetterEffect = {
+  rotate: number;
+  scale: number;
+  lift: number;
+  color: string;
+  duration: number;
+};
+
+const cursorCycleColors = [
+  "#00A1FF",
+  "#36D744",
+  "#E8D31E",
+  "#ED49FF",
+  "#FF3E5E",
+  "#FF6D29",
+];
 type Point = {
   x: number;
   y: number;
@@ -622,12 +643,24 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [isSelectorGroupHovered, setIsSelectorGroupHovered] = useState(false);
   const [hoveredLocationToggle, setHoveredLocationToggle] = useState(false);
   const [hoveredTrailToggle, setHoveredTrailToggle] = useState(false);
+  const [hoveredFooterBrand, setHoveredFooterBrand] = useState(false);
   const [cursorButtonTiltDeg, setCursorButtonTiltDeg] = useState(0);
   const [hoveredIntroToggle, setHoveredIntroToggle] = useState(false);
   const [strokeCycleStep, setStrokeCycleStep] = useState(-1);
   const [footerDateLabel, setFooterDateLabel] = useState("DATE");
   const [lastVisitorLabel, setLastVisitorLabel] = useState("UNKNOWN, --");
-  const [visitsToday, setVisitsToday] = useState(0);
+  const [visitorsToday, setVisitorsToday] = useState(0);
+  const [visitorsAllTime, setVisitorsAllTime] = useState(0);
+  const [visitorCountMode, setVisitorCountMode] = useState<"today" | "all-time">(
+    "today",
+  );
+  const [footerBrandRippleToken, setFooterBrandRippleToken] = useState(0);
+  const [footerLogoRippleEffects, setFooterLogoRippleEffects] = useState<
+    Array<FooterRippleLetterEffect | null>
+  >([]);
+  const [footerBylineRippleEffects, setFooterBylineRippleEffects] = useState<
+    Array<FooterRippleLetterEffect | null>
+  >([]);
   const [hoveredProfileImage, setHoveredProfileImage] = useState(false);
   const [profileTooltipFlip, setProfileTooltipFlip] = useState(false);
   const [isEntriesHeaderHovered, setIsEntriesHeaderHovered] = useState(false);
@@ -773,7 +806,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       const now = new Date();
       const dateLabel = new Intl.DateTimeFormat("en-US", {
         month: "short",
-        day: "2-digit",
+        day: "numeric",
         year: "numeric",
       })
         .format(now)
@@ -784,7 +817,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
       let city = "UNKNOWN";
       let country = "--";
-      let nextVisitsToday = 0;
+      let nextVisitorsToday = 0;
+      let nextVisitorsAllTime = 0;
       let nextLastVisitorLabel = "UNKNOWN, --";
       try {
         const response = await fetch("/api/footer-stats", { cache: "no-store" });
@@ -793,7 +827,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             city?: string | null;
             country?: string | null;
             lastVisitorLabel?: string | null;
-            visitsToday?: number | null;
+            visitorsToday?: number | null;
+            visitorsAllTime?: number | null;
           };
           if (footerStats.city) {
             city = footerStats.city;
@@ -804,8 +839,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           if (footerStats.lastVisitorLabel) {
             nextLastVisitorLabel = footerStats.lastVisitorLabel;
           }
-          if (typeof footerStats.visitsToday === "number") {
-            nextVisitsToday = footerStats.visitsToday;
+          if (typeof footerStats.visitorsToday === "number") {
+            nextVisitorsToday = footerStats.visitorsToday;
+          }
+          if (typeof footerStats.visitorsAllTime === "number") {
+            nextVisitorsAllTime = footerStats.visitorsAllTime;
           }
         }
       } catch {
@@ -817,7 +855,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       const currentVisitorLabel = `${city}, ${country}`;
       if (isMounted) {
         setLastVisitorLabel(nextLastVisitorLabel === "UNKNOWN, --" ? currentVisitorLabel : nextLastVisitorLabel);
-        setVisitsToday(nextVisitsToday);
+        setVisitorsToday(nextVisitorsToday);
+        setVisitorsAllTime(nextVisitorsAllTime);
       }
     }, 0);
 
@@ -1549,11 +1588,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       : "MAR 29 2026 8:04PM"
     : null;
   const cursorTrailModeLabel = hoveredTrailToggle ? "SWITCH CURSOR MODE" : null;
+  const cursorFooterBrandLabel = hoveredFooterBrand ? "THANKS FOR VISITING!" : null;
   const cursorIntroLabel = hoveredIntroToggle ? "SITE INFO" : null;
   const activeCursorBadgeText = cursorControlLabel
     ? cursorControlLabel
     : cursorLocationLabel
       ? cursorLocationLabel
+      : cursorFooterBrandLabel
+        ? cursorFooterBrandLabel
       : cursorTrailModeLabel
         ? cursorTrailModeLabel
         : cursorIntroLabel
@@ -1564,7 +1606,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           ? "READ MORE"
           : cursorBadgeMode === "close-entry"
             ? "CLOSE ENTRY"
-            : "";
+            : cursorBadgeMode === "show-all-time"
+              ? "SHOW ALL-TIME"
+              : cursorBadgeMode === "show-today"
+                ? "SHOW TODAY"
+                : "";
 
   const badgeOffset = 14;
   const estimatedBadgeWidth = Math.max(88, activeCursorBadgeText.length * 7.1 + 18);
@@ -1701,10 +1747,75 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   );
   const entryById = Object.fromEntries(entriesData.map((entry) => [entry.id, entry]));
 
+  const buildFooterRippleEffects = (
+    text: string,
+    style: "logo" | "byline",
+  ): Array<FooterRippleLetterEffect | null> =>
+    [...text].map((character) => {
+      if (character === " ") {
+        return null;
+      }
+      const isLogo = style === "logo";
+      return {
+        rotate: Math.floor(Math.random() * (isLogo ? 23 : 19)) - (isLogo ? 11 : 9),
+        scale: isLogo ? 2.2 + Math.random() * 0.6 : 1.55 + Math.random() * 0.5,
+        lift: isLogo
+          ? -(11 + Math.floor(Math.random() * 11))
+          : -(6 + Math.floor(Math.random() * 9)),
+        color: isLogo
+          ? cursorCycleColors[Math.floor(Math.random() * cursorCycleColors.length)]
+          : `hsl(${Math.floor(Math.random() * 360)} 100% 54%)`,
+        duration: isLogo ? 430 + Math.floor(Math.random() * 160) : 390 + Math.floor(Math.random() * 150),
+      };
+    });
+
+  const triggerFooterBrandRipple = () => {
+    setFooterLogoRippleEffects(buildFooterRippleEffects("RGHV.CA", "logo"));
+    setFooterBylineRippleEffects(buildFooterRippleEffects("BY RAGHAV AGARWAL", "byline"));
+    setFooterBrandRippleToken((prev) => prev + 1);
+  };
+
+  const renderFooterRippleText = (
+    text: string,
+    effects: Array<FooterRippleLetterEffect | null>,
+    token: number,
+    delayOffsetMs = 0,
+  ) => (
+    <span aria-hidden="true">
+      {[...text].map((character, index) => {
+        if (character === " ") {
+          return <span key={`${token}-space-${index}`}>&nbsp;</span>;
+        }
+        const effect = effects[index];
+        return (
+          <span
+            key={`${token}-${index}-${character}`}
+            className={effect ? "inline-block footer-letter-ripple" : "inline-block"}
+            style={
+              effect
+                ? ({
+                    "--footer-letter-rotate": `${effect.rotate}deg`,
+                    "--footer-letter-scale": String(effect.scale),
+                    "--footer-letter-lift": `${effect.lift}px`,
+                    "--footer-letter-color": effect.color,
+                    animationDelay: `${delayOffsetMs + index * 42}ms`,
+                    animationDuration: `${effect.duration}ms`,
+                  } as CSSProperties)
+                : undefined
+            }
+          >
+            {character}
+          </span>
+        );
+      })}
+    </span>
+  );
+
   return (
     <main className="relative flex min-h-screen flex-col bg-background pb-6 pt-4">
       {cursorControlLabel ||
       cursorLocationLabel ||
+      cursorFooterBrandLabel ||
       cursorTrailModeLabel ||
       cursorIntroLabel ||
       cursorProfileImageLabel ||
@@ -1725,6 +1836,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               {cursorLocationLabel}
             </span>
+          ) : cursorFooterBrandLabel ? (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              {cursorFooterBrandLabel}
+            </span>
           ) : cursorTrailModeLabel ? (
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               {cursorTrailModeLabel}
@@ -1741,9 +1856,17 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               READ MORE
             </span>
-          ) : (
+          ) : cursorBadgeMode === "close-entry" ? (
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               CLOSE ENTRY
+            </span>
+          ) : cursorBadgeMode === "show-all-time" ? (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              SHOW ALL-TIME
+            </span>
+          ) : (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              SHOW TODAY
             </span>
           )}
         </div>
@@ -3130,13 +3253,74 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             <span>LAST VISITOR FROM</span>
             <span>{lastVisitorLabel}</span>
           </div>
+          <button
+            type="button"
+            className="flex cursor-crosshair items-center justify-between transition-colors hover:text-black/60"
+            style={{ cursor: "crosshair" }}
+            onMouseEnter={(event) => {
+              updateCursorBadgePosition(event);
+              setCursorBadgeMode(
+                visitorCountMode === "today" ? "show-all-time" : "show-today",
+              );
+            }}
+            onMouseMove={updateCursorBadgePosition}
+            onMouseLeave={() => {
+              setCursorBadgeMode((prev) =>
+                prev === "show-all-time" || prev === "show-today" ? null : prev,
+              );
+            }}
+            onClick={() => {
+              setVisitorCountMode((prev) => {
+                const nextMode = prev === "today" ? "all-time" : "today";
+                showCenterPopup(
+                  nextMode === "all-time"
+                    ? "SHOWING ALL-TIME VISITORS"
+                    : "SHOWING TODAY'S VISITORS",
+                );
+                return nextMode;
+              });
+            }}
+            aria-label={
+              visitorCountMode === "today"
+                ? "Show all-time visitors"
+                : "Show visitors today"
+            }
+          >
+            <span>{visitorCountMode === "today" ? footerDateLabel : "SINCE APR 9 2026"}</span>
+            <span>
+              {visitorCountMode === "today"
+                ? `${visitorsToday} VISITORS TODAY`
+                : `${visitorsAllTime} VISITORS ALL-TIME`}
+            </span>
+          </button>
           <div className="flex items-center justify-between">
-            <span>{footerDateLabel}</span>
-            <span>{visitsToday} VISITS TODAY</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span>RGHV.CA</span>
-            <span>BY RAGHAV AGARWAL</span>
+            <button
+              type="button"
+              className="flex w-full cursor-crosshair items-center justify-between transition-colors hover:text-black/60"
+              style={{ cursor: "crosshair" }}
+              onMouseEnter={(event) => {
+                updateCursorBadgePosition(event);
+                setHoveredFooterBrand(true);
+              }}
+              onMouseMove={updateCursorBadgePosition}
+              onMouseLeave={() => {
+                setHoveredFooterBrand(false);
+              }}
+              onClick={triggerFooterBrandRipple}
+              aria-label="Animate footer brand text"
+            >
+              {renderFooterRippleText(
+                "RGHV.CA",
+                footerLogoRippleEffects,
+                footerBrandRippleToken,
+              )}
+              {renderFooterRippleText(
+                "BY RAGHAV AGARWAL",
+                footerBylineRippleEffects,
+                footerBrandRippleToken,
+                "RGHV.CA".length * 42 + 100,
+              )}
+            </button>
           </div>
           </div>
         </div>

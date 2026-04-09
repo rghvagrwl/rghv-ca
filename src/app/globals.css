@@ -235,22 +235,22 @@ a[aria-disabled="true"] {
 
 @keyframes trail-mode-button-rgb {
   0% {
-    background-color: #39ff14;
+    background-color: #00a1ff;
   }
   20% {
-    background-color: #ff4fd9;
+    background-color: #36d744;
   }
   40% {
-    background-color: #ffe500;
+    background-color: #e8d31e;
   }
   60% {
-    background-color: #00c8ff;
+    background-color: #ed49ff;
   }
   80% {
-    background-color: #ff8a00;
+    background-color: #ff3e5e;
   }
   100% {
-    background-color: #ff5a6e;
+    background-color: #ff6d29;
   }
 }
 
@@ -312,4 +312,33 @@ a[aria-disabled="true"] {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+@keyframes footer-letter-ripple {
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    color: inherit;
+    font-weight: 400;
+  }
+  38% {
+    transform: translateY(var(--footer-letter-lift, -9px))
+      scale(var(--footer-letter-scale, 1.2))
+      rotate(var(--footer-letter-rotate, 0deg));
+    color: var(--footer-letter-color, inherit);
+    font-weight: 700;
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    color: inherit;
+    font-weight: 400;
+  }
+}
+
+.footer-letter-ripple {
+  display: inline-block;
+  animation-name: footer-letter-ripple;
+  animation-timing-function: cubic-bezier(0.2, 1, 0.34, 1);
+  animation-fill-mode: both;
+  will-change: transform, color;
+  margin-right: 0.075em;
 }
