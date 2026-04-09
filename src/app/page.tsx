@@ -1746,6 +1746,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     workProjects.map((project) => [project.id, project]),
   );
   const entryById = Object.fromEntries(entriesData.map((entry) => [entry.id, entry]));
+  const todayVisitorLabel = `${visitorsToday} ${
+    visitorsToday === 1 ? "VISITOR TODAY" : "VISITORS TODAY"
+  }`;
+  const allTimeVisitorLabel = `${visitorsAllTime} ${
+    visitorsAllTime === 1 ? "VISITOR ALL-TIME" : "VISITORS ALL-TIME"
+  }`;
 
   const buildFooterRippleEffects = (
     text: string,
@@ -3289,8 +3295,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             <span>{visitorCountMode === "today" ? footerDateLabel : "SINCE APR 9 2026"}</span>
             <span>
               {visitorCountMode === "today"
-                ? `${visitorsToday} VISITORS TODAY`
-                : `${visitorsAllTime} VISITORS ALL-TIME`}
+                ? todayVisitorLabel
+                : allTimeVisitorLabel}
             </span>
           </button>
           <div className="flex items-center justify-between">
