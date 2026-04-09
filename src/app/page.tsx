@@ -17,7 +17,7 @@ const ideasBody =
 const booksBody =
   "Currently reading Project Hail Mary by Andy Weir, The Almanack of Naval Ravikant, and Colorless by Tsukuru Tazaki.";
 const profileBody =
-  "I’m 18 years old, born and raised in Calgary, Canada, by immigrant parents. When I was younger, I wanted to be a scientist, which quickly turned into wanting to be an astronaut and an obsession with space, and eventually wanting to be an artist. During the pandemic, I discovered digital design and started spending more time around things that felt visual or expressive. I got into photography after picking up a camera in 2024, and drawing has been something I’ve been into for as long as I can remember. Music is almost always playing in the background, and I tend to cycle through hip hop, R&B, rap, and indie. My favourite artist is Daniel Caesar, and my favourite film is Spider-Man: Into the Spider-Verse. Most of my time is spent at my desk. Otherwise, I’m probably doomscrolling, at the gym, or out for a walk when the weather is good.";
+  "I’m 18 years old, born and raised in Calgary, Canada. When I was younger, I wanted to be a scientist, which quickly turned into wanting to be an astronaut and an obsession with space, and eventually wanting to be an artist. During the pandemic, I discovered digital design and started spending more time around things that felt visual or expressive. I got into photography after picking up a camera in 2024, and drawing has been something I’ve been into for as long as I can remember. Music is almost always playing in the background, and I tend to cycle through hip hop, R&B, rap, and indie. My favourite artist is Daniel Caesar, and my favourite film is Spider-Man: Into the Spider-Verse. Most of my time is spent at my desk. Otherwise, I’m probably doomscrolling, at the gym, or out for a walk when the weather is good.";
 
 const externalLinks = [
   { label: "LINKEDIN", href: "https://linkedin.com/in/rghv-agrwl", disabled: false },
@@ -234,7 +234,6 @@ const workProjects = [
 ] as const;
 const workLoadMoreThreshold = 3;
 const workLoadMoreThresholdMobile = 3;
-const identityScaleClass = "text-[clamp(16px,1.35vw,20px)]";
 const entriesData = [
   {
     id: "living-without-regrets",
@@ -2403,7 +2402,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 {!truncateModeActive || expandedInTruncate.contextIdentity ? (
                   <div className="mt-2 grid gap-6 md:grid-cols-2 xl:gap-6">
                     <p
-                      className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                      className="max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
                       style={{ fontFeatureSettings: "'salt' 1" }}
                     >
                       <button
@@ -2414,11 +2413,21 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         }`}
                       >
                         <span className="whitespace-nowrap">Raghav</span>
+                        <span
+                          aria-hidden="true"
+                          className={`inline-flex overflow-hidden align-middle leading-none transition-[max-width,opacity,margin-left,transform] duration-240 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                            isProfileWindowOpen
+                              ? "ml-1 max-w-[24px] translate-x-0 opacity-100"
+                              : "ml-0 max-w-0 -translate-x-1 opacity-0"
+                          }`}
+                        >
+                          <span className="text-[16px] leading-none text-black/80">×</span>
+                        </span>
                       </button>
                       {identityBodyOne}
                     </p>
                     <p
-                      className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                      className="max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
                       style={{ fontFeatureSettings: "'salt' 1" }}
                     >
                       {identityBodyTwo}
@@ -2799,7 +2808,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
                         {!truncateModeActive || expandedInTruncate.contextEducation ? (
                           <p
-                            className={`mt-2 max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                            className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
                             style={{ fontFeatureSettings: "'salt' 1" }}
                           >
                             {educationBody}
@@ -2820,7 +2829,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
                         {!truncateModeActive || expandedInTruncate.contextExperience ? (
                           <p
-                            className={`mt-2 max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                            className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
                             style={{ fontFeatureSettings: "'salt' 1" }}
                           >
                             {experienceBody}
@@ -2854,7 +2863,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
                         {!truncateModeActive || expandedInTruncate.contextIdeas ? (
                           <p
-                            className={`mt-2 max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                            className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
                             style={{ fontFeatureSettings: "'salt' 1" }}
                           >
                             {ideasBody}
@@ -2875,7 +2884,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
                         {!truncateModeActive || expandedInTruncate.contextBooks ? (
                           <p
-                            className={`mt-2 max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                            className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
                             style={{ fontFeatureSettings: "'salt' 1" }}
                           >
                             {booksBody}
@@ -3032,7 +3041,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             {!truncateModeActive || expandedInTruncate.contextProfile ? (
               <div className="mt-2 columns-1 gap-6 md:columns-2 xl:gap-6">
                 <p
-                  className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                  className="max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
                   style={{ fontFeatureSettings: "'salt' 1" }}
                 >
                   {profileBody}
