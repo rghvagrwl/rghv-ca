@@ -8,6 +8,15 @@ const VISITOR_COOKIE_NAME = "rghv_vid";
 const LAST_VISITOR_KEY = "footer:last-visitor";
 const ALL_TIME_VISITORS_KEY = "footer:visitors:all-time";
 const DAY_SECONDS = 60 * 60 * 24;
+const regionDisplayNames = new Intl.DisplayNames(["en"], { type: "region" });
+
+function resolveCountryName(countryCode: string) {
+  const code = countryCode.trim().toUpperCase();
+  if (!code) {
+    return "UNKNOWN COUNTRY";
+  }
+  return regionDisplayNames.of(code) ?? "UNKNOWN COUNTRY";
+}
 
 function getTodayKeyInToronto() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -76,7 +85,8 @@ async function getRedisClient() {
 export async function GET() {
   const requestHeaders = await headers();
   const city = requestHeaders.get("x-vercel-ip-city")?.trim().toUpperCase() || "UNKNOWN";
-  const country = requestHeaders.get("x-vercel-ip-country")?.trim().toUpperCase() || "--";
+  const countryCode = requestHeaders.get("x-vercel-ip-country")?.trim().toUpperCase() || "";
+  const country = resolveCountryName(countryCode);
   const currentVisitorLabel = `${city}, ${country}`;
   const todayKey = getTodayKeyInToronto();
   const todayVisitorsKey = `footer:visitors:${todayKey}`;

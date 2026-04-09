@@ -647,22 +647,24 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [hoveredFooterBrand, setHoveredFooterBrand] = useState(false);
   const [cursorButtonTiltDeg, setCursorButtonTiltDeg] = useState(0);
   const [hoveredIntroToggle, setHoveredIntroToggle] = useState(false);
-  const [displayedLocationCode, setDisplayedLocationCode] = useState(
+  const [displayedLocationCode, setDisplayedLocationCode] = useState<string>(
     locations[locationKey].code,
   );
-  const [displayedLocationCity, setDisplayedLocationCity] = useState(
+  const [displayedLocationCity, setDisplayedLocationCity] = useState<string>(
     locations[locationKey].city,
   );
   const [isLocationScrambling, setIsLocationScrambling] = useState(false);
   const [scrambledClock, setScrambledClock] = useState("");
   const [strokeCycleStep, setStrokeCycleStep] = useState(-1);
   const [footerDateLabel, setFooterDateLabel] = useState("DATE");
-  const [lastVisitorLabel, setLastVisitorLabel] = useState("UNKNOWN, --");
+  const [lastVisitorLabel, setLastVisitorLabel] = useState("UNKNOWN, UNKNOWN COUNTRY");
   const [visitorsToday, setVisitorsToday] = useState(0);
   const [visitorsAllTime, setVisitorsAllTime] = useState(0);
   const [animatedVisitorCount, setAnimatedVisitorCount] = useState(0);
   const [isFooterInView, setIsFooterInView] = useState(false);
   const [displayedFooterDateLabel, setDisplayedFooterDateLabel] = useState("DATE");
+  const [displayedVisitorModeLabel, setDisplayedVisitorModeLabel] =
+    useState("VISITORS TODAY");
   const [visitorCountMode, setVisitorCountMode] = useState<"today" | "all-time">(
     "today",
   );
@@ -785,6 +787,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const hasStartedSelectorCycleRef = useRef(false);
   const hasInitializedLocationScrambleRef = useRef(false);
   const hasInitializedFooterDateScrambleRef = useRef(false);
+  const hasInitializedVisitorModeScrambleRef = useRef(false);
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -831,10 +834,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       }
 
       let city = "UNKNOWN";
-      let country = "--";
+      let country = "UNKNOWN COUNTRY";
       let nextVisitorsToday = 0;
       let nextVisitorsAllTime = 0;
-      let nextLastVisitorLabel = "UNKNOWN, --";
+      let nextLastVisitorLabel = "UNKNOWN, UNKNOWN COUNTRY";
       try {
         const response = await fetch("/api/footer-stats", { cache: "no-store" });
         if (response.ok) {
@@ -869,7 +872,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
       const currentVisitorLabel = `${city}, ${country}`;
       if (isMounted) {
-        setLastVisitorLabel(nextLastVisitorLabel === "UNKNOWN, --" ? currentVisitorLabel : nextLastVisitorLabel);
+        setLastVisitorLabel(
+          nextLastVisitorLabel === "UNKNOWN, UNKNOWN COUNTRY"
+            ? currentVisitorLabel
+            : nextLastVisitorLabel,
+        );
         setVisitorsToday(nextVisitorsToday);
         setVisitorsAllTime(nextVisitorsAllTime);
       }
@@ -1364,7 +1371,13 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   };
 
   const handleLocationToggle = () => {
-    setLocationKey((prev) => (prev === "waterloo" ? "calgary" : "waterloo"));
+    setLocationKey((prev) => {
+      const next = prev === "waterloo" ? "calgary" : "waterloo";
+      showCenterPopup(
+        next === "waterloo" ? "SHOWING WATERLOO TIME" : "SHOWING CALGARY TIME",
+      );
+      return next;
+    });
   };
 
   const togglePanelTab = (tabId: PanelTabId) => {
@@ -1814,12 +1827,16 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     workProjects.map((project) => [project.id, project]),
   );
   const entryById = Object.fromEntries(entriesData.map((entry) => [entry.id, entry]));
-  const todayVisitorLabel = `${animatedVisitorCount} ${
-    animatedVisitorCount === 1 ? "VISITOR TODAY" : "VISITORS TODAY"
-  }`;
-  const allTimeVisitorLabel = `${animatedVisitorCount} ${
-    animatedVisitorCount === 1 ? "VISITOR ALL-TIME" : "VISITORS ALL-TIME"
-  }`;
+  const activeVisitorCountTarget =
+    visitorCountMode === "today" ? visitorsToday : visitorsAllTime;
+  const visitorModeLabelTarget =
+    visitorCountMode === "today"
+      ? activeVisitorCountTarget === 1
+        ? "VISITOR TODAY"
+        : "VISITORS TODAY"
+      : activeVisitorCountTarget === 1
+        ? "VISITOR ALL-TIME"
+        : "VISITORS ALL-TIME";
 
   const buildFooterRippleEffects = (
     text: string,
@@ -1997,6 +2014,28 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       window.clearInterval(intervalId);
     };
   }, [footerDateTargetLabel]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (!hasInitializedVisitorModeScrambleRef.current) {
+      hasInitializedVisitorModeScrambleRef.current = true;
+      const initialFrame = window.requestAnimationFrame(() => {
+        setDisplayedVisitorModeLabel(visitorModeLabelTarget);
+      });
+      return () => {
+        window.cancelAnimationFrame(initialFrame);
+      };
+    }
+    const intervalId = startScramble(visitorModeLabelTarget, setDisplayedVisitorModeLabel, {
+      stepMs: 26,
+      steps: 11,
+    });
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [visitorModeLabelTarget]);
 
   return (
     <main className="relative flex min-h-screen flex-col bg-background pb-6 pt-4">
@@ -3478,9 +3517,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           >
             <span>{displayedFooterDateLabel}</span>
             <span>
-              {visitorCountMode === "today"
-                ? todayVisitorLabel
-                : allTimeVisitorLabel}
+              {animatedVisitorCount} {displayedVisitorModeLabel}
             </span>
           </button>
           <div className="flex items-center justify-between">
