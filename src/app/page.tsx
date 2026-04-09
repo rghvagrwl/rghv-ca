@@ -10,6 +10,10 @@ const educationBody =
   "Currently completing his first year at the University of Waterloo, Honours Global Business and Digital Arts, where he's focusing on design, business, and digital media. He graduated from high school in 2025.";
 const experienceBody =
   "Over the last four years, he has taught himself visual and product design through personal projects and client work across startups and teams. Most recently, he interned part-time at PERMANENT© over his 1B study term.";
+const ideasBody =
+  "Thinking about building a design agency, exploring a new fitness consumer app, and learning motion design and video editing to create cinematic shorts this summer.";
+const booksBody =
+  "Reading Project Hail Mary by Andy Weir, The Almanack of Naval Ravikant, and Colorless Tsukuru Tazaki and His Years of Pilgrimage by Haruki Murakami.";
 const profileBodyOne =
   "I spend a lot of time around things that feel visual or expressive. I got into photography after picking up a camera in 2024, and drawing has been something I’ve been into for as long as I can remember.";
 const profileBodyTwo =
@@ -100,7 +104,7 @@ const cursorTrailPalette = [
   "#FF8A00",
 ];
 const fixedBottomWorkProjectId = "no-category";
-const mixedContextSectionIds = ["context:education"] as const;
+const mixedContextSectionIds = ["context:education", "context:current"] as const;
 const workProjects = [
   {
     id: "unordinary",
@@ -439,6 +443,27 @@ function buildMixedContentOrderWithEntrySpacing(
   return mixedOrder;
 }
 
+function insertItemsAtRandomPositions(baseItems: string[], itemsToInsert: string[]) {
+  const nextItems = [...baseItems];
+  shuffleArray(itemsToInsert).forEach((item) => {
+    const insertAt = Math.floor(Math.random() * (nextItems.length + 1));
+    nextItems.splice(insertAt, 0, item);
+  });
+  return nextItems;
+}
+
+function buildMixedOrderWithContextSections(
+  workItemIds: string[],
+  entryItemIds: string[],
+  contextItemIds: string[],
+) {
+  const mixedWorkAndEntries = buildMixedContentOrderWithEntrySpacing(
+    workItemIds,
+    entryItemIds,
+  );
+  return insertItemsAtRandomPositions(mixedWorkAndEntries, contextItemIds);
+}
+
 function hslToRgb(hue: number, saturation: number, lightness: number) {
   const s = saturation / 100;
   const l = lightness / 100;
@@ -732,6 +757,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     contextIdentity: false,
     contextEducation: false,
     contextExperience: false,
+    contextIdeas: false,
+    contextBooks: false,
     contextExternal: false,
     contextProfile: false,
     ...Object.fromEntries(workProjects.map((project) => [`work:${project.id}`, false])),
@@ -762,13 +789,15 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         ]),
       ),
     );
-  const [mixedWorkEntriesOrder, setMixedWorkEntriesOrder] = useState(() => [
-    ...workProjects
-      .filter((project) => project.id !== fixedBottomWorkProjectId)
-      .map((project) => `work:${project.id}`),
-    ...entriesData.map((entry) => `entry:${entry.id}`),
-    ...mixedContextSectionIds,
-  ]);
+  const [mixedWorkEntriesOrder, setMixedWorkEntriesOrder] = useState(() =>
+    buildMixedOrderWithContextSections(
+      workProjects
+        .filter((project) => project.id !== fixedBottomWorkProjectId)
+        .map((project) => `work:${project.id}`),
+      entriesData.map((entry) => `entry:${entry.id}`),
+      [...mixedContextSectionIds],
+    ),
+  );
   const [workImageOrderByProject, setWorkImageOrderByProject] = useState<
     Record<string, string[]>
   >(() =>
@@ -882,17 +911,13 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       setMixedWorkEntriesOrder(
-        (() => {
-          const mixed = buildMixedContentOrderWithEntrySpacing(
+        buildMixedOrderWithContextSections(
           workProjects
             .filter((project) => project.id !== fixedBottomWorkProjectId)
             .map((project) => `work:${project.id}`),
           entriesData.map((entry) => `entry:${entry.id}`),
-          );
-          const insertAt = Math.floor(Math.random() * (mixed.length + 1));
-          mixed.splice(insertAt, 0, ...mixedContextSectionIds);
-          return mixed;
-        })(),
+          [...mixedContextSectionIds],
+        ),
       );
       setWorkImageOrderByProject(
         Object.fromEntries(
@@ -1354,6 +1379,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         contextIdentity: false,
         contextEducation: false,
         contextExperience: false,
+        contextIdeas: false,
+        contextBooks: false,
         contextExternal: false,
         contextProfile: false,
         ...Object.fromEntries(workProjects.map((project) => [`work:${project.id}`, false])),
@@ -2172,6 +2199,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           contextIdentity: false,
                           contextEducation: false,
                           contextExperience: false,
+                          contextIdeas: false,
+                          contextBooks: false,
                           contextExternal: false,
                           contextProfile: false,
                           ...Object.fromEntries(
@@ -2247,6 +2276,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           contextIdentity: false,
                           contextEducation: false,
                           contextExperience: false,
+                          contextIdeas: false,
+                          contextBooks: false,
                           contextExternal: false,
                           contextProfile: false,
                           ...Object.fromEntries(
@@ -2737,6 +2768,53 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                             style={{ fontFeatureSettings: "'salt' 1" }}
                           >
                             {experienceBody}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </section>
+                );
+              }
+
+              if (item === "context:current") {
+                const contextCurrentReveal = reveal(230);
+                return (
+                  <section
+                    key="context-current"
+                    className={`${index === 0 ? "" : "mt-6"} ${contextCurrentReveal.className}`}
+                    style={contextCurrentReveal.style}
+                  >
+                    <div className="grid gap-6 md:grid-cols-2 xl:gap-6">
+                      <div>
+                        <SectionHeader
+                          activeTab={activePanelTab}
+                          secondary="IDEAS"
+                          onClick={() => toggleSectionContent("contextIdeas", "context")}
+                        />
+
+                        {!truncateModeActive || expandedInTruncate.contextIdeas ? (
+                          <p
+                            className={`mt-2 max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                            style={{ fontFeatureSettings: "'salt' 1" }}
+                          >
+                            {ideasBody}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div>
+                        <SectionHeader
+                          activeTab={activePanelTab}
+                          secondary="BOOKS"
+                          onClick={() => toggleSectionContent("contextBooks", "context")}
+                        />
+
+                        {!truncateModeActive || expandedInTruncate.contextBooks ? (
+                          <p
+                            className={`mt-2 max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
+                            style={{ fontFeatureSettings: "'salt' 1" }}
+                          >
+                            {booksBody}
                           </p>
                         ) : null}
                       </div>
