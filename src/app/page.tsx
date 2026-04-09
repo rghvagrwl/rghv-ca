@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const identityBodyOne =
   " is a designer working across product, brand, and digital interfaces. His work is shaped by paying attention to how people actually use things, especially where interactions feel unclear or inconsistent. He focuses on making systems that are simple, intuitive, and easy to move through.";
 const identityBodyTwo =
-  "Rather than adding complexity, his goal is to reduce it, creating work that feels natural without needing explanation. He draws inspiration from software, the internet, and visual culture, and approaches design as an ongoing process of refinement and iteration.";
+  "Rather than adding complexity, his goal is to reduce it, creating work that feels natural without needing explanation. He draws inspiration from software, the internet, and visual culture, and approaches design as an ongoing process of refinement and iteration. Currently looking for opportunities and work for the summer. Reach out below.";
 const educationBody =
   "Currently completing his first year at the University of Waterloo, Honours Global Business and Digital Arts, where he's focusing on design, business, and digital media. He graduated from high school in 2025.";
 const experienceBody =
@@ -2864,7 +2864,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </div>
 
                 {!truncateModeActive || expandedInTruncate.contextIdentity ? (
-                  <div className="mt-2 grid gap-6 md:grid-cols-2 xl:gap-6">
+                  <div className="mt-2 columns-1 gap-6 md:columns-2 xl:gap-6">
                     <p
                       className="max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
                       style={{ fontFeatureSettings: "'salt' 1" }}
@@ -2889,11 +2889,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         </span>
                       </button>
                       {identityBodyOne}
-                    </p>
-                    <p
-                      className="max-w-[52rem] text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
-                      style={{ fontFeatureSettings: "'salt' 1" }}
-                    >
+                      {" "}
                       {identityBodyTwo}
                     </p>
                   </div>
@@ -3600,6 +3596,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             onClick={() => {
               setVisitorCountMode((prev) => {
                 const nextMode = prev === "today" ? "all-time" : "today";
+                setCursorBadgeMode(
+                  nextMode === "today" ? "show-all-time" : "show-today",
+                );
                 showCenterPopup(
                   nextMode === "all-time"
                     ? "SHOWING ALL-TIME VISITORS"
