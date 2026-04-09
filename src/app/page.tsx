@@ -1786,7 +1786,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           </div>
         </div>
       ) : null}
-      <div className="pointer-events-none fixed inset-0 z-40">
+      <div className="pointer-events-none fixed inset-0 z-[110]">
         {trailSquares.map((square) => (
           <span
             key={square.id}
