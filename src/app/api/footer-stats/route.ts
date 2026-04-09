@@ -47,6 +47,7 @@ type RedisClient = {
   set: (key: string, value: string) => Promise<unknown>;
   sAdd: (key: string, member: string) => Promise<number>;
   sCard: (key: string) => Promise<number>;
+  sMembers: (key: string) => Promise<string[]>;
   expire: (key: string, seconds: number) => Promise<number>;
 };
 
@@ -104,6 +105,15 @@ export async function GET() {
     await redisClient.expire(todayVisitorsKey, DAY_SECONDS * 3);
     visitorsToday = await redisClient.sCard(todayVisitorsKey);
     visitorsAllTime = await redisClient.sCard(ALL_TIME_VISITORS_KEY);
+
+    // Backfill all-time from today's set if all-time tracking started later.
+    if (visitorsAllTime < visitorsToday) {
+      const todayMembers = await redisClient.sMembers(todayVisitorsKey);
+      for (const member of todayMembers) {
+        await redisClient.sAdd(ALL_TIME_VISITORS_KEY, member);
+      }
+      visitorsAllTime = await redisClient.sCard(ALL_TIME_VISITORS_KEY);
+    }
   } else {
     const previousLastVisitor = await kvRequest(`/get/${encodeURIComponent(LAST_VISITOR_KEY)}`);
     if (typeof previousLastVisitor?.result === "string" && previousLastVisitor.result.length > 0) {
