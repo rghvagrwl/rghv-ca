@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import type { CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const identityBodyOne =
-  " is a designer working across product, brand, and digital interfaces. His practice is shaped by observation, with a focus on micro interactions, emotional friction, and inconsistencies in how people experience interfaces. He believes design should feel clear and intuitive, where the decisions do not require explanation.";
+  " is a designer working across product, brand, and digital interfaces. His work is shaped by paying attention to how people actually use things, especially where interactions feel unclear or inconsistent. He focuses on making systems that are simple, intuitive, and easy to move through.";
 const identityBodyTwo =
-  "His work aims to reduce friction and create systems that feel calm, precise, and easy to use. Influenced by the internet and contemporary visual culture, he is interested in how details shape understanding over time, and how consistency can make something feel more coherent the longer it is experienced.";
+  "Rather than adding complexity, his goal is to reduce it, creating work that feels natural without needing explanation. He draws inspiration from software, the internet, and visual culture, and approaches design as an ongoing process of refinement and iteration.";
 const educationBody =
   "Currently completing his first year at the University of Waterloo, Honours Global Business and Digital Arts, where he's focusing on design, business, and digital media. He graduated from high school in 2025.";
 const experienceBody =
@@ -14,14 +16,8 @@ const ideasBody =
   "Thinking about building a design agency, exploring a new fitness consumer app, and learning motion design and video editing to create cinematic shorts this summer.";
 const booksBody =
   "Currently reading Project Hail Mary by Andy Weir, The Almanack of Naval Ravikant, and Colorless by Tsukuru Tazaki.";
-const profileBodyOne =
-  "I spend a lot of time around things that feel visual or expressive. I got into photography after picking up a camera in 2024, and drawing has been something I’ve been into for as long as I can remember.";
-const profileBodyTwo =
-  "Music is almost always playing in the background, and I tend to cycle through hip hop, R&B, rap, and indie.";
-const profileBodyThree =
-  "My favorite film is Spider-Man: Into the Spider-Verse, and I gravitate toward creators who focus on storytelling and detail.";
-const profileBodyFour =
-  "Most of my time is spent at my desk. Otherwise, I’m probably doomscrolling, at the gym, or out for a walk when the weather is good.";
+const profileBody =
+  "I’m 18 years old, born and raised in Calgary, Canada, by immigrant parents. When I was younger, I wanted to be a scientist, which quickly turned into wanting to be an astronaut and an obsession with space, and eventually wanting to be an artist. During the pandemic, I discovered digital design and started spending more time around things that felt visual or expressive. I got into photography after picking up a camera in 2024, and drawing has been something I’ve been into for as long as I can remember. Music is almost always playing in the background, and I tend to cycle through hip hop, R&B, rap, and indie. My favourite artist is Daniel Caesar, and my favourite film is Spider-Man: Into the Spider-Verse. Most of my time is spent at my desk. Otherwise, I’m probably doomscrolling, at the gym, or out for a walk when the weather is good.";
 
 const externalLinks = [
   { label: "LINKEDIN", href: "https://linkedin.com/in/rghv-agrwl", disabled: false },
@@ -91,10 +87,6 @@ const panelCopyByTab: Record<PanelTabId, string> = {
   entries:
     "A running collection of thoughts. Fragments, notes, and ideas that don't belong anywhere else. Some unfinished, some unresolved. Mostly just things that don't need to be finished to be worth keeping.",
 };
-const authorLinkStyle = {
-  color: "rgba(0, 0, 0, 0.6)",
-  textDecorationColor: "rgba(0, 0, 0, 0.6)",
-};
 const cursorTrailPalette = [
   "#00C8FF",
   "#FF4FD9",
@@ -111,14 +103,14 @@ const workProjects = [
     title: "UNORDINARY",
     year: "2024",
     images: [
-      "/unordinary/Unordinary 1.png",
-      "/unordinary/Unordinary 2.png",
-      "/unordinary/Unordinary 3.png",
-      "/unordinary/Unordinary 4.png",
-      "/unordinary/Unordinary 5.png",
-      "/unordinary/Unordinary 6.png",
-      "/unordinary/Unordinary 7.png",
-      "/unordinary/Unordinary 8.png",
+      "/unordinary/Unordinary 1.webp",
+      "/unordinary/Unordinary 2.webp",
+      "/unordinary/Unordinary 3.webp",
+      "/unordinary/Unordinary 4.webp",
+      "/unordinary/Unordinary 5.webp",
+      "/unordinary/Unordinary 6.webp",
+      "/unordinary/Unordinary 7.webp",
+      "/unordinary/Unordinary 8.webp",
     ],
   },
   {
@@ -126,31 +118,31 @@ const workProjects = [
     title: "MINIMUM",
     year: "2022",
     images: [
-      "/minimum/Minimum 1.png",
-      "/minimum/Minimum 2.png",
-      "/minimum/Minimum 3.png",
-      "/minimum/Minimum 4.png",
-      "/minimum/Minimum 5.png",
-      "/minimum/Minimum 6.png",
+      "/minimum/Minimum 1.webp",
+      "/minimum/Minimum 2.webp",
+      "/minimum/Minimum 3.webp",
+      "/minimum/Minimum 4.webp",
+      "/minimum/Minimum 5.webp",
+      "/minimum/Minimum 6.webp",
     ],
   },
   {
     id: "chrono",
     title: "CHRONO",
     year: "2026",
-    images: ["/chrono/Chrono 1.png", "/chrono/Chrono 2.png"],
+    images: ["/chrono/Chrono 1.webp", "/chrono/Chrono 2.webp"],
   },
   {
     id: "context",
     title: "CONTEXT",
     year: "2025",
     images: [
-      "/context/Context 1.png",
-      "/context/Context 2.png",
-      "/context/Context 3.png",
-      "/context/Context 4.png",
-      "/context/Context 5.png",
-      "/context/Context 6.png",
+      "/context/Context 1.webp",
+      "/context/Context 2.webp",
+      "/context/Context 3.webp",
+      "/context/Context 4.webp",
+      "/context/Context 5.webp",
+      "/context/Context 6.webp",
     ],
   },
   {
@@ -158,25 +150,25 @@ const workProjects = [
     title: "CRISPED",
     year: "2024",
     images: [
-      "/crisped/Crisped 1.png",
-      "/crisped/Crisped 2.png",
-      "/crisped/Crisped 3.png",
+      "/crisped/Crisped 1.webp",
+      "/crisped/Crisped 2.webp",
+      "/crisped/Crisped 3.webp",
     ],
   },
   {
     id: "faktor",
     title: "FAKTOR",
     year: "2022",
-    images: ["/faktor/Name.png", "/faktor/Name-1.png", "/faktor/Name-2.png"],
+    images: ["/faktor/Name.webp", "/faktor/Name-1.webp", "/faktor/Name-2.webp"],
   },
   {
     id: "instafleet",
     title: "INSTAFLEET",
     year: "2025",
     images: [
-      "/instafleet/Instafleet 1.png",
-      "/instafleet/Instafleet 2.png",
-      "/instafleet/Instafleet 3.png",
+      "/instafleet/Instafleet 1.webp",
+      "/instafleet/Instafleet 2.webp",
+      "/instafleet/Instafleet 3.webp",
     ],
   },
   {
@@ -184,10 +176,10 @@ const workProjects = [
     title: "MERGE CLUB",
     year: "2025",
     images: [
-      "/merge club/Merge 1.png",
-      "/merge club/Merge 2.png",
-      "/merge club/Merge 3.png",
-      "/merge club/Merge 4.png",
+      "/merge club/Merge 1.webp",
+      "/merge club/Merge 2.webp",
+      "/merge club/Merge 3.webp",
+      "/merge club/Merge 4.webp",
     ],
   },
   {
@@ -195,48 +187,48 @@ const workProjects = [
     title: "ON DECK FOUNDERS",
     year: "2025",
     images: [
-      "/on deck founders/ODF 1.png",
-      "/on deck founders/ODF 2.png",
-      "/on deck founders/ODF 3.png",
-      "/on deck founders/ODF 4.png",
+      "/on deck founders/ODF 1.webp",
+      "/on deck founders/ODF 2.webp",
+      "/on deck founders/ODF 3.webp",
+      "/on deck founders/ODF 4.webp",
     ],
   },
   {
     id: "para",
     title: "PARA",
     year: "2022",
-    images: ["/para/Para 1.png", "/para/Para 2.png"],
+    images: ["/para/Para 1.webp", "/para/Para 2.webp"],
   },
   {
     id: "prism-collective",
     title: "PRISM COLLECTIVE",
     year: "2025",
-    images: ["/prism collective/Prism 1.png", "/prism collective/Prism 2.png"],
+    images: ["/prism collective/Prism 1.webp", "/prism collective/Prism 2.webp"],
   },
   {
     id: "socratica",
     title: "SOCRATICA",
     year: "2026",
-    images: ["/socratica/Socratica 1.png", "/socratica/Socratica 2.png"],
+    images: ["/socratica/Socratica 1.webp", "/socratica/Socratica 2.webp"],
   },
   {
     id: "zero-email",
     title: "ZERO EMAIL",
     year: "2024",
-    images: ["/zero email/Zero 1.png", "/zero email/Zero 2.png"],
+    images: ["/zero email/Zero 1.webp", "/zero email/Zero 2.webp"],
   },
   {
     id: "no-category",
     title: "NO CATEGORY",
     images: [
-      "/uncategorized/Human 1.png",
-      "/uncategorized/Other 1.png",
-      "/uncategorized/Other 2.png",
-      "/uncategorized/Other 3.png",
-      "/uncategorized/Other 4.png",
-      "/uncategorized/Other 5.png",
-      "/uncategorized/Verse 1.png",
-      "/uncategorized/Verse 2.png",
+      "/uncategorized/Human 1.webp",
+      "/uncategorized/Other 1.webp",
+      "/uncategorized/Other 2.webp",
+      "/uncategorized/Other 3.webp",
+      "/uncategorized/Other 4.webp",
+      "/uncategorized/Other 5.webp",
+      "/uncategorized/Verse 1.webp",
+      "/uncategorized/Verse 2.webp",
     ],
   },
 ] as const;
@@ -342,10 +334,12 @@ function HeaderWithDivider({
 
 function SectionHeader({
   activeTab,
+  strokeCycleActive = false,
   secondary,
   onClick,
 }: {
   activeTab: PanelTabId | null;
+  strokeCycleActive?: boolean;
   secondary: string;
   onClick?: () => void;
 }) {
@@ -362,11 +356,18 @@ function SectionHeader({
         aria-label={`Show context ${secondary.toLowerCase()} section`}
       >
         <span
-          className="cursor-crosshair px-1.5 py-0.5 text-[12px] font-medium tracking-[0.05em]"
+          className={`cursor-crosshair px-1.5 py-0.5 text-[12px] font-medium tracking-[0.05em] ${
+            strokeCycleActive ? "section-chip-stroke-cycle" : ""
+          }`}
           style={
-            isContextActive
-              ? { backgroundColor: contextColor, color: "#000000" }
-              : { backgroundColor: "rgba(0,0,0,0.05)", color: "rgba(0,0,0,0.4)" }
+            {
+              ...(isContextActive
+                ? { backgroundColor: contextColor, color: "#000000" }
+                : { backgroundColor: "rgba(0,0,0,0.05)", color: "rgba(0,0,0,0.4)" }),
+              ...(strokeCycleActive
+                ? ({ "--section-stroke-color": contextColor } as CSSProperties)
+                : null),
+            }
           }
         >
           CONTEXT
@@ -462,114 +463,6 @@ function buildMixedOrderWithContextSections(
     entryItemIds,
   );
   return insertItemsAtRandomPositions(mixedWorkAndEntries, contextItemIds);
-}
-
-function hslToRgb(hue: number, saturation: number, lightness: number) {
-  const s = saturation / 100;
-  const l = lightness / 100;
-  const c = (1 - Math.abs(2 * l - 1)) * s;
-  const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
-  const m = l - c / 2;
-  let rPrime = 0;
-  let gPrime = 0;
-  let bPrime = 0;
-
-  if (hue < 60) {
-    rPrime = c;
-    gPrime = x;
-  } else if (hue < 120) {
-    rPrime = x;
-    gPrime = c;
-  } else if (hue < 180) {
-    gPrime = c;
-    bPrime = x;
-  } else if (hue < 240) {
-    gPrime = x;
-    bPrime = c;
-  } else if (hue < 300) {
-    rPrime = x;
-    bPrime = c;
-  } else {
-    rPrime = c;
-    bPrime = x;
-  }
-
-  return {
-    r: Math.round((rPrime + m) * 255),
-    g: Math.round((gPrime + m) * 255),
-    b: Math.round((bPrime + m) * 255),
-  };
-}
-
-function pickRandomNameHighlight() {
-  const hue = Math.floor(Math.random() * 360);
-  const saturation = 75;
-  const lightness = 82;
-  const { r, g, b } = hslToRgb(hue, saturation, lightness);
-
-  return {
-    background: `rgb(${r} ${g} ${b})`,
-    text: "rgba(0, 0, 0, 0.5)",
-  };
-}
-
-function NameHighlight({
-  children,
-  onActivate,
-  isActive = false,
-}: {
-  children: React.ReactNode;
-  onActivate?: () => void;
-  isActive?: boolean;
-}) {
-  const defaultStyles = {
-    background: "rgba(0, 0, 0, 0.05)",
-    text: "rgba(0, 0, 0, 0.5)",
-  };
-  const [styles, setStyles] = useState(defaultStyles);
-
-  return (
-    <button
-      type="button"
-      onClick={onActivate}
-      className="m-0 inline-flex appearance-none items-center gap-0 border-0 bg-transparent p-0 px-0.5 transition-colors duration-220 ease-out"
-      style={
-        isActive
-          ? { backgroundColor: "#000000", color: "#FFFFFF", cursor: "crosshair" }
-          : {
-              backgroundColor: styles.background,
-              color: styles.text,
-              cursor: "crosshair",
-            }
-      }
-      onMouseEnter={() => {
-        if (isActive) {
-          return;
-        }
-        setStyles(pickRandomNameHighlight());
-      }}
-      onMouseLeave={() => {
-        if (isActive) {
-          return;
-        }
-        setStyles(defaultStyles);
-      }}
-    >
-      <span className="whitespace-nowrap">{children}</span>
-      <span
-        aria-hidden="true"
-        className={`inline-flex overflow-hidden leading-none text-white transition-[max-width,opacity,margin-left,transform] duration-240 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          isActive
-            ? "ml-1 max-w-[24px] translate-x-0 opacity-100"
-            : "ml-0 max-w-0 -translate-x-1 opacity-0"
-        }`}
-      >
-        <span className="text-[24px] leading-none text-white">
-          ×
-        </span>
-      </span>
-    </button>
-  );
 }
 
 function BringToTopIcon({
@@ -733,7 +626,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [isSelectorGroupHovered, setIsSelectorGroupHovered] = useState(false);
   const [hoveredLocationToggle, setHoveredLocationToggle] = useState(false);
   const [hoveredTrailToggle, setHoveredTrailToggle] = useState(false);
+  const [cursorButtonTiltDeg, setCursorButtonTiltDeg] = useState(0);
   const [hoveredIntroToggle, setHoveredIntroToggle] = useState(false);
+  const [strokeCycleStep, setStrokeCycleStep] = useState(-1);
   const [hoveredProfileImage, setHoveredProfileImage] = useState(false);
   const [profileTooltipFlip, setProfileTooltipFlip] = useState(false);
   const [isEntriesHeaderHovered, setIsEntriesHeaderHovered] = useState(false);
@@ -747,6 +642,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     null,
   );
   const [invalidSelectorFlash, setInvalidSelectorFlash] = useState<PanelTabId | null>(
+    null,
+  );
+  const [centerPopupText, setCenterPopupText] = useState<string | null>(null);
+  const [pressedSelectorTabId, setPressedSelectorTabId] = useState<PanelTabId | null>(
     null,
   );
   const [invalidExternalLinkFlash, setInvalidExternalLinkFlash] = useState<
@@ -789,15 +688,13 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         ]),
       ),
     );
-  const [mixedWorkEntriesOrder, setMixedWorkEntriesOrder] = useState(() =>
-    buildMixedOrderWithContextSections(
-      workProjects
-        .filter((project) => project.id !== fixedBottomWorkProjectId)
-        .map((project) => `work:${project.id}`),
-      entriesData.map((entry) => `entry:${entry.id}`),
-      [...mixedContextSectionIds],
-    ),
-  );
+  const [mixedWorkEntriesOrder, setMixedWorkEntriesOrder] = useState(() => [
+    ...workProjects
+      .filter((project) => project.id !== fixedBottomWorkProjectId)
+      .map((project) => `work:${project.id}`),
+    ...entriesData.map((entry) => `entry:${entry.id}`),
+    ...mixedContextSectionIds,
+  ]);
   const [workImageOrderByProject, setWorkImageOrderByProject] = useState<
     Record<string, string[]>
   >(() =>
@@ -816,6 +713,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const invalidControlFlashTimeoutRef = useRef<number | null>(null);
   const invalidSelectorFlashTimeoutRef = useRef<number | null>(null);
   const invalidExternalLinkFlashTimeoutRef = useRef<number | null>(null);
+  const centerPopupTimeoutRef = useRef<number | null>(null);
   const profileWindowRef = useRef<HTMLDivElement | null>(null);
   const profileWindowDragOffsetRef = useRef<Point>({ x: 0, y: 0 });
   const profileWindowResizeStartRef = useRef<{
@@ -1395,6 +1293,20 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     setActivePanelTab(tabId);
   };
 
+  const showCenterPopup = (message: string) => {
+    setCenterPopupText(message);
+    if (centerPopupTimeoutRef.current !== null) {
+      window.clearTimeout(centerPopupTimeoutRef.current);
+    }
+    centerPopupTimeoutRef.current = window.setTimeout(() => {
+      setCenterPopupText(null);
+    }, 1500);
+  };
+  const getSectionHighlightPopupText = (tab: PanelTabId) =>
+    activePanelTab === tab
+      ? `REMOVING ${tab.toUpperCase()} HIGHLIGHT`
+      : `HIGHLIGHTING ${tab.toUpperCase()}`;
+
   const toggleSectionContent = (sectionKey: string, tab: PanelTabId) => {
     if (truncateModeActive) {
       setExpandedInTruncate((prev) => ({
@@ -1448,6 +1360,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       }
     };
   }, [hoveredSelectorTab, isLoaded, isSelectorGroupHovered]);
+
+  useEffect(() => {
+    return () => {
+      if (centerPopupTimeoutRef.current !== null) {
+        window.clearTimeout(centerPopupTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -1645,9 +1565,59 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   });
   const shouldShowFixedBottomWork =
     !showOnlySelected || activePanelTab === null || activePanelTab === "work";
-  const visibleOrderedContentItems = shouldShowFixedBottomWork
-    ? [...visibleMixedWorkEntries, `work:${fixedBottomWorkProjectId}`]
-    : visibleMixedWorkEntries;
+  const visibleOrderedContentItems = useMemo(
+    () =>
+      shouldShowFixedBottomWork
+        ? [...visibleMixedWorkEntries, `work:${fixedBottomWorkProjectId}`]
+        : visibleMixedWorkEntries,
+    [shouldShowFixedBottomWork, visibleMixedWorkEntries],
+  );
+  const orderedDividerStrokeKeys = useMemo(() => {
+    const keys: string[] = ["context:identity", "context:external"];
+
+    visibleOrderedContentItems.forEach((item) => {
+      if (item.startsWith("entry:") || item.startsWith("work:")) {
+        keys.push(item);
+        return;
+      }
+      if (item === "context:education") {
+        keys.push("context:education", "context:experience");
+        return;
+      }
+      if (item === "context:current") {
+        keys.push("context:ideas", "context:books");
+      }
+    });
+
+    keys.push("context:profile");
+    return keys;
+  }, [visibleOrderedContentItems]);
+
+  useEffect(() => {
+    if (!isLoaded || !orderedDividerStrokeKeys.length) {
+      return;
+    }
+
+    const startTimeout = window.setTimeout(() => {
+      setStrokeCycleStep(0);
+    }, 140);
+
+    const intervalId = window.setInterval(() => {
+      setStrokeCycleStep((prev) => (prev + 1) % orderedDividerStrokeKeys.length);
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(startTimeout);
+      window.clearInterval(intervalId);
+    };
+  }, [isLoaded, orderedDividerStrokeKeys]);
+  const activeStrokeCycleKeys = useMemo(() => {
+    if (!orderedDividerStrokeKeys.length || strokeCycleStep < 0) {
+      return [];
+    }
+    return [orderedDividerStrokeKeys[strokeCycleStep % orderedDividerStrokeKeys.length]];
+  }, [orderedDividerStrokeKeys, strokeCycleStep]);
+
   const workProjectById = Object.fromEntries(
     workProjects.map((project) => [project.id, project]),
   );
@@ -1701,6 +1671,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         </div>
       ) : null}
 
+      {centerPopupText ? (
+        <div className="pointer-events-none fixed inset-0 z-[125] flex items-center justify-center">
+          <span className="inline-flex items-center whitespace-nowrap bg-black px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-white">
+            {centerPopupText}
+          </span>
+        </div>
+      ) : null}
+
       {isProfileWindowOpen && profileWindowPosition ? (
         <div
           ref={profileWindowRef}
@@ -1737,9 +1715,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           <span className="pointer-events-none absolute -top-6 left-0 right-0 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] font-medium leading-none text-[#00A1FF]">
             RAGHAV ON BAKER BEACH, SAN FRANCISCO
           </span>
-          <img
-            src="/profile.png"
+          <Image
+            src="/profile.webp"
             alt="Raghav portrait"
+            fill
+            sizes="(max-width: 768px) 80vw, 520px"
             className="block h-full w-full select-none object-cover"
             draggable={false}
             onMouseEnter={(event) => {
@@ -1801,10 +1781,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
       {previewImage ? (
         <div className="pointer-events-none fixed inset-0 z-[70] flex items-center justify-center">
-          <div className="h-[75vh] w-[75vw] overflow-hidden">
-            <img
+          <div className="relative h-[75vh] w-[75vw] overflow-hidden">
+            <Image
               src={previewImage}
               alt=""
+              fill
+              sizes="75vw"
               className="h-full w-full object-contain"
               draggable={false}
             />
@@ -1836,7 +1818,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.02em] text-black/40">
               <button
                 type="button"
-                className="inline-flex flex-1 items-center justify-between pr-3 transition-colors hover:text-black/60"
+                className="navbar-click location-switch-click inline-flex flex-1 items-center justify-between pr-3 transition-colors hover:text-black/60"
                 onClick={handleLocationToggle}
                 onMouseEnter={(event) => {
                   setHoveredLocationToggle(true);
@@ -1850,7 +1832,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   locationKey === "waterloo" ? "Calgary" : "Waterloo"
                 }`}
               >
-                <span className="inline-flex items-center gap-2">
+                <span className="location-switch-content inline-flex items-center gap-2">
                   <span className="inline-block w-[44px] text-left">
                     {activeLocation.code}
                   </span>
@@ -1865,13 +1847,25 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
+                  className={`navbar-click cursor-button-click inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     isTrailBoosted
                       ? "trail-mode-button-active border-black/80"
                       : "border-black/20 bg-[#F7F7F7]"
                   }`}
+                  style={
+                    {
+                      "--cursor-click-tilt": `${cursorButtonTiltDeg}deg`,
+                    } as CSSProperties
+                  }
+                  onPointerDown={() => {
+                    setCursorButtonTiltDeg(Math.random() * 10 - 5);
+                  }}
                   onClick={() => {
-                    setIsTrailBoosted((prev) => !prev);
+                    setIsTrailBoosted((prev) => {
+                      const next = !prev;
+                      showCenterPopup(next ? "RAINBOW CURSOR ON" : "RAINBOW CURSOR OFF");
+                      return next;
+                    });
                   }}
                   onMouseEnter={(event) => {
                     setHoveredTrailToggle(true);
@@ -1887,7 +1881,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className="flex h-6 w-6 items-center justify-center border-[0.5px] border-black/20 bg-[#F7F7F7] text-[16px] leading-none text-black transition-all duration-150"
+                  className="navbar-click flex h-6 w-6 items-center justify-center border-[0.5px] border-black/20 bg-[#F7F7F7] text-[16px] leading-none text-black transition-all duration-150"
                   onClick={() => setIsIntroOpen((prev) => !prev)}
                   onMouseEnter={(event) => {
                     setHoveredIntroToggle(true);
@@ -1937,8 +1931,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   Inspired by the works of{" "}
                   <a
                     href="https://adamho.com"
-                    className="text-black/60 underline decoration-dotted underline-offset-2"
-                    style={authorLinkStyle}
+                    className="credit-name-link"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1947,8 +1940,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   ,{" "}
                   <a
                     href="https://frankchimero.com"
-                    className="text-black/60 underline decoration-dotted underline-offset-2"
-                    style={authorLinkStyle}
+                    className="credit-name-link"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1957,8 +1949,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   ,{" "}
                   <a
                     href="https://benji.org"
-                    className="text-black/60 underline decoration-dotted underline-offset-2"
-                    style={authorLinkStyle}
+                    className="credit-name-link"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1967,8 +1958,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   and{" "}
                   <a
                     href="https://ryanyan.ca"
-                    className="text-black/60 underline decoration-dotted underline-offset-2"
-                    style={authorLinkStyle}
+                    className="credit-name-link"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -2009,6 +1999,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     hoveredSelectorTab === null && autoHoverSelectorTab === tab.id;
                   const isIdleCycleActive = autoHoverSelectorTab !== null;
                   const hasAnySelected = activePanelTab !== null;
+                  const isPressed = pressedSelectorTabId === tab.id;
+                  const scaleValue = (isSelected ? 1.01 : 1) * (isPressed ? 0.95 : 1);
                   const sideShift =
                     hasAnySelected && !isSelected ? (index === 0 ? -1 : index === 2 ? 1 : 0) : 0;
 
@@ -2041,13 +2033,21 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           );
                           return;
                         }
+                        showCenterPopup(getSectionHighlightPopupText(tab.id));
                         togglePanelTab(tab.id);
                       }}
-                        className={`inline-flex h-6 items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2 py-[2px] text-[clamp(11px,0.76vw,12px)] font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] ${
+                        className={`navbar-click inline-flex h-6 items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2 py-[2px] text-[clamp(11px,0.76vw,12px)] font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] ${
                           isSelectorBouncing ? "selector-jolt" : ""
                         } ${isAutoCyclePreview ? "selector-auto-bob" : ""} ${
                           invalidSelectorFlash === tab.id ? "control-error-wiggle" : ""
                         }`}
+                        onPointerDown={() => setPressedSelectorTabId(tab.id)}
+                        onPointerUp={() =>
+                          setPressedSelectorTabId((prev) => (prev === tab.id ? null : prev))
+                        }
+                        onPointerCancel={() =>
+                          setPressedSelectorTabId((prev) => (prev === tab.id ? null : prev))
+                        }
                         style={
                           isSelected
                             ? {
@@ -2059,7 +2059,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                                     ? `1px 1px 0 0 ${tab.color}`
                                     : "1px 1px 0 0 #000000"
                                   : "none",
-                                transform: "translateX(0px) scale(1.01)",
+                                transform: `translateX(0px) scale(${scaleValue})`,
                                 cursor: isEntryControlLockActive ? "not-allowed" : "pointer",
                               }
                             : {
@@ -2070,7 +2070,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                                     ? `1px 1px 0 0 ${tab.color}`
                                     : "1px 1px 0 0 #000000"
                                   : "none",
-                                transform: `translateX(${sideShift}px) scale(1)`,
+                                transform: `translateX(${sideShift}px) scale(${scaleValue})`,
                                 cursor: isEntryControlLockActive ? "not-allowed" : "pointer",
                               }
                         }
@@ -2085,6 +2085,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         }}
                         onMouseLeave={() => {
                           setHoveredSelectorTab((prev) =>
+                            prev === tab.id ? null : prev,
+                          );
+                          setPressedSelectorTabId((prev) =>
                             prev === tab.id ? null : prev,
                           );
                         }}
@@ -2108,7 +2111,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
+                  className={`navbar-click inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "bring"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2122,13 +2125,16 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   onClick={() => {
                     if (isEntryControlLockActive) {
                       triggerDisabledControlFeedback("bring");
+                      showCenterPopup("SELECT A SECTION");
                       return;
                     }
                     if (!activePanelTab) {
                       triggerDisabledControlFeedback("bring");
+                      showCenterPopup("SELECT A SECTION");
                       return;
                     }
                     handleBringSelectedToTop();
+                    showCenterPopup(`DISPLAYING ${activePanelTab.toUpperCase()} AT TOP`);
                   }}
                   onMouseEnter={(event) => {
                     setHoveredControl("bring");
@@ -2169,7 +2175,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
+                  className={`navbar-click inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "show"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2183,12 +2189,15 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   onClick={() => {
                     if (isEntryControlLockActive) {
                       triggerDisabledControlFeedback("show");
+                      showCenterPopup("SELECT A SECTION");
                       return;
                     }
                     if (!activePanelTab) {
                       triggerDisabledControlFeedback("show");
+                      showCenterPopup("SELECT A SECTION");
                       return;
                     }
+                    showCenterPopup(!showOnlySelected ? "HIDING ALL CONTENT" : "SHOWING ALL CONTENT");
                     setShowOnlySelected((prev) => {
                       const next = !prev;
                       if (!next) {
@@ -2251,7 +2260,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
+                  className={`navbar-click inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "truncate"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2261,14 +2270,21 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   onClick={() => {
                     if (isEntryControlLockActive) {
                       triggerDisabledControlFeedback("truncate");
+                      showCenterPopup("SELECT A SECTION");
                       return;
                     }
                     if (!canUseTruncateControl) {
                       triggerDisabledControlFeedback("truncate");
+                      showCenterPopup("SELECT A SECTION");
                       return;
                     }
                     setIsTruncateMode((prev) => {
                       const next = !prev;
+                      showCenterPopup(
+                        next
+                          ? `TRUNCATING ${activePanelTab ? activePanelTab.toUpperCase() : "CONTENT"}`
+                          : "SHOWING ALL CONTENT",
+                      );
                       if (next) {
                         setExpandedInTruncate({
                           contextIdentity: false,
@@ -2375,8 +2391,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 <div ref={homeIdentityDividerRef}>
                   <SectionHeader
                     activeTab={activePanelTab}
+                    strokeCycleActive={activeStrokeCycleKeys.includes("context:identity")}
                     secondary="IDENTITY"
-                    onClick={() => toggleSectionContent("contextIdentity", "context")}
+                    onClick={() => {
+                      showCenterPopup(getSectionHighlightPopupText("context"));
+                      toggleSectionContent("contextIdentity", "context");
+                    }}
                   />
                 </div>
 
@@ -2386,13 +2406,15 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
                       style={{ fontFeatureSettings: "'salt' 1" }}
                     >
-                      <NameHighlight
-                        key={isProfileWindowOpen ? "name-active" : "name-default"}
-                        onActivate={openProfileWindow}
-                        isActive={isProfileWindowOpen}
+                      <button
+                        type="button"
+                        onClick={openProfileWindow}
+                        className={`raghav-link m-0 inline-block appearance-none border-0 bg-transparent p-0 cursor-crosshair ${
+                          isProfileWindowOpen ? "raghav-link-active" : ""
+                        }`}
                       >
-                        Raghav Agarwal
-                      </NameHighlight>
+                        <span className="whitespace-nowrap">Raghav</span>
+                      </button>
                       {identityBodyOne}
                     </p>
                     <p
@@ -2412,8 +2434,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               >
                 <SectionHeader
                   activeTab={activePanelTab}
+                  strokeCycleActive={activeStrokeCycleKeys.includes("context:external")}
                   secondary="EXTERNAL"
-                  onClick={() => toggleSectionContent("contextExternal", "context")}
+                  onClick={() => {
+                    showCenterPopup(getSectionHighlightPopupText("context"));
+                    toggleSectionContent("contextExternal", "context");
+                  }}
                 />
 
                 {!truncateModeActive || expandedInTruncate.contextExternal ? (
@@ -2473,6 +2499,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         onClick={(event) => {
                           if (link.disabled) {
                             event.preventDefault();
+                            if (link.label === "UNORDINARY") {
+                              showCenterPopup("BUILDING...");
+                            }
                             setInvalidExternalLinkFlash(link.label);
                             if (invalidExternalLinkFlashTimeoutRef.current !== null) {
                               window.clearTimeout(invalidExternalLinkFlashTimeoutRef.current);
@@ -2515,6 +2544,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   return null;
                 }
                 const entryKey = `entry:${entry.id}`;
+                const isEntryExpanded = expandedEntryId === entry.id;
+                const additionalParagraphs =
+                  entry.paragraphs[0]?.trim() === entry.excerpt.trim()
+                    ? entry.paragraphs.slice(1)
+                    : entry.paragraphs;
                 const entriesReveal = reveal(340);
                 return (
                   <section
@@ -2633,16 +2667,26 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                             }}
                             onClick={(event) => {
                               event.stopPropagation();
+                              showCenterPopup(getSectionHighlightPopupText("entries"));
                               toggleSectionContent(entryKey, "entries");
                             }}
                             aria-label="Show entries section"
                           >
                             <span
-                              className="cursor-crosshair px-1.5 py-0.5"
+                              className={`cursor-crosshair px-1.5 py-0.5 ${
+                                activeStrokeCycleKeys.includes(`entry:${entry.id}`)
+                                  ? "section-chip-stroke-cycle"
+                                  : ""
+                              }`}
                               style={
-                                activePanelTab === "entries"
-                                  ? { backgroundColor: "#FFE500", color: "#000000" }
-                                  : { backgroundColor: "rgba(0,0,0,0.05)" }
+                                {
+                                  ...(activePanelTab === "entries"
+                                    ? { backgroundColor: "#FFE500", color: "#000000" }
+                                    : { backgroundColor: "rgba(0,0,0,0.05)" }),
+                                  ...(activeStrokeCycleKeys.includes(`entry:${entry.id}`)
+                                    ? ({ "--section-stroke-color": "#FFE500" } as CSSProperties)
+                                    : null),
+                                }
                               }
                             >
                               ENTRIES
@@ -2663,45 +2707,51 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     {!truncateModeActive || expandedInTruncate[entryKey] ? (
                       <div className="mt-2 grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
-                          <div
-                            className={`grid transition-[grid-template-rows,opacity] duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                              expandedEntryId === entry.id
-                                ? "grid-rows-[0fr] opacity-0"
-                                : "grid-rows-[1fr] opacity-100"
-                            }`}
+                          <p
+                            className="min-h-0 overflow-hidden text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
+                            style={{
+                              fontFeatureSettings: "'salt' 1",
+                              ...(isEntryExpanded
+                                ? {}
+                                : {
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 5,
+                                    WebkitBoxOrient: "vertical",
+                                  }),
+                            }}
                           >
-                            <p
-                              className="min-h-0 overflow-hidden text-[16px] leading-[1.5] text-black/40 text-justify whitespace-pre-line"
-                              style={{
-                                fontFeatureSettings: "'salt' 1",
-                                display: "-webkit-box",
-                                WebkitLineClamp: 5,
-                                WebkitBoxOrient: "vertical",
-                              }}
-                            >
-                              {entry.excerpt}
-                            </p>
-                          </div>
+                            {entry.excerpt}
+                          </p>
 
                           <div
-                            className={`grid transition-[grid-template-rows,opacity] duration-420 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                              expandedEntryId === entry.id
-                                ? "mt-0.5 grid-rows-[1fr] opacity-100 delay-140"
-                                : "mt-0 grid-rows-[0fr] opacity-0"
+                            className={`overflow-hidden transition-[max-height,margin-top] duration-520 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+                              isEntryExpanded && additionalParagraphs.length > 0
+                                ? "mt-2"
+                                : "mt-0"
                             }`}
+                            style={{
+                              maxHeight:
+                                isEntryExpanded && additionalParagraphs.length > 0
+                                  ? "1400px"
+                                  : "0px",
+                            }}
                           >
-                            <div className="min-h-0 overflow-hidden">
-                              <div className="text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line">
-                                {entry.paragraphs.map((paragraph, paragraphIndex) => (
-                                  <p
-                                    key={`${entry.id}-${paragraphIndex}`}
-                                    className="mb-4"
-                                    style={{ fontFeatureSettings: "'salt' 1" }}
-                                  >
-                                    {paragraph}
-                                  </p>
-                                ))}
-                              </div>
+                            <div
+                              className={`text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line transition-[opacity,transform] duration-360 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                                isEntryExpanded && additionalParagraphs.length > 0
+                                  ? "translate-y-0 opacity-100 delay-420"
+                                  : "translate-y-1 opacity-0 delay-0"
+                              }`}
+                            >
+                              {additionalParagraphs.map((paragraph, paragraphIndex) => (
+                                <p
+                                  key={`${entry.id}-${paragraphIndex}`}
+                                  className="mb-4"
+                                  style={{ fontFeatureSettings: "'salt' 1" }}
+                                >
+                                  {paragraph}
+                                </p>
+                              ))}
                             </div>
                           </div>
                         </div>
@@ -2711,14 +2761,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                             className="border-[0.5px] border-black/20 bg-[#F7F7F7] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black/80"
                             onClick={(event) => {
                               event.stopPropagation();
-                              if (expandedEntryId === entry.id) {
+                              if (isEntryExpanded) {
                                 closeEntry();
                               } else {
                                 openEntry(entry.id);
                               }
                             }}
                           >
-                            {expandedEntryId === entry.id ? "CLOSE ENTRY" : "READ MORE"}
+                            {isEntryExpanded ? "CLOSE ENTRY" : "READ MORE"}
                           </button>
                         </div>
                       </div>
@@ -2739,8 +2789,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <div>
                         <SectionHeader
                           activeTab={activePanelTab}
+                          strokeCycleActive={activeStrokeCycleKeys.includes("context:education")}
                           secondary="EDUCATION"
-                          onClick={() => toggleSectionContent("contextEducation", "context")}
+                          onClick={() => {
+                            showCenterPopup(getSectionHighlightPopupText("context"));
+                            toggleSectionContent("contextEducation", "context");
+                          }}
                         />
 
                         {!truncateModeActive || expandedInTruncate.contextEducation ? (
@@ -2756,8 +2810,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <div>
                         <SectionHeader
                           activeTab={activePanelTab}
+                          strokeCycleActive={activeStrokeCycleKeys.includes("context:experience")}
                           secondary="EXPERIENCE"
-                          onClick={() => toggleSectionContent("contextExperience", "context")}
+                          onClick={() => {
+                            showCenterPopup(getSectionHighlightPopupText("context"));
+                            toggleSectionContent("contextExperience", "context");
+                          }}
                         />
 
                         {!truncateModeActive || expandedInTruncate.contextExperience ? (
@@ -2786,8 +2844,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <div>
                         <SectionHeader
                           activeTab={activePanelTab}
+                          strokeCycleActive={activeStrokeCycleKeys.includes("context:ideas")}
                           secondary="IDEAS"
-                          onClick={() => toggleSectionContent("contextIdeas", "context")}
+                          onClick={() => {
+                            showCenterPopup(getSectionHighlightPopupText("context"));
+                            toggleSectionContent("contextIdeas", "context");
+                          }}
                         />
 
                         {!truncateModeActive || expandedInTruncate.contextIdeas ? (
@@ -2803,8 +2865,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <div>
                         <SectionHeader
                           activeTab={activePanelTab}
+                          strokeCycleActive={activeStrokeCycleKeys.includes("context:books")}
                           secondary="BOOKS"
-                          onClick={() => toggleSectionContent("contextBooks", "context")}
+                          onClick={() => {
+                            showCenterPopup(getSectionHighlightPopupText("context"));
+                            toggleSectionContent("contextBooks", "context");
+                          }}
                         />
 
                         {!truncateModeActive || expandedInTruncate.contextBooks ? (
@@ -2844,15 +2910,27 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <button
                         type="button"
                         className="inline-flex cursor-crosshair items-center gap-2 text-left"
-                        onClick={() => toggleSectionContent(key, "work")}
+                        onClick={() => {
+                          showCenterPopup(getSectionHighlightPopupText("work"));
+                          toggleSectionContent(key, "work");
+                        }}
                         aria-label={`Show ${project.title.toLowerCase()} work section`}
                       >
                         <span
-                          className="cursor-crosshair px-1.5 py-0.5"
+                          className={`cursor-crosshair px-1.5 py-0.5 ${
+                            activeStrokeCycleKeys.includes(`work:${project.id}`)
+                              ? "section-chip-stroke-cycle"
+                              : ""
+                          }`}
                           style={
-                            activePanelTab === "work"
-                              ? { backgroundColor: "#FF4FD9", color: "#000000" }
-                              : { backgroundColor: "rgba(0,0,0,0.05)" }
+                            {
+                              ...(activePanelTab === "work"
+                                ? { backgroundColor: "#FF4FD9", color: "#000000" }
+                                : { backgroundColor: "rgba(0,0,0,0.05)" }),
+                              ...(activeStrokeCycleKeys.includes(`work:${project.id}`)
+                                ? ({ "--section-stroke-color": "#FF4FD9" } as CSSProperties)
+                                : null),
+                            }
                           }
                         >
                           WORK
@@ -2877,7 +2955,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         <button
                           key={src}
                           type="button"
-                          className="no-save-media relative w-full cursor-crosshair overflow-hidden bg-black/5 text-left"
+                          className="no-save-media relative aspect-[16/9] w-full cursor-crosshair overflow-hidden bg-black/5 text-left"
                           style={{ cursor: "crosshair" }}
                           onClick={() => handleWorkImageClick(src)}
                           onContextMenu={(event) => {
@@ -2888,10 +2966,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           }}
                           aria-label={`Preview ${project.title.toLowerCase()} work image`}
                         >
-                          <img
+                          <Image
                             src={src}
                             alt=""
-                            className="no-save-media aspect-[16/9] h-auto w-full cursor-crosshair select-none object-cover"
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="no-save-media cursor-crosshair select-none object-cover"
                             draggable={false}
                             onContextMenu={(event) => {
                               event.preventDefault();
@@ -2941,23 +3021,21 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           >
             <SectionHeader
               activeTab={activePanelTab}
+              strokeCycleActive={activeStrokeCycleKeys.includes("context:profile")}
               secondary="PROFILE"
-              onClick={() => toggleSectionContent("contextProfile", "context")}
+              onClick={() => {
+                showCenterPopup(getSectionHighlightPopupText("context"));
+                toggleSectionContent("contextProfile", "context");
+              }}
             />
 
             {!truncateModeActive || expandedInTruncate.contextProfile ? (
-              <div className="mt-2 grid gap-6 md:grid-cols-2 xl:gap-6">
+              <div className="mt-2 columns-1 gap-6 md:columns-2 xl:gap-6">
                 <p
                   className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
                   style={{ fontFeatureSettings: "'salt' 1" }}
                 >
-                  {profileBodyOne} {profileBodyTwo}
-                </p>
-                <p
-                  className={`max-w-[52rem] ${identityScaleClass} font-medium leading-[1.5] tracking-[-0.015em] text-black/40 text-justify`}
-                  style={{ fontFeatureSettings: "'salt' 1" }}
-                >
-                  {profileBodyThree} {profileBodyFour}
+                  {profileBody}
                 </p>
               </div>
             ) : null}
