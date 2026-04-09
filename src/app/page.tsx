@@ -358,11 +358,17 @@ function SectionHeader({
   strokeCycleActive = false,
   secondary,
   onClick,
+  onMouseEnter,
+  onMouseMove,
+  onMouseLeave,
 }: {
   activeTab: PanelTabId | null;
   strokeCycleActive?: boolean;
   secondary: string;
   onClick?: () => void;
+  onMouseEnter?: (event: React.MouseEvent<HTMLElement>) => void;
+  onMouseMove?: (event: React.MouseEvent<HTMLElement>) => void;
+  onMouseLeave?: () => void;
 }) {
   const isContextActive = activeTab === "context";
   const contextColor =
@@ -374,6 +380,9 @@ function SectionHeader({
         type="button"
         className="inline-flex w-fit self-start cursor-crosshair items-center gap-3 text-left"
         onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
         aria-label={`Show context ${secondary.toLowerCase()} section`}
       >
         <span
@@ -636,6 +645,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [cursorBadgeMode, setCursorBadgeMode] = useState<CursorBadgeMode>(null);
   const [cursorBadgePosition, setCursorBadgePosition] = useState({ x: 0, y: 0 });
   const [hoveredControl, setHoveredControl] = useState<HoveredControl>(null);
+  const [hoveredDividerTab, setHoveredDividerTab] = useState<PanelTabId | null>(null);
   const [hoveredSelectorTab, setHoveredSelectorTab] = useState<PanelTabId | null>(
     null,
   );
@@ -645,6 +655,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [hoveredLocationToggle, setHoveredLocationToggle] = useState(false);
   const [hoveredTrailToggle, setHoveredTrailToggle] = useState(false);
   const [hoveredFooterBrand, setHoveredFooterBrand] = useState(false);
+  const [hoveredOutboundLink, setHoveredOutboundLink] = useState(false);
   const [cursorButtonTiltDeg, setCursorButtonTiltDeg] = useState(0);
   const [hoveredIntroToggle, setHoveredIntroToggle] = useState(false);
   const [displayedLocationCode, setDisplayedLocationCode] = useState<string>(
@@ -655,7 +666,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   );
   const [isLocationScrambling, setIsLocationScrambling] = useState(false);
   const [scrambledClock, setScrambledClock] = useState("");
-  const [strokeCycleStep, setStrokeCycleStep] = useState(-1);
+  const [strokeCycleStep] = useState(-1);
   const [footerDateLabel, setFooterDateLabel] = useState("DATE");
   const [lastVisitorLabel, setLastVisitorLabel] = useState("UNKNOWN, UNKNOWN COUNTRY");
   const [visitorsToday, setVisitorsToday] = useState(0);
@@ -1434,7 +1445,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   };
   const getSectionHighlightPopupText = (tab: PanelTabId) =>
     activePanelTab === tab
-      ? `REMOVING ${tab.toUpperCase()} HIGHLIGHT`
+      ? "REMOVING HIGHLIGHT"
       : `HIGHLIGHTING ${tab.toUpperCase()}`;
 
   const toggleSectionContent = (sectionKey: string, tab: PanelTabId) => {
@@ -1663,6 +1674,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       ? "SHOW CALGARY"
       : "SHOW WATERLOO"
     : null;
+  const cursorDividerLabel = hoveredDividerTab
+    ? `HIGHLIGHT ${hoveredDividerTab.toUpperCase()}`
+    : null;
+  const cursorOutboundLinkLabel = hoveredOutboundLink ? "OPEN IN NEW TAB" : null;
   const cursorProfileImageLabel = hoveredProfileImage
     ? profileTooltipFlip
       ? "DEL/BACKSPACE TO CLOSE"
@@ -1675,6 +1690,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     ? cursorControlLabel
     : cursorLocationLabel
       ? cursorLocationLabel
+      : cursorDividerLabel
+        ? cursorDividerLabel
+      : cursorOutboundLinkLabel
+        ? cursorOutboundLinkLabel
       : cursorFooterBrandLabel
         ? cursorFooterBrandLabel
       : cursorTrailModeLabel
@@ -1786,36 +1805,6 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     orderedDividerStrokeKeysRef.current = orderedDividerStrokeKeys;
   }, [orderedDividerStrokeKeys]);
 
-  useEffect(() => {
-    if (!isLoaded) {
-      return;
-    }
-    let currentIndex = 0;
-    let intervalId: number | null = null;
-
-    const startTimeout = window.setTimeout(() => {
-      const cycleLength = orderedDividerStrokeKeysRef.current.length;
-      if (!cycleLength) {
-        return;
-      }
-      setStrokeCycleStep(0);
-      intervalId = window.setInterval(() => {
-        const latestCycleLength = orderedDividerStrokeKeysRef.current.length;
-        if (!latestCycleLength) {
-          return;
-        }
-        currentIndex = (currentIndex + 1) % latestCycleLength;
-        setStrokeCycleStep(currentIndex);
-      }, 1000);
-    }, 4000);
-
-    return () => {
-      window.clearTimeout(startTimeout);
-      if (intervalId !== null) {
-        window.clearInterval(intervalId);
-      }
-    };
-  }, [isLoaded]);
   const activeStrokeCycleKeys = useMemo(() => {
     if (!orderedDividerStrokeKeys.length || strokeCycleStep < 0) {
       return [];
@@ -2041,6 +2030,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     <main className="relative flex min-h-screen flex-col bg-background pb-6 pt-4">
       {cursorControlLabel ||
       cursorLocationLabel ||
+      cursorDividerLabel ||
+      cursorOutboundLinkLabel ||
       cursorFooterBrandLabel ||
       cursorTrailModeLabel ||
       cursorIntroLabel ||
@@ -2061,6 +2052,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           ) : cursorLocationLabel ? (
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               {cursorLocationLabel}
+            </span>
+          ) : cursorDividerLabel ? (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              {cursorDividerLabel}
+            </span>
+          ) : cursorOutboundLinkLabel ? (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              {cursorOutboundLinkLabel}
             </span>
           ) : cursorFooterBrandLabel ? (
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
@@ -2139,9 +2138,16 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           onPointerDown={handleProfileWindowPointerDown}
           onClick={() => setIsProfileWindowSelected(true)}
         >
-          <span className="pointer-events-none absolute -top-6 left-0 right-0 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] font-medium leading-none text-[#00A1FF]">
+          <button
+            type="button"
+            className={`absolute -top-6 left-0 right-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-[14px] font-medium leading-none cursor-crosshair ${
+              isProfileWindowSelected ? "text-[#00A1FF]" : "text-black/40"
+            }`}
+            onClick={() => setIsProfileWindowSelected(true)}
+            aria-label="Select profile image window"
+          >
             RAGHAV ON BAKER BEACH, SAN FRANCISCO
-          </span>
+          </button>
           <Image
             src="/profile.webp"
             alt="Raghav portrait"
@@ -2361,6 +2367,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     className="credit-name-link"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onMouseEnter={(event) => {
+                      setHoveredOutboundLink(true);
+                      updateCursorBadgePosition(event);
+                    }}
+                    onMouseMove={updateCursorBadgePosition}
+                    onMouseLeave={() => setHoveredOutboundLink(false)}
                   >
                     Adam Ho
                   </a>
@@ -2370,6 +2382,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     className="credit-name-link"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onMouseEnter={(event) => {
+                      setHoveredOutboundLink(true);
+                      updateCursorBadgePosition(event);
+                    }}
+                    onMouseMove={updateCursorBadgePosition}
+                    onMouseLeave={() => setHoveredOutboundLink(false)}
                   >
                     Frank Chimero
                   </a>
@@ -2379,6 +2397,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     className="credit-name-link"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onMouseEnter={(event) => {
+                      setHoveredOutboundLink(true);
+                      updateCursorBadgePosition(event);
+                    }}
+                    onMouseMove={updateCursorBadgePosition}
+                    onMouseLeave={() => setHoveredOutboundLink(false)}
                   >
                     Benji Taylor
                   </a>{" "}
@@ -2388,6 +2412,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     className="credit-name-link"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onMouseEnter={(event) => {
+                      setHoveredOutboundLink(true);
+                      updateCursorBadgePosition(event);
+                    }}
+                    onMouseMove={updateCursorBadgePosition}
+                    onMouseLeave={() => setHoveredOutboundLink(false)}
                   >
                     Ryan Yan
                   </a>
@@ -2427,7 +2457,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   const isIdleCycleActive = autoHoverSelectorTab !== null;
                   const hasAnySelected = activePanelTab !== null;
                   const isPressed = pressedSelectorTabId === tab.id;
-                  const scaleValue = (isSelected ? 1.01 : 1) * (isPressed ? 0.95 : 1);
+                  const scaleValue = (isSelected ? 1.01 : 1) * (isPressed ? 0.985 : 1);
                   const sideShift =
                     hasAnySelected && !isSelected ? (index === 0 ? -1 : index === 2 ? 1 : 0) : 0;
 
@@ -2820,6 +2850,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     activeTab={activePanelTab}
                     strokeCycleActive={activeStrokeCycleKeys.includes("context:identity")}
                     secondary="IDENTITY"
+                    onMouseEnter={(event) => {
+                      setHoveredDividerTab("context");
+                      updateCursorBadgePosition(event);
+                    }}
+                    onMouseMove={updateCursorBadgePosition}
+                    onMouseLeave={() => setHoveredDividerTab(null)}
                     onClick={() => {
                       showCenterPopup(getSectionHighlightPopupText("context"));
                       toggleSectionContent("contextIdentity", "context");
@@ -2873,6 +2909,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   activeTab={activePanelTab}
                   strokeCycleActive={activeStrokeCycleKeys.includes("context:external")}
                   secondary="EXTERNAL"
+                  onMouseEnter={(event) => {
+                    setHoveredDividerTab("context");
+                    updateCursorBadgePosition(event);
+                  }}
+                  onMouseMove={updateCursorBadgePosition}
+                  onMouseLeave={() => setHoveredDividerTab(null)}
                   onClick={() => {
                     showCenterPopup(getSectionHighlightPopupText("context"));
                     toggleSectionContent("contextExternal", "context");
@@ -2914,14 +2956,24 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         }
                         onMouseEnter={(event) => {
                           if (link.disabled) {
+                            setHoveredOutboundLink(false);
                             return;
                           }
+                          setHoveredOutboundLink(true);
+                          updateCursorBadgePosition(event);
                           event.currentTarget.style.cursor = "alias";
                           event.currentTarget.style.color = "#003CFF";
                           event.currentTarget.style.borderColor = "#003CFF";
                           event.currentTarget.style.boxShadow = "2px 2px 0 0 #003CFF";
                         }}
+                        onMouseMove={(event) => {
+                          if (link.disabled) {
+                            return;
+                          }
+                          updateCursorBadgePosition(event);
+                        }}
                         onMouseLeave={(event) => {
+                          setHoveredOutboundLink(false);
                           if (link.disabled) {
                             return;
                           }
@@ -2931,10 +2983,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           event.currentTarget.style.boxShadow = "none";
                         }}
                         aria-disabled={link.disabled}
-                        target={link.disabled || link.href.startsWith("mailto:") ? undefined : "_blank"}
-                        rel={link.disabled || link.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+                        target={link.disabled ? undefined : "_blank"}
+                        rel={link.disabled ? undefined : "noopener noreferrer"}
                         onClick={(event) => {
                           if (link.disabled) {
+                            setHoveredOutboundLink(false);
                             event.preventDefault();
                             if (link.label === "UNORDINARY") {
                               showCenterPopup("BUILDING...");
@@ -3090,7 +3143,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           <button
                             type="button"
                             className="inline-flex cursor-crosshair items-center gap-2 text-left"
-                            onMouseEnter={() => {
+                            onMouseEnter={(event) => {
                               setIsEntriesHeaderHovered(true);
                               if (
                                 cursorBadgeMode === "read-more" ||
@@ -3098,8 +3151,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                               ) {
                                 setCursorBadgeMode(null);
                               }
+                              setHoveredDividerTab("entries");
+                              updateCursorBadgePosition(event);
                             }}
+                            onMouseMove={updateCursorBadgePosition}
                             onMouseLeave={() => {
+                              setHoveredDividerTab(null);
                               setIsEntriesHeaderHovered(false);
                             }}
                             onClick={(event) => {
@@ -3120,6 +3177,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                                   ...(activePanelTab === "entries"
                                     ? { backgroundColor: "#FFE500", color: "#000000" }
                                     : { backgroundColor: "rgba(0,0,0,0.05)" }),
+                                  ...(activeStrokeCycleKeys.includes(`entry:${entry.id}`)
+                                    ? ({ "--section-shadow-color": "#FFE500" } as CSSProperties)
+                                    : null),
                                 }
                               }
                             >
@@ -3225,6 +3285,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           activeTab={activePanelTab}
                           strokeCycleActive={activeStrokeCycleKeys.includes("context:education")}
                           secondary="EDUCATION"
+                          onMouseEnter={(event) => {
+                            setHoveredDividerTab("context");
+                            updateCursorBadgePosition(event);
+                          }}
+                          onMouseMove={updateCursorBadgePosition}
+                          onMouseLeave={() => setHoveredDividerTab(null)}
                           onClick={() => {
                             showCenterPopup(getSectionHighlightPopupText("context"));
                             toggleSectionContent("contextEducation", "context");
@@ -3246,6 +3312,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           activeTab={activePanelTab}
                           strokeCycleActive={activeStrokeCycleKeys.includes("context:experience")}
                           secondary="EXPERIENCE"
+                          onMouseEnter={(event) => {
+                            setHoveredDividerTab("context");
+                            updateCursorBadgePosition(event);
+                          }}
+                          onMouseMove={updateCursorBadgePosition}
+                          onMouseLeave={() => setHoveredDividerTab(null)}
                           onClick={() => {
                             showCenterPopup(getSectionHighlightPopupText("context"));
                             toggleSectionContent("contextExperience", "context");
@@ -3280,6 +3352,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           activeTab={activePanelTab}
                           strokeCycleActive={activeStrokeCycleKeys.includes("context:ideas")}
                           secondary="IDEAS"
+                          onMouseEnter={(event) => {
+                            setHoveredDividerTab("context");
+                            updateCursorBadgePosition(event);
+                          }}
+                          onMouseMove={updateCursorBadgePosition}
+                          onMouseLeave={() => setHoveredDividerTab(null)}
                           onClick={() => {
                             showCenterPopup(getSectionHighlightPopupText("context"));
                             toggleSectionContent("contextIdeas", "context");
@@ -3301,6 +3379,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           activeTab={activePanelTab}
                           strokeCycleActive={activeStrokeCycleKeys.includes("context:books")}
                           secondary="BOOKS"
+                          onMouseEnter={(event) => {
+                            setHoveredDividerTab("context");
+                            updateCursorBadgePosition(event);
+                          }}
+                          onMouseMove={updateCursorBadgePosition}
+                          onMouseLeave={() => setHoveredDividerTab(null)}
                           onClick={() => {
                             showCenterPopup(getSectionHighlightPopupText("context"));
                             toggleSectionContent("contextBooks", "context");
@@ -3344,6 +3428,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <button
                         type="button"
                         className="inline-flex cursor-crosshair items-center gap-2 text-left"
+                        onMouseEnter={(event) => {
+                          setHoveredDividerTab("work");
+                          updateCursorBadgePosition(event);
+                        }}
+                        onMouseMove={updateCursorBadgePosition}
+                        onMouseLeave={() => setHoveredDividerTab(null)}
                         onClick={() => {
                           showCenterPopup(getSectionHighlightPopupText("work"));
                           toggleSectionContent(key, "work");
@@ -3361,6 +3451,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                               ...(activePanelTab === "work"
                                 ? { backgroundColor: "#FF4FD9", color: "#000000" }
                                 : { backgroundColor: "rgba(0,0,0,0.05)" }),
+                              ...(activeStrokeCycleKeys.includes(`work:${project.id}`)
+                                ? ({ "--section-shadow-color": "#FF4FD9" } as CSSProperties)
+                                : null),
                             }
                           }
                         >
@@ -3454,6 +3547,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               activeTab={activePanelTab}
               strokeCycleActive={activeStrokeCycleKeys.includes("context:profile")}
               secondary="PROFILE"
+              onMouseEnter={(event) => {
+                setHoveredDividerTab("context");
+                updateCursorBadgePosition(event);
+              }}
+              onMouseMove={updateCursorBadgePosition}
+              onMouseLeave={() => setHoveredDividerTab(null)}
               onClick={() => {
                 showCenterPopup(getSectionHighlightPopupText("context"));
                 toggleSectionContent("contextProfile", "context");
