@@ -72,6 +72,7 @@ const cursorCycleColors = [
   "#FF3E5E",
   "#FF6D29",
 ];
+const scrambleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:".split("");
 type Point = {
   x: number;
   y: number;
@@ -646,11 +647,22 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [hoveredFooterBrand, setHoveredFooterBrand] = useState(false);
   const [cursorButtonTiltDeg, setCursorButtonTiltDeg] = useState(0);
   const [hoveredIntroToggle, setHoveredIntroToggle] = useState(false);
+  const [displayedLocationCode, setDisplayedLocationCode] = useState(
+    locations[locationKey].code,
+  );
+  const [displayedLocationCity, setDisplayedLocationCity] = useState(
+    locations[locationKey].city,
+  );
+  const [isLocationScrambling, setIsLocationScrambling] = useState(false);
+  const [scrambledClock, setScrambledClock] = useState("");
   const [strokeCycleStep, setStrokeCycleStep] = useState(-1);
   const [footerDateLabel, setFooterDateLabel] = useState("DATE");
   const [lastVisitorLabel, setLastVisitorLabel] = useState("UNKNOWN, --");
   const [visitorsToday, setVisitorsToday] = useState(0);
   const [visitorsAllTime, setVisitorsAllTime] = useState(0);
+  const [animatedVisitorCount, setAnimatedVisitorCount] = useState(0);
+  const [isFooterInView, setIsFooterInView] = useState(false);
+  const [displayedFooterDateLabel, setDisplayedFooterDateLabel] = useState("DATE");
   const [visitorCountMode, setVisitorCountMode] = useState<"today" | "all-time">(
     "today",
   );
@@ -769,7 +781,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const entryHeaderRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const homeIdentityDividerRef = useRef<HTMLDivElement | null>(null);
   const homeSectionsStartRef = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
   const hasStartedSelectorCycleRef = useRef(false);
+  const hasInitializedLocationScrambleRef = useRef(false);
+  const hasInitializedFooterDateScrambleRef = useRef(false);
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -1464,6 +1479,59 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   }, [hoveredSelectorTab, isLoaded, isSelectorGroupHovered]);
 
   useEffect(() => {
+    if (typeof window === "undefined" || !footerRef.current) {
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
+          setIsFooterInView(true);
+        }
+      },
+      { threshold: 0.2 },
+    );
+    observer.observe(footerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isFooterInView) {
+      return;
+    }
+    const targetCount = visitorCountMode === "today" ? visitorsToday : visitorsAllTime;
+    let rafId = 0;
+    if (targetCount <= 0) {
+      rafId = window.requestAnimationFrame(() => {
+        setAnimatedVisitorCount(0);
+      });
+      return () => {
+        window.cancelAnimationFrame(rafId);
+      };
+    }
+
+    rafId = window.requestAnimationFrame(() => {
+      setAnimatedVisitorCount(0);
+    });
+    const durationMs = 820;
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / durationMs, 1);
+      const eased = 1 - (1 - progress) * (1 - progress);
+      setAnimatedVisitorCount(Math.round(targetCount * eased));
+      if (progress < 1) {
+        rafId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
+  }, [isFooterInView, visitorCountMode, visitorsToday, visitorsAllTime]);
+
+  useEffect(() => {
     return () => {
       if (centerPopupTimeoutRef.current !== null) {
         window.clearTimeout(centerPopupTimeoutRef.current);
@@ -1746,11 +1814,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     workProjects.map((project) => [project.id, project]),
   );
   const entryById = Object.fromEntries(entriesData.map((entry) => [entry.id, entry]));
-  const todayVisitorLabel = `${visitorsToday} ${
-    visitorsToday === 1 ? "VISITOR TODAY" : "VISITORS TODAY"
+  const todayVisitorLabel = `${animatedVisitorCount} ${
+    animatedVisitorCount === 1 ? "VISITOR TODAY" : "VISITORS TODAY"
   }`;
-  const allTimeVisitorLabel = `${visitorsAllTime} ${
-    visitorsAllTime === 1 ? "VISITOR ALL-TIME" : "VISITORS ALL-TIME"
+  const allTimeVisitorLabel = `${animatedVisitorCount} ${
+    animatedVisitorCount === 1 ? "VISITOR ALL-TIME" : "VISITORS ALL-TIME"
   }`;
 
   const buildFooterRippleEffects = (
@@ -1816,6 +1884,119 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       })}
     </span>
   );
+
+  const startScramble = (
+    target: string,
+    setValue: (value: string) => void,
+    options?: { stepMs?: number; steps?: number },
+  ) => {
+    const steps = options?.steps ?? 11;
+    const stepMs = options?.stepMs ?? 30;
+    let frame = 0;
+    const intervalId = window.setInterval(() => {
+      frame += 1;
+      const revealed = Math.floor((frame / steps) * target.length);
+      const scrambled = [...target]
+        .map((character, index) => {
+          if (character === " ") {
+            return " ";
+          }
+          if (character === "," || character === "." || character === "-") {
+            return character;
+          }
+          if (index < revealed) {
+            return character;
+          }
+          return scrambleAlphabet[Math.floor(Math.random() * scrambleAlphabet.length)];
+        })
+        .join("");
+      setValue(scrambled);
+      if (frame >= steps) {
+        window.clearInterval(intervalId);
+        setValue(target);
+      }
+    }, stepMs);
+    return intervalId;
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const targetCode = activeLocation.code;
+    const targetCity = activeLocation.city;
+    const targetClock = new Intl.DateTimeFormat("en-CA", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: activeLocation.timeZone,
+    }).format(new Date());
+
+    if (!hasInitializedLocationScrambleRef.current) {
+      hasInitializedLocationScrambleRef.current = true;
+      const initialFrame = window.requestAnimationFrame(() => {
+        setDisplayedLocationCode(targetCode);
+        setDisplayedLocationCity(targetCity);
+        setScrambledClock(targetClock);
+      });
+      return () => {
+        window.cancelAnimationFrame(initialFrame);
+      };
+    }
+
+    const startFrame = window.requestAnimationFrame(() => {
+      setIsLocationScrambling(true);
+    });
+    const codeInterval = startScramble(targetCode, setDisplayedLocationCode, {
+      stepMs: 24,
+      steps: 10,
+    });
+    const cityInterval = startScramble(targetCity, setDisplayedLocationCity, {
+      stepMs: 24,
+      steps: 11,
+    });
+    const timeInterval = startScramble(targetClock, setScrambledClock, {
+      stepMs: 22,
+      steps: 9,
+    });
+    const endTimeout = window.setTimeout(() => {
+      setIsLocationScrambling(false);
+    }, 320);
+
+    return () => {
+      window.cancelAnimationFrame(startFrame);
+      window.clearInterval(codeInterval);
+      window.clearInterval(cityInterval);
+      window.clearInterval(timeInterval);
+      window.clearTimeout(endTimeout);
+    };
+  }, [activeLocation.code, activeLocation.city, activeLocation.timeZone]);
+
+  const footerDateTargetLabel =
+    visitorCountMode === "today" ? footerDateLabel : `SINCE ${footerDateLabel}`;
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (!hasInitializedFooterDateScrambleRef.current) {
+      hasInitializedFooterDateScrambleRef.current = true;
+      const initialFrame = window.requestAnimationFrame(() => {
+        setDisplayedFooterDateLabel(footerDateTargetLabel);
+      });
+      return () => {
+        window.cancelAnimationFrame(initialFrame);
+      };
+    }
+    const intervalId = startScramble(footerDateTargetLabel, setDisplayedFooterDateLabel, {
+      stepMs: 30,
+      steps: 12,
+    });
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [footerDateTargetLabel]);
 
   return (
     <main className="relative flex min-h-screen flex-col bg-background pb-6 pt-4">
@@ -2041,13 +2222,13 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               >
                 <span className="location-switch-content inline-flex cursor-crosshair items-center gap-2">
                   <span className="inline-block w-[44px] cursor-crosshair text-left">
-                    {activeLocation.code}
+                    {displayedLocationCode}
                   </span>
                   <span className="inline-block w-[90px] cursor-crosshair text-left">
-                    {activeLocation.city}
+                    {displayedLocationCity}
                   </span>
                   <span className="inline-block w-[68px] cursor-crosshair text-left font-sans">
-                    {clock}
+                    {isLocationScrambling ? scrambledClock : clock}
                   </span>
                 </span>
               </button>
@@ -3253,7 +3434,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           </section>
         ) : null}
 
-        <div className="order-last mt-6 border-t border-black/10 pt-2 text-[12px] leading-[1.5] text-black/40">
+        <div
+          ref={footerRef}
+          className="order-last mt-6 border-t border-black/10 pt-2 text-[12px] leading-[1.5] text-black/40"
+        >
           <div className="grid gap-6 min-[940px]:grid-cols-3 xl:gap-20">
           <div className="flex items-center justify-between">
             <span>LAST VISITOR FROM</span>
@@ -3292,7 +3476,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 : "Show visitors today"
             }
           >
-            <span>{visitorCountMode === "today" ? footerDateLabel : "SINCE APR 9 2026"}</span>
+            <span>{displayedFooterDateLabel}</span>
             <span>
               {visitorCountMode === "today"
                 ? todayVisitorLabel
