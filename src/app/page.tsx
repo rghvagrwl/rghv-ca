@@ -809,6 +809,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const entryHeaderRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const homeIdentityDividerRef = useRef<HTMLDivElement | null>(null);
   const homeSectionsStartRef = useRef<HTMLDivElement | null>(null);
+  const hasStartedSelectorCycleRef = useRef(false);
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -1381,34 +1382,47 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   };
 
   useEffect(() => {
-    if (isSelectorGroupHovered || hoveredSelectorTab !== null) {
+    if (!isLoaded || isSelectorGroupHovered || hoveredSelectorTab !== null) {
       return;
     }
 
-    let cycleInterval: number | null = null;
-    const idleTimeout = window.setTimeout(() => {
+    let cycleStepInterval: number | null = null;
+    let nextCycleTimeout: number | null = null;
+
+    const getRandomCycleDelay = () => 7000 + Math.floor(Math.random() * 3001);
+
+    const runCycle = () => {
       let nextIndex = 0;
       setAutoHoverSelectorTab(panelTabs[nextIndex]?.id ?? null);
-      cycleInterval = window.setInterval(() => {
+
+      cycleStepInterval = window.setInterval(() => {
         nextIndex += 1;
         if (nextIndex >= panelTabs.length) {
-          setAutoHoverSelectorTab(null);
-          if (cycleInterval !== null) {
-            window.clearInterval(cycleInterval);
+          if (cycleStepInterval !== null) {
+            window.clearInterval(cycleStepInterval);
+            cycleStepInterval = null;
           }
+          setAutoHoverSelectorTab(null);
+          nextCycleTimeout = window.setTimeout(runCycle, getRandomCycleDelay());
           return;
         }
         setAutoHoverSelectorTab(panelTabs[nextIndex]?.id ?? null);
       }, 620);
-    }, 8000);
+    };
+
+    const initialDelay = hasStartedSelectorCycleRef.current ? getRandomCycleDelay() : 3000;
+    hasStartedSelectorCycleRef.current = true;
+    nextCycleTimeout = window.setTimeout(runCycle, initialDelay);
 
     return () => {
-      window.clearTimeout(idleTimeout);
-      if (cycleInterval !== null) {
-        window.clearInterval(cycleInterval);
+      if (nextCycleTimeout !== null) {
+        window.clearTimeout(nextCycleTimeout);
+      }
+      if (cycleStepInterval !== null) {
+        window.clearInterval(cycleStepInterval);
       }
     };
-  }, [hoveredSelectorTab, isSelectorGroupHovered]);
+  }, [hoveredSelectorTab, isLoaded, isSelectorGroupHovered]);
 
   useEffect(() => {
     return () => {
@@ -1454,7 +1468,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       isLoaded ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
     }`,
     style: {
-      transitionDelay: isLoaded ? `${Math.min(delayMs, 120)}ms` : "0ms",
+      transitionDelay: isLoaded ? `${280 + delayMs}ms` : "0ms",
     },
   });
 
@@ -1826,7 +1840,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border transition-colors ${
+                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     isTrailBoosted
                       ? "trail-mode-button-active border-black/80"
                       : "border-black/20 bg-[#F7F7F7]"
@@ -1848,7 +1862,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className="flex h-6 w-6 items-center justify-center border border-black/20 bg-[#F7F7F7] text-[16px] leading-none text-black transition-all duration-150"
+                  className="flex h-6 w-6 items-center justify-center border-[0.5px] border-black/20 bg-[#F7F7F7] text-[16px] leading-none text-black transition-all duration-150"
                   onClick={() => setIsIntroOpen((prev) => !prev)}
                   onMouseEnter={(event) => {
                     setHoveredIntroToggle(true);
@@ -1974,10 +1988,23 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     hasAnySelected && !isSelected ? (index === 0 ? -1 : index === 2 ? 1 : 0) : 0;
 
                   return (
-                    <button
+                    <div
                       key={tab.id}
-                      type="button"
-                      onClick={() => {
+                      style={{
+                        opacity: isLoaded ? 1 : 0,
+                        transform: isLoaded
+                          ? "translateY(0px) scale(1)"
+                          : "translateY(7px) scale(0.96)",
+                        transitionProperty: "opacity, transform",
+                        transitionDuration: "360ms, 560ms",
+                        transitionTimingFunction:
+                          "ease-out, cubic-bezier(0.22,1.22,0.36,1)",
+                        transitionDelay: isLoaded ? `${40 + index * 85}ms` : "0ms",
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
                         if (isEntryControlLockActive) {
                           setInvalidSelectorFlash(tab.id);
                           if (invalidSelectorFlashTimeoutRef.current !== null) {
@@ -1991,63 +2018,64 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         }
                         togglePanelTab(tab.id);
                       }}
-                      className={`inline-flex h-6 items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2 py-[2px] text-[clamp(11px,0.76vw,12px)] font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] ${
-                        isSelectorBouncing ? "selector-jolt" : ""
-                      } ${isAutoCyclePreview ? "selector-auto-bob" : ""} ${
-                        invalidSelectorFlash === tab.id ? "control-error-wiggle" : ""
-                      }`}
-                      style={
-                        isSelected
-                          ? {
-                              backgroundColor: tab.color,
-                              borderColor: "#000000",
-                              color: "#000000",
-                              boxShadow: isHoverPreview
-                                ? isAutoCyclePreview
-                                  ? `1px 1px 0 0 ${tab.color}`
-                                  : "1px 1px 0 0 #000000"
-                                : "none",
-                              transform: "translateX(0px) scale(1.01)",
-                              cursor: isEntryControlLockActive ? "not-allowed" : "pointer",
-                            }
-                          : {
-                              borderColor: isHoverPreview ? "#000000" : "rgba(0,0,0,0.5)",
-                              color: "rgb(0,0,0)",
-                              boxShadow: isHoverPreview
-                                ? isAutoCyclePreview
-                                  ? `1px 1px 0 0 ${tab.color}`
-                                  : "1px 1px 0 0 #000000"
-                                : "none",
-                              transform: `translateX(${sideShift}px) scale(1)`,
-                              cursor: isEntryControlLockActive ? "not-allowed" : "pointer",
-                            }
-                      }
-                      onMouseEnter={() => {
-                        setHoveredSelectorTab(tab.id);
-                        setAutoHoverSelectorTab(null);
-                      }}
-                      onMouseMove={() => {
-                        if (!isSelectorGroupHovered) {
-                          setIsSelectorGroupHovered(true);
+                        className={`inline-flex h-6 items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2 py-[2px] text-[clamp(11px,0.76vw,12px)] font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] ${
+                          isSelectorBouncing ? "selector-jolt" : ""
+                        } ${isAutoCyclePreview ? "selector-auto-bob" : ""} ${
+                          invalidSelectorFlash === tab.id ? "control-error-wiggle" : ""
+                        }`}
+                        style={
+                          isSelected
+                            ? {
+                                backgroundColor: tab.color,
+                                borderColor: "#000000",
+                                color: "#000000",
+                                boxShadow: isHoverPreview
+                                  ? isAutoCyclePreview
+                                    ? `1px 1px 0 0 ${tab.color}`
+                                    : "1px 1px 0 0 #000000"
+                                  : "none",
+                                transform: "translateX(0px) scale(1.01)",
+                                cursor: isEntryControlLockActive ? "not-allowed" : "pointer",
+                              }
+                            : {
+                                borderColor: isHoverPreview ? "#000000" : "rgba(0,0,0,0.5)",
+                                color: "rgb(0,0,0)",
+                                boxShadow: isHoverPreview
+                                  ? isAutoCyclePreview
+                                    ? `1px 1px 0 0 ${tab.color}`
+                                    : "1px 1px 0 0 #000000"
+                                  : "none",
+                                transform: `translateX(${sideShift}px) scale(1)`,
+                                cursor: isEntryControlLockActive ? "not-allowed" : "pointer",
+                              }
                         }
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredSelectorTab((prev) =>
-                          prev === tab.id ? null : prev,
-                        );
-                      }}
-                    >
-                      {isSelected ? (
-                        <span
-                          aria-hidden="true"
-                          className="inline-block h-[5px] w-[5px]"
-                          style={{
-                            backgroundColor: isIdleCycleActive ? tab.color : "#000000",
-                          }}
-                        />
-                      ) : null}
-                      <span>{tab.label}</span>
-                    </button>
+                        onMouseEnter={() => {
+                          setHoveredSelectorTab(tab.id);
+                          setAutoHoverSelectorTab(null);
+                        }}
+                        onMouseMove={() => {
+                          if (!isSelectorGroupHovered) {
+                            setIsSelectorGroupHovered(true);
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          setHoveredSelectorTab((prev) =>
+                            prev === tab.id ? null : prev,
+                          );
+                        }}
+                      >
+                        {isSelected ? (
+                          <span
+                            aria-hidden="true"
+                            className="inline-block h-[5px] w-[5px]"
+                            style={{
+                              backgroundColor: isIdleCycleActive ? tab.color : "#000000",
+                            }}
+                          />
+                        ) : null}
+                        <span>{tab.label}</span>
+                      </button>
+                    </div>
                   );
                 })}
               </div>
@@ -2055,7 +2083,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border transition-colors ${
+                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "bring"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2116,7 +2144,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border transition-colors ${
+                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "show"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2196,7 +2224,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border transition-colors ${
+                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "truncate"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2290,7 +2318,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             </div>
           </div>
 
-          <div className="w-full max-w-[480px] min-[940px]:order-1">
+          <div
+            className={`w-full max-w-[480px] min-[940px]:order-1 ${reveal(180).className}`}
+            style={reveal(180).style}
+          >
             <div className="h-6" aria-hidden="true" />
           </div>
         </section>
@@ -2365,7 +2396,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <a
                         key={link.label}
                         href={link.href}
-                        className={`group inline-flex h-[26px] items-center gap-2 border px-2 py-[3px] text-[16px] font-medium leading-none whitespace-nowrap ${
+                        className={`group inline-flex h-[26px] items-center gap-2 border-[0.5px] px-2 py-[3px] text-[16px] font-medium leading-none whitespace-nowrap ${
                           link.disabled
                             ? "border-black/20 text-black/20"
                             : "border-black/50 text-black transition-[color,border-color,box-shadow,padding-right] duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] hover:pr-4 hover:cursor-alias"
@@ -2648,7 +2679,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         <div className="flex items-start justify-start">
                           <button
                             type="button"
-                            className="border border-black/20 bg-[#F7F7F7] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black/80"
+                            className="border-[0.5px] border-black/20 bg-[#F7F7F7] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black/80"
                             onClick={(event) => {
                               event.stopPropagation();
                               if (expandedEntryId === entry.id) {
@@ -2802,7 +2833,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     <div className="mt-2 flex justify-end">
                       <button
                         type="button"
-                        className="border border-black/20 bg-[#F7F7F7] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black/80"
+                        className="border-[0.5px] border-black/20 bg-[#F7F7F7] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black/80"
                         onClick={() =>
                           setVisibleWorkImageCountByProject((prev) => ({
                             ...prev,
