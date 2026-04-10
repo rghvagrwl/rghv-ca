@@ -137,6 +137,7 @@ const fixedBottomWorkProjectId = "no-category";
 const mixedContextSectionIds = ["context:education", "context:current"] as const;
 const IGNORE_VISITOR_COOKIE_NAME = "rghv_ignore_visitor";
 const IGNORE_VISITOR_QUERY_PARAM = "ignoreVisitor";
+const ALL_TIME_SINCE_LABEL = "SINCE APR 9, 2026";
 
 function formatRelativeVisitorAge(seenAt: number | null, nowMs: number) {
   if (!seenAt || Number.isNaN(seenAt)) {
@@ -2005,7 +2006,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   }, [activeLocation.code, activeLocation.city, activeLocation.timeZone]);
 
   const footerDateTargetLabel =
-    visitorCountMode === "today" ? footerDateLabel : `SINCE ${footerDateLabel}`;
+    visitorCountMode === "today" ? footerDateLabel : ALL_TIME_SINCE_LABEL;
 
   useEffect(() => {
     if (typeof window === "undefined") {
