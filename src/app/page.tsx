@@ -802,6 +802,15 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const hasInitializedFooterDateScrambleRef = useRef(false);
   const hasInitializedVisitorModeScrambleRef = useRef(false);
 
+  const closeProfileWindow = () => {
+    setIsProfileWindowOpen(false);
+    setIsProfileWindowSelected(false);
+    setIsProfileWindowDragging(false);
+    setIsProfileWindowResizing(false);
+    setActiveResizeHandle(null);
+    setHoveredProfileImage(false);
+  };
+
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat("en-CA", {
       hour: "2-digit",
@@ -1147,12 +1156,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         return;
       }
       event.preventDefault();
-      setIsProfileWindowOpen(false);
-      setIsProfileWindowSelected(false);
-      setIsProfileWindowDragging(false);
-      setIsProfileWindowResizing(false);
-      setActiveResizeHandle(null);
-      setHoveredProfileImage(false);
+      closeProfileWindow();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -1168,7 +1172,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
     const timer = window.setInterval(() => {
       setProfileTooltipFlip((prev) => !prev);
-    }, 3000);
+    }, 1500);
 
     return () => {
       window.clearInterval(timer);
@@ -1179,12 +1183,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
   const openProfileWindow = () => {
     if (isProfileWindowOpen) {
-      setIsProfileWindowOpen(false);
-      setIsProfileWindowSelected(false);
-      setIsProfileWindowDragging(false);
-      setIsProfileWindowResizing(false);
-      setActiveResizeHandle(null);
-      setHoveredProfileImage(false);
+      closeProfileWindow();
       return;
     }
 
@@ -2313,7 +2312,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className={`navbar-click cursor-button-click inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
+                  className={`navbar-click cursor-button-click inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center border-[0.5px] transition-colors md:h-6 md:w-6 ${
                     isTrailBoosted
                       ? "trail-mode-button-active border-black/80"
                       : "border-black/20 bg-[#F7F7F7]"
@@ -2347,7 +2346,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className="navbar-click flex h-6 w-6 items-center justify-center border-[0.5px] border-black/20 bg-[#F7F7F7] text-[16px] leading-none text-black transition-all duration-150"
+                  className="navbar-click flex h-[26px] w-[26px] items-center justify-center border-[0.5px] border-black/20 bg-[#F7F7F7] text-[16px] leading-none text-black transition-all duration-150 md:h-6 md:w-6"
                   onClick={() => setIsIntroOpen((prev) => !prev)}
                   onMouseEnter={(event) => {
                     setHoveredIntroToggle(true);
@@ -2526,7 +2525,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         showCenterPopup(getSectionHighlightPopupText(tab.id));
                         togglePanelTab(tab.id);
                       }}
-                        className={`navbar-click inline-flex h-6 items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2 py-[2px] text-[clamp(11px,0.76vw,12px)] font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] ${
+                        className={`navbar-click inline-flex h-[26px] items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2.5 py-[2px] text-[clamp(11px,0.76vw,12px)] font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] md:h-6 md:px-2 ${
                           isSelectorBouncing ? "selector-jolt" : ""
                         } ${isAutoCyclePreview ? "selector-auto-bob" : ""} ${
                           invalidSelectorFlash === tab.id ? "control-error-wiggle" : ""
@@ -2603,7 +2602,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className={`navbar-click inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
+                  className={`navbar-click inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center border-[0.5px] transition-colors md:h-6 md:w-6 ${
                     invalidControlFlash === "bring"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2667,7 +2666,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className={`navbar-click inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
+                  className={`navbar-click inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center border-[0.5px] transition-colors md:h-6 md:w-6 ${
                     invalidControlFlash === "show"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2752,7 +2751,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className={`navbar-click inline-flex h-6 w-6 shrink-0 items-center justify-center border-[0.5px] transition-colors ${
+                  className={`navbar-click inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center border-[0.5px] transition-colors md:h-6 md:w-6 ${
                     invalidControlFlash === "truncate"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2859,7 +2858,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             className={`w-full max-w-[480px] min-[940px]:order-1 ${reveal(180).className}`}
             style={reveal(180).style}
           >
-            <div className="h-6" aria-hidden="true" />
+            <div className="h-[26px] md:h-6" aria-hidden="true" />
           </div>
         </section>
 
@@ -3685,6 +3684,20 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           </div>
         </div>
       </div>
+      {isProfileWindowOpen && profileWindowPosition ? (
+        <button
+          type="button"
+          className="fixed left-1/2 z-[115] inline-flex h-[26px] -translate-x-1/2 items-center justify-center border-[0.5px] border-black bg-[#00A1FF] px-2.5 text-[clamp(11px,0.76vw,12px)] font-medium leading-none text-white md:hidden"
+          style={{
+            left: profileWindowPosition.x + profileWindowSize.width / 2,
+            top: profileWindowPosition.y + profileWindowSize.height + 8,
+          }}
+          onClick={closeProfileWindow}
+          aria-label="Delete profile photo window"
+        >
+          DELETE PHOTO
+        </button>
+      ) : null}
     </main>
   );
 }
