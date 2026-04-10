@@ -22,20 +22,20 @@ const switzer = localFont({
   display: "swap",
 });
 const GA_MEASUREMENT_ID = "G-7J753C2G2R";
+const siteDescription =
+  "Raghav Agarwal is a designer working across product, brand, and digital interfaces.";
 
 export const metadata: Metadata = {
   title: "raghav agarwal",
-  description:
-    "Raghav Agarwal is a designer working across product, brand, and digital interfaces. His practice is shaped by observation, with a focus on micro interactions, emotional friction, and inconsistencies in how people experience interfaces. He believes design should feel clear and intuitive, where the decisions do not require explanation.",
+  description: siteDescription,
   openGraph: {
     title: "raghav agarwal",
-    description:
-      "Raghav Agarwal is a designer working across product, brand, and digital interfaces. His practice is shaped by observation, with a focus on micro interactions, emotional friction, and inconsistencies in how people experience interfaces. He believes design should feel clear and intuitive, where the decisions do not require explanation.",
+    description: siteDescription,
   },
   twitter: {
     title: "raghav agarwal",
-    description:
-      "Raghav Agarwal is a designer working across product, brand, and digital interfaces. His practice is shaped by observation, with a focus on micro interactions, emotional friction, and inconsistencies in how people experience interfaces. He believes design should feel clear and intuitive, where the decisions do not require explanation.",
+    description: siteDescription,
+    card: "summary_large_image",
   },
   icons: {
     icon: "/icon.svg",

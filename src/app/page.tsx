@@ -612,10 +612,12 @@ function ShowHideIcon({
 }
 
 function TruncateIcon({
+  active = false,
   disabled = false,
   inactive = false,
   error = false,
 }: {
+  active?: boolean;
   disabled?: boolean;
   inactive?: boolean;
   error?: boolean;
@@ -624,6 +626,8 @@ function TruncateIcon({
     ? "#DC2626"
     : disabled
       ? "rgba(0,0,0,0.2)"
+      : active
+        ? "white"
       : inactive
         ? "rgba(0,0,0,0.8)"
         : "rgba(0,0,0,0.8)";
@@ -687,6 +691,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [cursorBadgePosition, setCursorBadgePosition] = useState({ x: 0, y: 0 });
   const [hoveredControl, setHoveredControl] = useState<HoveredControl>(null);
   const [hoveredDividerTab, setHoveredDividerTab] = useState<PanelTabId | null>(null);
+  const [hoveredSectionKey, setHoveredSectionKey] = useState<string | null>(null);
   const [hoveredSelectorTab, setHoveredSelectorTab] = useState<PanelTabId | null>(
     null,
   );
@@ -961,7 +966,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         city = cityPart.replace(/_/g, " ").toUpperCase();
       }
 
-      const currentVisitorLabel = `${city}, ${country}`;
+      const currentVisitorLabel =
+        city === "UNKNOWN" && country !== "UNKNOWN COUNTRY"
+          ? country
+          : city !== "UNKNOWN" && country === "UNKNOWN COUNTRY"
+            ? city
+          : `${city}, ${country}`;
       if (isMounted) {
         setLastVisitorLabel(
           nextLastVisitorLabel === "UNKNOWN, UNKNOWN COUNTRY"
@@ -1523,10 +1533,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       setCenterPopupText(null);
     }, 1500);
   };
-  const getSectionHighlightPopupText = (tab: PanelTabId) =>
-    activePanelTab === tab
-      ? "HIGHLIGHT REMOVED"
-      : `HIGHLIGHTING ${tab.toUpperCase()}`;
+  const getSectionHighlightPopupText = (tab: PanelTabId, sectionKey?: string) =>
+    truncateModeActive && sectionKey
+      ? expandedInTruncate[sectionKey]
+        ? "TRUNCATED"
+        : "EXPANDED"
+      : activePanelTab === tab
+        ? "HIGHLIGHT REMOVED"
+        : `HIGHLIGHTING ${tab.toUpperCase()}`;
 
   const toggleSectionContent = (sectionKey: string, tab: PanelTabId) => {
     if (truncateModeActive) {
@@ -1734,6 +1748,27 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const canUseTruncateControl = activePanelTab !== null && showOnlySelected;
   const truncateModeActive = isTruncateMode && canUseTruncateControl;
   const isEntryControlLockActive = false;
+  const hasTruncatedContentInActivePanel =
+    canUseTruncateControl && activePanelTab
+      ? (activePanelTab === "context"
+          ? [
+              "contextIdentity",
+              "contextEducation",
+              "contextExperience",
+              "contextIdeas",
+              "contextBooks",
+              "contextExternal",
+              "contextProfile",
+            ]
+          : activePanelTab === "work"
+            ? workProjects.map((project) => `work:${project.id}`)
+            : entriesData.map((entry) => `entry:${entry.id}`)).some(
+          (sectionKey) => !expandedInTruncate[sectionKey],
+        )
+      : false;
+  const isTruncateButtonActive = truncateModeActive && hasTruncatedContentInActivePanel;
+  const getTruncateSectionActionLabel = (sectionKey: string) =>
+    expandedInTruncate[sectionKey] ? "TRUNCATE" : "EXPAND";
 
   const cursorControlLabel =
     !hoveredControl || !activePanelTab
@@ -1745,7 +1780,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         : hoveredControl === "truncate"
           ? canUseTruncateControl
             ? truncateModeActive
-              ? "EXTEND"
+              ? "EXPAND"
               : "TRUNCATE"
             : null
         : showOnlySelected
@@ -1757,10 +1792,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       ? "SHOW CALGARY"
       : "SHOW WATERLOO"
     : null;
-  const getSectionHoverCursorLabel = (tab: PanelTabId) =>
-    activePanelTab === tab ? "REMOVE HIGHLIGHT" : `HIGHLIGHT ${tab.toUpperCase()}`;
+  const getSectionHoverCursorLabel = (tab: PanelTabId, sectionKey?: string | null) =>
+    truncateModeActive && sectionKey
+      ? getTruncateSectionActionLabel(sectionKey)
+      : activePanelTab === tab
+        ? "REMOVE HIGHLIGHT"
+        : `HIGHLIGHT ${tab.toUpperCase()}`;
   const cursorDividerLabel = hoveredDividerTab
-    ? getSectionHoverCursorLabel(hoveredDividerTab)
+    ? getSectionHoverCursorLabel(hoveredDividerTab, hoveredSectionKey)
     : null;
   const cursorSelectorLabel = hoveredSelectorTab
     ? getSectionHoverCursorLabel(hoveredSelectorTab)
@@ -2959,7 +2998,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
                       ? "border-black/20 bg-[#F7F7F7]"
-                      : "border-black/20 bg-[#F7F7F7]"
+                      : isTruncateButtonActive
+                        ? "border-black bg-black"
+                        : "border-black/20 bg-[#F7F7F7]"
                   }`}
                   onClick={() => {
                     if (isEntryControlLockActive) {
@@ -3030,8 +3071,13 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   }
                 >
                   <TruncateIcon
+                    active={isTruncateButtonActive}
                     disabled={!canUseTruncateControl || isEntryControlLockActive}
-                    inactive={canUseTruncateControl && !isEntryControlLockActive}
+                    inactive={
+                      canUseTruncateControl &&
+                      !isEntryControlLockActive &&
+                      !isTruncateButtonActive
+                    }
                     error={invalidControlFlash === "truncate"}
                   />
                 </button>
@@ -3097,12 +3143,18 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     secondary="IDENTITY"
                     onMouseEnter={(event) => {
                       setHoveredDividerTab("context");
+                      setHoveredSectionKey("contextIdentity");
                       updateCursorBadgePosition(event);
                     }}
                     onMouseMove={updateCursorBadgePosition}
-                    onMouseLeave={() => setHoveredDividerTab(null)}
+                    onMouseLeave={() => {
+                      setHoveredDividerTab(null);
+                      setHoveredSectionKey(null);
+                    }}
                     onClick={() => {
-                      showCenterPopup(getSectionHighlightPopupText("context"));
+                      showCenterPopup(
+                        getSectionHighlightPopupText("context", "contextIdentity"),
+                      );
                       toggleSectionContent("contextIdentity", "context");
                     }}
                   />
@@ -3164,12 +3216,18 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   secondary="EXTERNAL"
                   onMouseEnter={(event) => {
                     setHoveredDividerTab("context");
+                    setHoveredSectionKey("contextExternal");
                     updateCursorBadgePosition(event);
                   }}
                   onMouseMove={updateCursorBadgePosition}
-                  onMouseLeave={() => setHoveredDividerTab(null)}
+                  onMouseLeave={() => {
+                    setHoveredDividerTab(null);
+                    setHoveredSectionKey(null);
+                  }}
                   onClick={() => {
-                    showCenterPopup(getSectionHighlightPopupText("context"));
+                    showCenterPopup(
+                      getSectionHighlightPopupText("context", "contextExternal"),
+                    );
                     toggleSectionContent("contextExternal", "context");
                   }}
                 />
@@ -3405,16 +3463,20 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                                 setCursorBadgeMode(null);
                               }
                               setHoveredDividerTab("entries");
+                              setHoveredSectionKey(entryKey);
                               updateCursorBadgePosition(event);
                             }}
                             onMouseMove={updateCursorBadgePosition}
                             onMouseLeave={() => {
                               setHoveredDividerTab(null);
+                              setHoveredSectionKey(null);
                               setIsEntriesHeaderHovered(false);
                             }}
                             onClick={(event) => {
                               event.stopPropagation();
-                              showCenterPopup(getSectionHighlightPopupText("entries"));
+                              showCenterPopup(
+                                getSectionHighlightPopupText("entries", entryKey),
+                              );
                               toggleSectionContent(entryKey, "entries");
                             }}
                             aria-label="Show entries section"
@@ -3540,12 +3602,18 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           secondary="EDUCATION"
                           onMouseEnter={(event) => {
                             setHoveredDividerTab("context");
+                            setHoveredSectionKey("contextEducation");
                             updateCursorBadgePosition(event);
                           }}
                           onMouseMove={updateCursorBadgePosition}
-                          onMouseLeave={() => setHoveredDividerTab(null)}
+                          onMouseLeave={() => {
+                            setHoveredDividerTab(null);
+                            setHoveredSectionKey(null);
+                          }}
                           onClick={() => {
-                            showCenterPopup(getSectionHighlightPopupText("context"));
+                            showCenterPopup(
+                              getSectionHighlightPopupText("context", "contextEducation"),
+                            );
                             toggleSectionContent("contextEducation", "context");
                           }}
                         />
@@ -3567,12 +3635,18 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           secondary="EXPERIENCE"
                           onMouseEnter={(event) => {
                             setHoveredDividerTab("context");
+                            setHoveredSectionKey("contextExperience");
                             updateCursorBadgePosition(event);
                           }}
                           onMouseMove={updateCursorBadgePosition}
-                          onMouseLeave={() => setHoveredDividerTab(null)}
+                          onMouseLeave={() => {
+                            setHoveredDividerTab(null);
+                            setHoveredSectionKey(null);
+                          }}
                           onClick={() => {
-                            showCenterPopup(getSectionHighlightPopupText("context"));
+                            showCenterPopup(
+                              getSectionHighlightPopupText("context", "contextExperience"),
+                            );
                             toggleSectionContent("contextExperience", "context");
                           }}
                         />
@@ -3607,12 +3681,18 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           secondary="IDEAS"
                           onMouseEnter={(event) => {
                             setHoveredDividerTab("context");
+                            setHoveredSectionKey("contextIdeas");
                             updateCursorBadgePosition(event);
                           }}
                           onMouseMove={updateCursorBadgePosition}
-                          onMouseLeave={() => setHoveredDividerTab(null)}
+                          onMouseLeave={() => {
+                            setHoveredDividerTab(null);
+                            setHoveredSectionKey(null);
+                          }}
                           onClick={() => {
-                            showCenterPopup(getSectionHighlightPopupText("context"));
+                            showCenterPopup(
+                              getSectionHighlightPopupText("context", "contextIdeas"),
+                            );
                             toggleSectionContent("contextIdeas", "context");
                           }}
                         />
@@ -3634,12 +3714,18 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           secondary="BOOKS"
                           onMouseEnter={(event) => {
                             setHoveredDividerTab("context");
+                            setHoveredSectionKey("contextBooks");
                             updateCursorBadgePosition(event);
                           }}
                           onMouseMove={updateCursorBadgePosition}
-                          onMouseLeave={() => setHoveredDividerTab(null)}
+                          onMouseLeave={() => {
+                            setHoveredDividerTab(null);
+                            setHoveredSectionKey(null);
+                          }}
                           onClick={() => {
-                            showCenterPopup(getSectionHighlightPopupText("context"));
+                            showCenterPopup(
+                              getSectionHighlightPopupText("context", "contextBooks"),
+                            );
                             toggleSectionContent("contextBooks", "context");
                           }}
                         />
@@ -3683,12 +3769,16 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         className="inline-flex cursor-crosshair items-center gap-2 text-left"
                         onMouseEnter={(event) => {
                           setHoveredDividerTab("work");
+                          setHoveredSectionKey(key);
                           updateCursorBadgePosition(event);
                         }}
                         onMouseMove={updateCursorBadgePosition}
-                        onMouseLeave={() => setHoveredDividerTab(null)}
+                        onMouseLeave={() => {
+                          setHoveredDividerTab(null);
+                          setHoveredSectionKey(null);
+                        }}
                         onClick={() => {
-                          showCenterPopup(getSectionHighlightPopupText("work"));
+                          showCenterPopup(getSectionHighlightPopupText("work", key));
                           toggleSectionContent(key, "work");
                         }}
                         aria-label={`Show ${project.title.toLowerCase()} work section`}
@@ -3802,12 +3892,16 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               secondary="PROFILE"
               onMouseEnter={(event) => {
                 setHoveredDividerTab("context");
+                setHoveredSectionKey("contextProfile");
                 updateCursorBadgePosition(event);
               }}
               onMouseMove={updateCursorBadgePosition}
-              onMouseLeave={() => setHoveredDividerTab(null)}
+              onMouseLeave={() => {
+                setHoveredDividerTab(null);
+                setHoveredSectionKey(null);
+              }}
               onClick={() => {
-                showCenterPopup(getSectionHighlightPopupText("context"));
+                showCenterPopup(getSectionHighlightPopupText("context", "contextProfile"));
                 toggleSectionContent("contextProfile", "context");
               }}
             />

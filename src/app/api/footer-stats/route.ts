@@ -80,6 +80,12 @@ function normalizeVisitorLabel(rawLabel: string) {
   const city = decodeLegacyText(rawCity).trim().toUpperCase() || "UNKNOWN";
   const countryJoined = countryParts.join(",").trim();
   const country = normalizeCountryText(countryJoined || "UNKNOWN COUNTRY");
+  if (city === "UNKNOWN" && country !== "UNKNOWN COUNTRY") {
+    return country;
+  }
+  if (city !== "UNKNOWN" && country === "UNKNOWN COUNTRY") {
+    return city;
+  }
   return `${city}, ${country}`;
 }
 
