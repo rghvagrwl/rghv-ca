@@ -25,7 +25,7 @@ function resolveCountryLabel(countryCode: string) {
     return "UNKNOWN COUNTRY";
   }
   if (code === "US") {
-    return "US";
+    return "USA";
   }
   if (code === "GB") {
     return "UK";
@@ -39,7 +39,7 @@ function resolveCountryLabel(countryCode: string) {
   }
   const uppercaseCountryName = countryName.toUpperCase();
   if (uppercaseCountryName === "UNITED STATES") {
-    return "US";
+    return "USA";
   }
   if (uppercaseCountryName === "UNITED KINGDOM") {
     return "UK";
@@ -56,7 +56,7 @@ function normalizeCountryText(country: string) {
     return "UNKNOWN COUNTRY";
   }
   if (normalized === "UNITED STATES" || normalized === "US") {
-    return "US";
+    return "USA";
   }
   if (normalized === "UNITED KINGDOM" || normalized === "UK" || normalized === "GB") {
     return "UK";
