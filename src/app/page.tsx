@@ -2692,7 +2692,6 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     hoveredSelectorTab === tab.id || autoHoverSelectorTab === tab.id;
                   const isAutoCyclePreview =
                     hoveredSelectorTab === null && autoHoverSelectorTab === tab.id;
-                  const isIdleCycleActive = autoHoverSelectorTab !== null;
                   const hasAnySelected = activePanelTab !== null;
                   const isPressed = pressedSelectorTabId === tab.id;
                   const scaleValue = (isSelected ? 1.01 : 1) * (isPressed ? 0.985 : 1);
@@ -2793,9 +2792,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           <span
                             aria-hidden="true"
                             className="inline-block h-[5px] w-[5px]"
-                            style={{
-                              backgroundColor: isIdleCycleActive ? tab.color : "#000000",
-                            }}
+                            style={{ backgroundColor: "#000000" }}
                           />
                         ) : null}
                         <span>{tab.label}</span>
