@@ -639,7 +639,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     initialTab,
   );
   const [isSelectorBouncing, setIsSelectorBouncing] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded] = useState(true);
   const [trailSquares, setTrailSquares] = useState<TrailSquare[]>([]);
   const [isTrailBoosted, setIsTrailBoosted] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -822,11 +822,6 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       clearInterval(timer);
     };
   }, [locationKey]);
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => setIsLoaded(true), 40);
-    return () => window.clearTimeout(timeoutId);
-  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") {

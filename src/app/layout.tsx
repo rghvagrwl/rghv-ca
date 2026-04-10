@@ -49,22 +49,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isProduction = process.env.NODE_ENV === "production";
+
   return (
     <html lang="en" className={`${switzer.variable} h-full scroll-smooth antialiased`}>
       <body className="min-h-full">
         {children}
-        <Analytics />
-        <SpeedInsights />
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
+        {isProduction ? <Analytics /> : null}
+        {isProduction ? <SpeedInsights /> : null}
+        {isProduction ? (
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+            strategy="lazyOnload"
+          />
+        ) : null}
+        {isProduction ? (
+          <Script id="google-analytics" strategy="lazyOnload">
+            {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_MEASUREMENT_ID}');`}
-        </Script>
+          </Script>
+        ) : null}
       </body>
     </html>
   );
