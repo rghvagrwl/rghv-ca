@@ -46,6 +46,8 @@ type CursorBadgeMode =
   | "close-entry"
   | "show-all-time"
   | "show-today"
+  | "show-visitor-time"
+  | "show-last-visitor-location"
   | null;
 type HoveredControl = "bring" | "show" | "truncate" | null;
 type TrailSquare = {
@@ -135,6 +137,27 @@ const fixedBottomWorkProjectId = "no-category";
 const mixedContextSectionIds = ["context:education", "context:current"] as const;
 const IGNORE_VISITOR_COOKIE_NAME = "rghv_ignore_visitor";
 const IGNORE_VISITOR_QUERY_PARAM = "ignoreVisitor";
+
+function formatRelativeVisitorAge(seenAt: number | null, nowMs: number) {
+  if (!seenAt || Number.isNaN(seenAt)) {
+    return "UNKNOWN";
+  }
+  const elapsedSeconds = Math.max(0, Math.floor((nowMs - seenAt) / 1000));
+  if (elapsedSeconds < 60) {
+    return `${elapsedSeconds}S AGO`;
+  }
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+  if (elapsedMinutes < 60) {
+    return `${elapsedMinutes}M AGO`;
+  }
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) {
+    return `${elapsedHours}H AGO`;
+  }
+  const elapsedDays = Math.floor(elapsedHours / 24);
+  return `${elapsedDays}D AGO`;
+}
+
 const workProjects = [
   {
     id: "unordinary",
@@ -684,6 +707,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [strokeCycleStep] = useState(-1);
   const [footerDateLabel, setFooterDateLabel] = useState("DATE");
   const [lastVisitorLabel, setLastVisitorLabel] = useState("UNKNOWN, UNKNOWN COUNTRY");
+  const [lastVisitorSeenAt, setLastVisitorSeenAt] = useState<number | null>(null);
+  const [lastVisitorMode, setLastVisitorMode] = useState<"from" | "was">("from");
+  const [relativeNowMs, setRelativeNowMs] = useState(() => Date.now());
+  const [displayedLastVisitorHeading, setDisplayedLastVisitorHeading] =
+    useState("LAST VISITOR FROM");
+  const [displayedLastVisitorValue, setDisplayedLastVisitorValue] = useState(
+    "UNKNOWN, UNKNOWN COUNTRY",
+  );
   const [visitorsToday, setVisitorsToday] = useState(0);
   const [visitorsAllTime, setVisitorsAllTime] = useState(0);
   const [animatedVisitorCount, setAnimatedVisitorCount] = useState(0);
@@ -807,6 +838,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const hasInitializedLocationScrambleRef = useRef(false);
   const hasInitializedFooterDateScrambleRef = useRef(false);
   const hasInitializedVisitorModeScrambleRef = useRef(false);
+  const hasInitializedLastVisitorScrambleRef = useRef(false);
+  const previousLastVisitorModeRef = useRef<"from" | "was">("from");
 
   const closeProfileWindow = () => {
     setIsProfileWindowOpen(false);
@@ -882,6 +915,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       let nextVisitorsToday = 0;
       let nextVisitorsAllTime = 0;
       let nextLastVisitorLabel = "UNKNOWN, UNKNOWN COUNTRY";
+      let nextLastVisitorSeenAt: number | null = null;
       try {
         const response = await fetch("/api/footer-stats", { cache: "no-store" });
         if (response.ok) {
@@ -889,6 +923,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             city?: string | null;
             country?: string | null;
             lastVisitorLabel?: string | null;
+            lastVisitorSeenAt?: number | null;
             visitorsToday?: number | null;
             visitorsAllTime?: number | null;
           };
@@ -900,6 +935,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           }
           if (footerStats.lastVisitorLabel) {
             nextLastVisitorLabel = footerStats.lastVisitorLabel;
+          }
+          if (typeof footerStats.lastVisitorSeenAt === "number") {
+            nextLastVisitorSeenAt = footerStats.lastVisitorSeenAt;
           }
           if (typeof footerStats.visitorsToday === "number") {
             nextVisitorsToday = footerStats.visitorsToday;
@@ -921,6 +959,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             ? currentVisitorLabel
             : nextLastVisitorLabel,
         );
+        setLastVisitorSeenAt(nextLastVisitorSeenAt);
         setVisitorsToday(nextVisitorsToday);
         setVisitorsAllTime(nextVisitorsAllTime);
       }
@@ -929,6 +968,15 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     return () => {
       isMounted = false;
       window.clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setRelativeNowMs(Date.now());
+    }, 1000);
+    return () => {
+      window.clearInterval(timer);
     };
   }, []);
 
@@ -1730,7 +1778,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         ? cursorTrailModeLabel
         : cursorIntroLabel
           ? cursorIntroLabel
-      : cursorProfileImageLabel
+        : cursorProfileImageLabel
         ? cursorProfileImageLabel
         : cursorBadgeMode === "read-more"
           ? "READ MORE"
@@ -1740,6 +1788,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               ? "SHOW ALL-TIME"
               : cursorBadgeMode === "show-today"
                 ? "SHOW TODAY"
+                : cursorBadgeMode === "show-visitor-time"
+                  ? "SHOW VISITOR TIME"
+                  : cursorBadgeMode === "show-last-visitor-location"
+                    ? "SHOW LAST VISITOR LOCATION"
                 : "";
 
   const badgeOffset = 14;
@@ -1856,6 +1908,14 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       : activeVisitorCountTarget === 1
         ? "VISITOR ALL-TIME"
         : "VISITORS ALL-TIME";
+  const lastVisitorRelativeLabel = useMemo(
+    () => formatRelativeVisitorAge(lastVisitorSeenAt, relativeNowMs),
+    [lastVisitorSeenAt, relativeNowMs],
+  );
+  const lastVisitorHeadingTarget =
+    lastVisitorMode === "from" ? "LAST VISITOR FROM" : "LAST VISIT WAS";
+  const lastVisitorValueTarget =
+    lastVisitorMode === "from" ? lastVisitorLabel : lastVisitorRelativeLabel;
   const startScramble = (
     target: string,
     setValue: (value: string) => void,
@@ -1991,6 +2051,50 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     };
   }, [visitorModeLabelTarget]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (!hasInitializedLastVisitorScrambleRef.current) {
+      hasInitializedLastVisitorScrambleRef.current = true;
+      previousLastVisitorModeRef.current = lastVisitorMode;
+      const initialFrame = window.requestAnimationFrame(() => {
+        setDisplayedLastVisitorHeading(lastVisitorHeadingTarget);
+        setDisplayedLastVisitorValue(lastVisitorValueTarget);
+      });
+      return () => {
+        window.cancelAnimationFrame(initialFrame);
+      };
+    }
+
+    const modeChanged = previousLastVisitorModeRef.current !== lastVisitorMode;
+    previousLastVisitorModeRef.current = lastVisitorMode;
+
+    if (!modeChanged) {
+      const frame = window.requestAnimationFrame(() => {
+        setDisplayedLastVisitorHeading(lastVisitorHeadingTarget);
+        setDisplayedLastVisitorValue(lastVisitorValueTarget);
+      });
+      return () => {
+        window.cancelAnimationFrame(frame);
+      };
+    }
+
+    const headingInterval = startScramble(
+      lastVisitorHeadingTarget,
+      setDisplayedLastVisitorHeading,
+      { stepMs: 24, steps: 11 },
+    );
+    const valueInterval = startScramble(lastVisitorValueTarget, setDisplayedLastVisitorValue, {
+      stepMs: 24,
+      steps: 11,
+    });
+    return () => {
+      window.clearInterval(headingInterval);
+      window.clearInterval(valueInterval);
+    };
+  }, [lastVisitorHeadingTarget, lastVisitorMode, lastVisitorValueTarget]);
+
   return (
     <main className="relative flex min-h-screen flex-col bg-background pb-6 pt-4">
       <div className="-mt-4 mb-4 w-full overflow-hidden bg-black/5 py-1 text-[10px] text-black/40">
@@ -2074,11 +2178,19 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               SHOW ALL-TIME
             </span>
-          ) : (
+          ) : cursorBadgeMode === "show-today" ? (
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               SHOW TODAY
             </span>
-          )}
+          ) : cursorBadgeMode === "show-visitor-time" ? (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              SHOW VISITOR TIME
+            </span>
+          ) : cursorBadgeMode === "show-last-visitor-location" ? (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              SHOW LAST VISITOR LOCATION
+            </span>
+          ) : null}
         </div>
       ) : null}
 
@@ -3572,10 +3684,51 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           className="ui-wide-letter-spacing order-last mt-6 border-t border-black/10 pt-2 text-[12px] leading-[1.5] text-black/80"
         >
           <div className="grid gap-6 min-[940px]:grid-cols-3 xl:gap-20">
-          <div className="flex items-center justify-between">
-            <span>LAST VISITOR FROM</span>
-            <span>{lastVisitorLabel}</span>
-          </div>
+          <button
+            type="button"
+            className="flex cursor-crosshair items-center justify-between text-left transition-colors hover:text-black/60"
+            style={{ cursor: "crosshair" }}
+            onMouseEnter={(event) => {
+              updateCursorBadgePosition(event);
+              setCursorBadgeMode(
+                lastVisitorMode === "from"
+                  ? "show-visitor-time"
+                  : "show-last-visitor-location",
+              );
+            }}
+            onMouseMove={updateCursorBadgePosition}
+            onMouseLeave={() => {
+              setCursorBadgeMode((prev) =>
+                prev === "show-visitor-time" || prev === "show-last-visitor-location"
+                  ? null
+                  : prev,
+              );
+            }}
+            onClick={() => {
+              setLastVisitorMode((prev) => {
+                const next = prev === "from" ? "was" : "from";
+                setCursorBadgeMode(
+                  next === "was"
+                    ? "show-last-visitor-location"
+                    : "show-visitor-time",
+                );
+                showCenterPopup(
+                  next === "was"
+                    ? "SHOWING LAST VISITOR TIME"
+                    : "SHOWING LAST VISITOR LOCATION",
+                );
+                return next;
+              });
+            }}
+            aria-label={
+              lastVisitorMode === "from"
+                ? "Show when the last visitor was here"
+                : "Show where the last visitor was from"
+            }
+          >
+            <span>{displayedLastVisitorHeading}</span>
+            <span>{displayedLastVisitorValue}</span>
+          </button>
           <div className="flex items-center justify-center text-center" />
           <button
             type="button"

@@ -83,6 +83,54 @@ function normalizeVisitorLabel(rawLabel: string) {
   return `${city}, ${country}`;
 }
 
+type LastVisitorRecord = {
+  label: string;
+  seenAt: number | null;
+};
+
+function parseLastVisitorRecord(rawValue: string): LastVisitorRecord {
+  const decoded = decodeLegacyText(rawValue).trim();
+  if (!decoded) {
+    return { label: "UNKNOWN, UNKNOWN COUNTRY", seenAt: null };
+  }
+
+  try {
+    const parsed = JSON.parse(decoded) as {
+      label?: unknown;
+      seenAt?: unknown;
+      timestamp?: unknown;
+    };
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      typeof parsed.label === "string" &&
+      parsed.label.trim().length > 0
+    ) {
+      const seenAtCandidate =
+        typeof parsed.seenAt === "number"
+          ? parsed.seenAt
+          : typeof parsed.timestamp === "number"
+            ? parsed.timestamp
+            : null;
+      return {
+        label: normalizeVisitorLabel(parsed.label),
+        seenAt: seenAtCandidate,
+      };
+    }
+  } catch {
+    // Legacy plain-text format (city + country only).
+  }
+
+  return {
+    label: normalizeVisitorLabel(decoded),
+    seenAt: null,
+  };
+}
+
+function serializeLastVisitorRecord(label: string, seenAt: number) {
+  return JSON.stringify({ label, seenAt });
+}
+
 function getTodayKeyInToronto() {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Toronto",
@@ -170,16 +218,22 @@ export async function GET() {
   let visitorsToday: number | null = null;
   let visitorsAllTime: number | null = null;
   let lastVisitorLabel = isIgnoredVisitor ? "UNKNOWN, UNKNOWN COUNTRY" : currentVisitorLabel;
+  let lastVisitorSeenAt: number | null = null;
 
   const redisClient = await getRedisClient();
   if (redisClient) {
     const previousLastVisitor = await redisClient.get(LAST_VISITOR_KEY);
     if (previousLastVisitor) {
-      lastVisitorLabel = normalizeVisitorLabel(previousLastVisitor);
+      const previousRecord = parseLastVisitorRecord(previousLastVisitor);
+      lastVisitorLabel = previousRecord.label;
+      lastVisitorSeenAt = previousRecord.seenAt;
     }
 
     if (!isIgnoredVisitor) {
-      await redisClient.set(LAST_VISITOR_KEY, currentVisitorLabel);
+      await redisClient.set(
+        LAST_VISITOR_KEY,
+        serializeLastVisitorRecord(currentVisitorLabel, Date.now()),
+      );
       await redisClient.sAdd(todayVisitorsKey, visitorId);
       await redisClient.sAdd(ALL_TIME_VISITORS_KEY, visitorId);
       await redisClient.expire(todayVisitorsKey, DAY_SECONDS * 3);
@@ -199,12 +253,16 @@ export async function GET() {
   } else {
     const previousLastVisitor = await kvRequest(`/get/${encodeURIComponent(LAST_VISITOR_KEY)}`);
     if (typeof previousLastVisitor?.result === "string" && previousLastVisitor.result.length > 0) {
-      lastVisitorLabel = normalizeVisitorLabel(previousLastVisitor.result);
+      const previousRecord = parseLastVisitorRecord(previousLastVisitor.result);
+      lastVisitorLabel = previousRecord.label;
+      lastVisitorSeenAt = previousRecord.seenAt;
     }
 
     if (!isIgnoredVisitor) {
       await kvRequest(
-        `/set/${encodeURIComponent(LAST_VISITOR_KEY)}/${encodeURIComponent(currentVisitorLabel)}`,
+        `/set/${encodeURIComponent(LAST_VISITOR_KEY)}/${encodeURIComponent(
+          serializeLastVisitorRecord(currentVisitorLabel, Date.now()),
+        )}`,
         {
           method: "POST",
         },
@@ -236,6 +294,7 @@ export async function GET() {
     city: isIgnoredVisitor ? "UNKNOWN" : city,
     country: isIgnoredVisitor ? "UNKNOWN COUNTRY" : country,
     lastVisitorLabel,
+    lastVisitorSeenAt,
     visitorsToday,
     visitorsAllTime,
   });
