@@ -3484,10 +3484,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                             }}
                           >
                             <div
-                              className={`text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line transition-[opacity,transform] duration-360 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                              className={`text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line transition-[opacity,transform] duration-540 ease-[cubic-bezier(0.2,1,0.34,1)] ${
                                 isEntryExpanded && additionalParagraphs.length > 0
-                                  ? "translate-y-0 opacity-100 delay-420"
-                                  : "translate-y-1 opacity-0 delay-0"
+                                  ? "translate-y-0 opacity-100 delay-460"
+                                  : "translate-y-[0.5px] opacity-0 delay-0"
                               }`}
                             >
                               {additionalParagraphs.map((paragraph, paragraphIndex) => (
