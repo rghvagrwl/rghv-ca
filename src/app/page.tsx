@@ -112,6 +112,8 @@ const topMarqueeItems = [
   "୧༼ಠ益ಠ༽୨",
   "ᕙ(⇀‸↼‶)ᕗ",
   "ʕっ•ᴥ•ʔっ",
+  "ヽ(´ー｀)ノ",
+  "♪♪ ヽ(ˇ∀ˇ )ゞ",
 ] as const;
 const shuffledTopMarqueeItems = (() => {
   const items = topMarqueeItems.map((item) => item.toUpperCase());
