@@ -3860,14 +3860,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         onClick={() =>
                           setVisibleWorkImageCountByProject((prev) => ({
                             ...prev,
-                            [project.id]: Math.min(
-                              (prev[project.id] ?? workLoadMoreThreshold) + 2,
-                              project.images.length,
-                            ),
+                            [project.id]: project.images.length,
                           }))
                         }
                       >
-                        LOAD MORE
+                        LOAD ALL
                       </button>
                     </div>
                   ) : null}
