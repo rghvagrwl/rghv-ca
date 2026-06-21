@@ -2496,6 +2496,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               alt=""
               fill
               sizes="75vw"
+              unoptimized
               className="h-full w-full object-contain"
               draggable={false}
             />
