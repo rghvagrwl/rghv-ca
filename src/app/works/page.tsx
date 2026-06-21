@@ -1,5 +1,5 @@
-import { SitePage } from "../page";
+import { redirect } from "next/navigation";
 
 export default function WorksPage() {
-  return <SitePage defaultTab="work" />;
+  redirect("/work");
 }

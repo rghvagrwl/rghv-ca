@@ -5,17 +5,15 @@ import type { CSSProperties } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const identityBodyOne =
-  " is a designer working across product, brand, and digital interfaces. His work is shaped by paying attention to how people actually use things, especially where interactions feel unclear or inconsistent. He focuses on making systems that are simple, intuitive, and easy to move through.";
+  " is a designer working across product, brand, and digital interfaces. He enjoys figuring out how things work, why they sometimes don't, and how they can be improved. His work is guided by a belief that good design should feel simple and intuitive.";
 const identityBodyTwo =
-  "Rather than adding complexity, his goal is to reduce it, creating work that feels natural without needing explanation. He draws inspiration from software, the internet, and visual culture, and approaches design as an ongoing process of refinement and iteration. Currently looking for opportunities and work for the summer. Reach out below.";
+  "Rather than adding complexity, he focuses on creating experiences that are clear, thoughtful, and easy to use. He draws inspiration from software, the internet, and visual culture, and sees design as an ongoing process of learning, refining, and building. This summer, he is working in San Francisco as a Product Design Intern at Vercel. Reach out below.";
 const educationBody =
   "Currently completing his first year at the University of Waterloo, Honours Global Business and Digital Arts, where he's focusing on design, business, and digital media. He graduated from high school in 2025.";
 const experienceBody =
   "Over the last four years, he has taught himself visual and product design through personal projects and client work across startups and teams. Most recently, he interned part-time at PERMANENT© over his 1B study term.";
-const ideasBody =
-  "Thinking about building a design agency, exploring a new fitness consumer app, and learning motion design and video editing to create cinematic shorts this summer.";
-const booksBody =
-  "Currently reading Project Hail Mary by Andy Weir, The Almanack of Naval Ravikant, and Colorless by Tsukuru Tazaki.";
+const statusBody =
+  "Currently preparing for a summer in San Francisco. Spending time with family and friends, soaking up the Calgary summer, and trying to stay present before everything changes.";
 const profileBody =
   "I’m 18 years old, born and raised in Calgary, Canada. When I was younger, I wanted to be a scientist, which quickly turned into wanting to be an astronaut and an obsession with space, and eventually wanting to be an artist. During the pandemic, I discovered digital design and started spending more time around things that felt visual or expressive. I got into photography after picking up a camera in 2024, and drawing has been something I’ve been into for as long as I can remember. Music is almost always playing in the background, and I tend to cycle through hip hop, R&B, rap, and indie. My favourite artist is Daniel Caesar, and my favourite film is Spider-Man: Into the Spider-Verse. Most of my time is spent at my desk. Otherwise, I’m probably doomscrolling, at the gym, or out for a walk when the weather is good.";
 
@@ -118,14 +116,6 @@ const topMarqueeItems = [
   "ヽ(´ー｀)ノ",
   "♪♪ ヽ(ˇ∀ˇ )ゞ",
 ] as const;
-const shuffledTopMarqueeItems = (() => {
-  const items = topMarqueeItems.map((item) => item.toUpperCase());
-  for (let index = items.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
-  }
-  return items;
-})();
 const cursorTrailPalette = [
   "#00C8FF",
   "#FF4FD9",
@@ -139,6 +129,22 @@ const mixedContextSectionIds = ["context:education", "context:current"] as const
 const IGNORE_VISITOR_COOKIE_NAME = "rghv_ignore_visitor";
 const IGNORE_VISITOR_QUERY_PARAM = "ignoreVisitor";
 const ALL_TIME_SINCE_LABEL = "SINCE APR 9, 2026";
+
+function getInitialMixedWorkEntriesOrder() {
+  return buildMixedOrderWithContextSections(
+    workProjects
+      .filter((project) => project.id !== fixedBottomWorkProjectId)
+      .map((project) => `work:${project.id}`),
+    entriesData.map((entry) => `entry:${entry.id}`),
+    [...mixedContextSectionIds],
+  );
+}
+
+function getInitialWorkImageOrderByProject() {
+  return Object.fromEntries(
+    workProjects.map((project) => [project.id, shuffleArray(project.images)]),
+  );
+}
 
 function formatRelativeVisitorAge(seenAt: number | null, nowMs: number) {
   if (!seenAt || Number.isNaN(seenAt)) {
@@ -273,6 +279,18 @@ const workProjects = [
     title: "SOCRATICA",
     year: "2026",
     images: ["/socratica/Socratica 1.webp", "/socratica/Socratica 2.webp"],
+  },
+  {
+    id: "ando",
+    title: "ANDO",
+    year: "2026",
+    images: ["/ando/Ando 1.png", "/ando/Ando 2.png", "/ando/Ando 3.png"],
+  },
+  {
+    id: "tembo",
+    title: "TEMBO",
+    year: "2026",
+    images: ["/tembo/Tembo 1.png", "/tembo/Tembo 2.png"],
   },
   {
     id: "zero-email",
@@ -739,6 +757,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const [hoveredProfileImage, setHoveredProfileImage] = useState(false);
   const [profileTooltipFlip, setProfileTooltipFlip] = useState(false);
   const [isEntriesHeaderHovered, setIsEntriesHeaderHovered] = useState(false);
+  const [isContextStatusDescriptionHovered, setIsContextStatusDescriptionHovered] =
+    useState(false);
   const [sectionPriority, setSectionPriority] = useState<PanelTabId | null>(
     initialTab,
   );
@@ -763,8 +783,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     contextIdentity: false,
     contextEducation: false,
     contextExperience: false,
-    contextIdeas: false,
-    contextBooks: false,
+    contextStatus: false,
     contextExternal: false,
     contextProfile: false,
     ...Object.fromEntries(workProjects.map((project) => [`work:${project.id}`, false])),
@@ -795,21 +814,17 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         ]),
       ),
     );
-  const [mixedWorkEntriesOrder, setMixedWorkEntriesOrder] = useState(() => [
-    ...workProjects
-      .filter((project) => project.id !== fixedBottomWorkProjectId)
-      .map((project) => `work:${project.id}`),
-    ...entriesData.map((entry) => `entry:${entry.id}`),
-    ...mixedContextSectionIds,
-  ]);
-  const [workImageOrderByProject, setWorkImageOrderByProject] = useState<
-    Record<string, string[]>
-  >(() =>
-    Object.fromEntries(workProjects.map((project) => [project.id, [...project.images]])),
+  const [mixedWorkEntriesOrder] = useState(() => getInitialMixedWorkEntriesOrder());
+  const [workImageOrderByProject] = useState<Record<string, string[]>>(() =>
+    getInitialWorkImageOrderByProject(),
   );
-  const [contextSectionOrder, setContextSectionOrder] = useState<
-    ("identity" | "external")[]
-  >(["identity", "external"]);
+  const [contextSectionOrder] = useState<("identity" | "external")[]>([
+    "identity",
+    "external",
+  ]);
+  const [topMarqueeDisplayItems] = useState(() =>
+    shuffleArray(topMarqueeItems).map((item) => item.toUpperCase()),
+  );
   const lastTrailTimeRef = useRef(0);
   const lastTrailPointRef = useRef({ x: 0, y: 0 });
   const trailIdRef = useRef(0);
@@ -1034,30 +1049,6 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           ]),
         ),
       );
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, []);
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setMixedWorkEntriesOrder(
-        buildMixedOrderWithContextSections(
-          workProjects
-            .filter((project) => project.id !== fixedBottomWorkProjectId)
-            .map((project) => `work:${project.id}`),
-          entriesData.map((entry) => `entry:${entry.id}`),
-          [...mixedContextSectionIds],
-        ),
-      );
-      setWorkImageOrderByProject(
-        Object.fromEntries(
-          workProjects.map((project) => [project.id, shuffleArray(project.images)]),
-        ),
-      );
-      setContextSectionOrder(["identity", "external"]);
     }, 0);
 
     return () => {
@@ -1506,8 +1497,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         contextIdentity: false,
         contextEducation: false,
         contextExperience: false,
-        contextIdeas: false,
-        contextBooks: false,
+        contextStatus: false,
         contextExternal: false,
         contextProfile: false,
         ...Object.fromEntries(workProjects.map((project) => [`work:${project.id}`, false])),
@@ -1755,8 +1745,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               "contextIdentity",
               "contextEducation",
               "contextExperience",
-              "contextIdeas",
-              "contextBooks",
+              "contextStatus",
               "contextExternal",
               "contextProfile",
             ]
@@ -1804,6 +1793,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   const cursorSelectorLabel = hoveredSelectorTab
     ? getSectionHoverCursorLabel(hoveredSelectorTab)
     : null;
+  const cursorContextStatusLabel = isContextStatusDescriptionHovered
+    ? "UPDATED SUN MAY 31 9:37:08PM"
+    : null;
   const cursorOutboundLinkLabel = hoveredOutboundLink ? "OPEN IN NEW TAB" : null;
   const cursorProfileImageLabel = hoveredProfileImage
     ? profileTooltipFlip
@@ -1820,6 +1812,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         ? cursorDividerLabel
       : cursorSelectorLabel
         ? cursorSelectorLabel
+      : cursorContextStatusLabel
+        ? cursorContextStatusLabel
       : cursorOutboundLinkLabel
         ? cursorOutboundLinkLabel
       : cursorTrailModeLabel
@@ -1924,7 +1918,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         return;
       }
       if (item === "context:current") {
-        keys.push("context:ideas", "context:books");
+        keys.push("context:status");
       }
     });
 
@@ -2285,7 +2279,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               className="top-news-marquee-list"
               aria-hidden={copyIndex === 1}
             >
-              {shuffledTopMarqueeItems.map((item) => (
+              {topMarqueeDisplayItems.map((item) => (
                 <span
                   key={`${copyIndex}-${item}`}
                   className="whitespace-nowrap tracking-[0.11em]"
@@ -2301,6 +2295,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       cursorLocationLabel ||
       cursorDividerLabel ||
       cursorSelectorLabel ||
+      cursorContextStatusLabel ||
       cursorOutboundLinkLabel ||
       cursorTrailModeLabel ||
       cursorIntroLabel ||
@@ -2329,6 +2324,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           ) : cursorSelectorLabel ? (
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
               {cursorSelectorLabel}
+            </span>
+          ) : cursorContextStatusLabel ? (
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+              {cursorContextStatusLabel}
             </span>
           ) : cursorOutboundLinkLabel ? (
             <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
@@ -2939,8 +2938,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           contextIdentity: false,
                           contextEducation: false,
                           contextExperience: false,
-                          contextIdeas: false,
-                          contextBooks: false,
+                          contextStatus: false,
                           contextExternal: false,
                           contextProfile: false,
                           ...Object.fromEntries(
@@ -3025,8 +3023,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           contextIdentity: false,
                           contextEducation: false,
                           contextExperience: false,
-                          contextIdeas: false,
-                          contextBooks: false,
+                          contextStatus: false,
                           contextExternal: false,
                           contextProfile: false,
                           ...Object.fromEntries(
@@ -3677,11 +3674,11 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <div>
                         <SectionHeader
                           activeTab={activePanelTab}
-                          strokeCycleActive={activeStrokeCycleKeys.includes("context:ideas")}
-                          secondary="IDEAS"
+                          strokeCycleActive={activeStrokeCycleKeys.includes("context:status")}
+                          secondary="STATUS"
                           onMouseEnter={(event) => {
                             setHoveredDividerTab("context");
-                            setHoveredSectionKey("contextIdeas");
+                            setHoveredSectionKey("contextStatus");
                             updateCursorBadgePosition(event);
                           }}
                           onMouseMove={updateCursorBadgePosition}
@@ -3691,54 +3688,30 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           }}
                           onClick={() => {
                             showCenterPopup(
-                              getSectionHighlightPopupText("context", "contextIdeas"),
+                              getSectionHighlightPopupText("context", "contextStatus"),
                             );
-                            toggleSectionContent("contextIdeas", "context");
+                            toggleSectionContent("contextStatus", "context");
                           }}
                         />
 
-                        {!truncateModeActive || expandedInTruncate.contextIdeas ? (
+                        {!truncateModeActive || expandedInTruncate.contextStatus ? (
                           <p
                             className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line"
                             style={{ fontFeatureSettings: "'salt' 1" }}
+                            onMouseEnter={(event) => {
+                              setIsContextStatusDescriptionHovered(true);
+                              updateCursorBadgePosition(event);
+                            }}
+                            onMouseMove={updateCursorBadgePosition}
+                            onMouseLeave={() => {
+                              setIsContextStatusDescriptionHovered(false);
+                            }}
                           >
-                            {ideasBody}
+                            {statusBody}
                           </p>
                         ) : null}
                       </div>
-
-                      <div>
-                        <SectionHeader
-                          activeTab={activePanelTab}
-                          strokeCycleActive={activeStrokeCycleKeys.includes("context:books")}
-                          secondary="BOOKS"
-                          onMouseEnter={(event) => {
-                            setHoveredDividerTab("context");
-                            setHoveredSectionKey("contextBooks");
-                            updateCursorBadgePosition(event);
-                          }}
-                          onMouseMove={updateCursorBadgePosition}
-                          onMouseLeave={() => {
-                            setHoveredDividerTab(null);
-                            setHoveredSectionKey(null);
-                          }}
-                          onClick={() => {
-                            showCenterPopup(
-                              getSectionHighlightPopupText("context", "contextBooks"),
-                            );
-                            toggleSectionContent("contextBooks", "context");
-                          }}
-                        />
-
-                        {!truncateModeActive || expandedInTruncate.contextBooks ? (
-                          <p
-                            className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line"
-                            style={{ fontFeatureSettings: "'salt' 1" }}
-                          >
-                            {booksBody}
-                          </p>
-                        ) : null}
-                      </div>
+                      <div aria-hidden="true" className="hidden md:block" />
                     </div>
                   </section>
                 );
