@@ -350,15 +350,16 @@ const entriesData = [
     title: "ELITISM",
     year: "2025",
     excerpt:
-      "Early on, I started to notice how quickly people form impressions of each other. Conversations often felt like quiet evaluations. Small pieces of information would shift the tone. The energy of an interaction could change almost instantly, sometimes without anything being said directly. It felt transactional. Like the value of the interaction had already been decided.",
+      "It was not always obvious at first. People would ask the normal questions. What program are you in? What do you do? Are you in co-op? What internships are you applying for? But after a while, I started to feel like some conversations were less about genuine interest and more about figuring out where someone stood.",
     paragraphs: [
-      "Early on, I started to notice how quickly people form impressions of each other. Conversations often felt like quiet evaluations. Small pieces of information would shift the tone. The energy of an interaction could change almost instantly, sometimes without anything being said directly. It felt transactional. Like the value of the interaction had already been decided.",
-      "Over time, it became clear how often people tie their identity to what they do. Not just as something they’re pursuing, but as something that defines their worth. And naturally, that lens extends outward, shaping how they see others. At first, it got to me. It was hard not to internalize it, to question whether I was being perceived a certain way for a reason. Whether there was something I was missing. But that way of seeing things didn’t feel complete.",
-      "I don’t think most of this comes from a bad place. If anything, it reflects the environments people come from. Years of pressure, competition, and reinforcement around certain paths being more valuable than others. It makes sense that people begin to see the world through that lens. In a way, it’s learned.",
-      "There were also moments where the tone of an interaction would shift again. More interest, more engagement, depending on what someone thought they understood about you. That stood out to me. Not in a way that made me resent it, but in a way that made me more aware of what was actually driving the interaction.",
-      "Over time, I stopped taking it personally. It became less about how I was being perceived, and more about what it revealed. Not something to judge, but something to recognize.",
-      "I also don’t think people stay fixed in that mindset. The way someone understands value, status, or identity at one point in their life is shaped by where they are. That changes. The friendships that lasted felt different from the start. They weren’t based on evaluation or what someone represented. There was no need to qualify yourself first. Just people talking to people.",
-      "Looking back, I’m glad I experienced it early. It gave me a clearer sense of what kind of interactions I value, and what kind of people I want to be around. Not defined by status, but just grounded in who they are.",
+      "It was not always obvious at first. People would ask the normal questions. What program are you in? What do you do? Are you in co-op? What internships are you applying for? But after a while, I started to feel like some conversations were less about genuine interest and more about figuring out where someone stood.",
+      "Small pieces of information could change the entire tone. Someone would seem half-interested at first, then suddenly become more engaged once they heard something they thought was impressive. Other times, the energy would drop once they decided you were not relevant to whatever world they were trying to be part of.",
+      "That was probably the part that bothered me most. Not the ambition, or even the elitism itself, but the lack of real curiosity. It felt like people were not always asking questions because they wanted to know you. They were asking to place you.",
+      "At first, I took it personally. It made me wonder if I was being seen a certain way because of my program, my experience, or what people assumed about me. It was hard not to internalize that, especially in a place where so much of people’s identity is tied to what they do.",
+      "But over time, I realized a lot of it comes from the environment. Waterloo is competitive. People are constantly thinking about co-op, internships, status, companies, and what comes next. When you’re surrounded by that for long enough, it makes sense that people start seeing themselves and others through that lens.",
+      "I don’t think most people mean to be fake or judgmental. A lot of it feels learned. But it still creates this strange social dynamic where conversations can feel like evaluations instead of actual conversations.",
+      "The friendships that lasted felt different. They did not feel like I had to qualify myself first. There was no hidden calculation behind the conversation. It was just people being curious, joking around, talking honestly, and actually wanting to know each other.",
+      "Looking back, I’m glad I noticed it early. It helped me understand what kind of interactions I value. I want to be around people who are ambitious, but still genuine. People who care about what you do, but do not make it the only reason they care about you.",
     ],
   },
   {
@@ -445,7 +446,7 @@ function SectionHeader({
         aria-label={`Show context ${secondary.toLowerCase()} section`}
       >
         <span
-          className={`cursor-crosshair px-1.5 py-0.5 text-[12px] font-medium tracking-[0.05em] ${
+          className={`cursor-crosshair px-1.5 py-0.5 site-ui-text font-medium tracking-[0.05em] ${
             strokeCycleActive ? "section-chip-stroke-cycle" : ""
           }`}
           style={
@@ -459,7 +460,7 @@ function SectionHeader({
           CONTEXT
         </span>
         <span
-          className={`cursor-crosshair text-[12px] font-medium tracking-[0.05em] ${
+          className={`cursor-crosshair site-ui-text font-medium tracking-[0.05em] ${
             isContextActive ? "text-black/80" : "text-muted"
           }`}
         >
@@ -2270,8 +2271,8 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
   }, [lastVisitorHeadingTarget, lastVisitorMode, lastVisitorValueTarget]);
 
   return (
-    <main className="relative flex min-h-screen flex-col bg-background pb-6 pt-4">
-      <div className="-mt-4 mb-4 w-full overflow-hidden bg-black/5 py-1 text-[10px] text-black/40">
+    <main className="site-shell relative flex min-h-screen flex-col bg-background">
+      <div className="site-marquee w-full overflow-hidden bg-black/5 text-black/40">
         <div className="top-news-marquee-track">
           {[0, 1].map((copyIndex) => (
             <div
@@ -2310,63 +2311,63 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           }}
         >
           {cursorControlLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorControlLabel}
             </span>
           ) : cursorLocationLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorLocationLabel}
             </span>
           ) : cursorDividerLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorDividerLabel}
             </span>
           ) : cursorSelectorLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorSelectorLabel}
             </span>
           ) : cursorContextStatusLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorContextStatusLabel}
             </span>
           ) : cursorOutboundLinkLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorOutboundLinkLabel}
             </span>
           ) : cursorTrailModeLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorTrailModeLabel}
             </span>
           ) : cursorIntroLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorIntroLabel}
             </span>
           ) : cursorProfileImageLabel ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               {cursorProfileImageLabel}
             </span>
           ) : cursorBadgeMode === "read-more" ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               READ MORE
             </span>
           ) : cursorBadgeMode === "close-entry" ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               CLOSE ENTRY
             </span>
           ) : cursorBadgeMode === "show-all-time" ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               SHOW ALL-TIME
             </span>
           ) : cursorBadgeMode === "show-today" ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               SHOW TODAY
             </span>
           ) : cursorBadgeMode === "show-visitor-time" ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               SHOW VISITOR TIME
             </span>
           ) : cursorBadgeMode === "show-last-visitor-location" ? (
-            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black">
+            <span className="inline-flex items-center whitespace-nowrap bg-[#DEDEDE] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black">
               SHOW LAST VISITOR LOCATION
             </span>
           ) : null}
@@ -2375,7 +2376,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
       {centerPopupText ? (
         <div className="pointer-events-none fixed inset-0 z-[125] flex items-center justify-center">
-          <span className="inline-flex items-center whitespace-nowrap bg-black px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-white">
+          <span className="inline-flex items-center whitespace-nowrap bg-black px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-white">
             {centerPopupText}
           </span>
         </div>
@@ -2416,7 +2417,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         >
           <button
             type="button"
-            className={`absolute -top-6 left-0 right-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-[14px] font-medium leading-none cursor-crosshair ${
+            className={`absolute -top-6 left-0 right-0 overflow-hidden text-ellipsis whitespace-nowrap text-left site-caption-text font-medium leading-none cursor-crosshair ${
               isProfileWindowSelected ? "text-[#00A1FF]" : "text-black/40"
             }`}
             onClick={() => setIsProfileWindowSelected(true)}
@@ -2520,12 +2521,12 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       </div>
 
       <div className="container-frame relative z-10 flex flex-1 flex-col">
-        <section className="grid gap-6 min-[940px]:grid-cols-3 xl:gap-20">
+        <section className="grid site-wide-grid-gap min-[940px]:grid-cols-3">
           <div
-            className={`w-full max-w-[480px] min-[940px]:order-3 ${reveal(0).className}`}
+            className={`w-full min-w-0 min-[940px]:order-3 ${reveal(0).className}`}
             style={reveal(0).style}
           >
-            <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.02em] text-black/80">
+            <div className="flex items-center justify-between site-ui-text uppercase tracking-[0.02em] text-black/80">
               <button
                 type="button"
                 className="navbar-click location-switch-click inline-flex flex-1 cursor-crosshair items-center justify-between pr-3 transition-colors hover:text-black/60"
@@ -2543,13 +2544,13 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 }`}
               >
                 <span className="location-switch-content inline-flex cursor-crosshair items-center gap-2">
-                  <span className="inline-block w-[44px] cursor-crosshair text-left">
+                  <span className="inline-block site-location-code cursor-crosshair text-left">
                     {displayedLocationCode}
                   </span>
-                  <span className="inline-block w-[90px] cursor-crosshair text-left">
+                  <span className="inline-block site-location-city cursor-crosshair text-left">
                     {displayedLocationCity}
                   </span>
-                  <span className="inline-block w-[68px] cursor-crosshair text-left font-sans">
+                  <span className="inline-block site-location-time cursor-crosshair text-left font-sans">
                     {isLocationScrambling ? scrambledClock : clock}
                   </span>
                 </span>
@@ -2557,7 +2558,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className={`navbar-click cursor-button-click inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center border-[0.5px] transition-colors md:h-6 md:w-6 ${
+                  className={`navbar-click cursor-button-click inline-flex site-control-square shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     isTrailBoosted
                       ? "trail-mode-button-active border-black/80"
                       : "border-black/20 bg-[#F7F7F7]"
@@ -2591,7 +2592,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className="navbar-click flex h-[26px] w-[26px] items-center justify-center border-[0.5px] border-black/20 bg-[#F7F7F7] text-[16px] leading-none text-black transition-all duration-150 md:h-6 md:w-6"
+                  className="navbar-click flex site-control-square items-center justify-center border-[0.5px] border-black/20 bg-[#F7F7F7] site-body-text leading-none text-black transition-all duration-150"
                   onClick={() => setIsIntroOpen((prev) => !prev)}
                   onMouseEnter={(event) => {
                     setHoveredIntroToggle(true);
@@ -2605,7 +2606,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 >
                   <span
                     aria-hidden="true"
-                    className={`relative block h-[12px] w-[12px] transition-transform duration-260 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    className={`relative block site-plus-icon transition-transform duration-260 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                       isIntroOpen ? "rotate-45" : "rotate-0"
                     }`}
                   >
@@ -2626,7 +2627,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   isIntroOpen ? "opacity-100 delay-320" : "opacity-0 delay-0"
                 }`}
               >
-                <p className="text-[12px] leading-[1.5] text-black/80 text-justify">
+                <p className="site-ui-text leading-[1.5] text-black/80 text-justify">
                   The idea for this version of the website began in March of
                   2026, then was paused due to a lack of creative vision. It
                   was revisited a few weeks later following a shift in
@@ -2637,7 +2638,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   making.
                 </p>
 
-                <p className="mt-2 text-[12px] leading-[1.5] text-black/80 text-justify">
+                <p className="mt-2 site-ui-text leading-[1.5] text-black/80 text-justify">
                   Inspired by the works of{" "}
                   <a
                     href="https://adamho.com"
@@ -2705,7 +2706,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           </div>
 
           <div
-            className={`w-full max-w-[480px] min-[940px]:order-2 ${reveal(90).className}`}
+            className={`w-full min-w-0 min-[940px]:order-2 ${reveal(90).className}`}
             style={reveal(90).style}
           >
             <div className="flex items-center justify-between gap-2">
@@ -2769,7 +2770,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         showCenterPopup(getSectionHighlightPopupText(tab.id));
                         togglePanelTab(tab.id);
                       }}
-                        className={`navbar-click inline-flex h-[26px] items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2.5 py-[2px] text-[clamp(11px,0.76vw,12px)] font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] md:h-6 md:px-2 ${
+                        className={`navbar-click inline-flex site-control-height items-center justify-center gap-1 border-[0.5px] border-black/50 bg-[#F7F7F7] px-2.5 py-[2px] site-ui-text font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-350 ease-[cubic-bezier(0.22,1.35,0.32,1)] md:px-2 ${
                           isSelectorBouncing ? "selector-jolt" : ""
                         } ${isAutoCyclePreview ? "selector-auto-bob" : ""} ${
                           invalidSelectorFlash === tab.id ? "control-error-wiggle" : ""
@@ -2830,7 +2831,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         {isSelected ? (
                           <span
                             aria-hidden="true"
-                            className="inline-block h-[5px] w-[5px]"
+                            className="inline-block site-selector-dot"
                             style={{ backgroundColor: "#000000" }}
                           />
                         ) : null}
@@ -2844,7 +2845,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className={`navbar-click inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center border-[0.5px] transition-colors md:h-6 md:w-6 ${
+                  className={`navbar-click inline-flex site-control-square shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "bring"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2908,7 +2909,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className={`navbar-click inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center border-[0.5px] transition-colors md:h-6 md:w-6 ${
+                  className={`navbar-click inline-flex site-control-square shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "show"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -2992,7 +2993,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </button>
                 <button
                   type="button"
-                  className={`navbar-click inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center border-[0.5px] transition-colors md:h-6 md:w-6 ${
+                  className={`navbar-click inline-flex site-control-square shrink-0 items-center justify-center border-[0.5px] transition-colors ${
                     invalidControlFlash === "truncate"
                       ? "border-red-600 bg-[#F7F7F7] control-error-wiggle"
                       : isEntryControlLockActive
@@ -3100,7 +3101,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 >
                   <p
                     ref={panelCopyMeasureRef}
-                    className="text-[12px] leading-[1.5] text-black/80 text-justify"
+                    className="site-ui-text leading-[1.5] text-black/80 text-justify"
                   >
                     {displayedPanelCopy}
                   </p>
@@ -3110,10 +3111,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
           </div>
 
           <div
-            className={`w-full max-w-[480px] min-[940px]:order-1 ${reveal(180).className}`}
+            className={`w-full min-w-0 min-[940px]:order-1 ${reveal(180).className}`}
             style={reveal(180).style}
           >
-            <div className="h-[26px] md:h-6" aria-hidden="true" />
+            <div className="site-control-height" aria-hidden="true" />
           </div>
         </section>
 
@@ -3124,7 +3125,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
         />
 
         <div ref={homeSectionsStartRef} />
-        <div className="flex flex-col gap-6 transition-opacity duration-560 ease-[cubic-bezier(0.22,1,0.36,1)] opacity-100">
+        <div className="flex flex-col site-stack-gap transition-opacity duration-560 ease-[cubic-bezier(0.22,1,0.36,1)] opacity-100">
         {!(showOnlySelected && activePanelTab !== "context") ? (
         <div className="flex flex-col" style={{ order: getSectionOrder("context") }}>
           {contextSectionOrder.map((sectionKey, index) =>
@@ -3159,9 +3160,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                 </div>
 
                 {!truncateModeActive || expandedInTruncate.contextIdentity ? (
-                  <div className="mt-2 columns-1 gap-6 md:columns-2 xl:gap-6">
+                  <div className="mt-2 columns-1 site-column-gap md:columns-2">
                     <p
-                      className="max-w-[52rem] text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line"
+                      className="site-body-text leading-[1.5] text-black/80 text-justify whitespace-pre-line"
                       style={{ fontFeatureSettings: "'salt' 1" }}
                     >
                       <button
@@ -3187,7 +3188,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           }`}
                         >
                           <span
-                            className={`text-[16px] leading-none ${
+                            className={`site-body-text leading-none ${
                               isProfileWindowOpen ? "text-[#00A1FF]" : "text-black/80"
                             }`}
                           >
@@ -3239,7 +3240,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                       <a
                         key={link.label}
                         href={link.href}
-                        className={`group inline-flex h-[26px] items-center gap-2 border-[0.5px] px-2 py-[3px] text-[16px] font-medium leading-none whitespace-nowrap ${
+                        className={`group inline-flex site-control-height items-center gap-2 border-[0.5px] px-2 py-[3px] site-body-text font-medium leading-none whitespace-nowrap ${
                           link.disabled
                             ? "border-black/20 text-black/20"
                             : "border-black/50 text-black transition-[color,border-color,box-shadow,padding-right] duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] hover:pr-4 hover:cursor-alias"
@@ -3448,7 +3449,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                           activePanelTab === "entries" ? "bg-[#FFE500]" : ""
                         }
                       >
-                        <div className="flex items-center justify-between text-[12px] font-medium tracking-[0.05em] text-muted">
+                        <div className="flex items-center justify-between site-ui-text font-medium tracking-[0.05em] text-muted">
                           <button
                             type="button"
                             className="inline-flex cursor-crosshair items-center gap-2 text-left"
@@ -3512,10 +3513,10 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     </div>
 
                     {!truncateModeActive || expandedInTruncate[entryKey] ? (
-                      <div className="mt-2 grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <div className="mt-2 grid grid-cols-1 site-grid-gap md:grid-cols-2">
                         <div>
                           <p
-                            className="min-h-0 overflow-hidden text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line"
+                            className="min-h-0 overflow-hidden site-body-text leading-[1.5] text-black/80 text-justify whitespace-pre-line"
                             style={{
                               fontFeatureSettings: "'salt' 1",
                               ...(isEntryExpanded
@@ -3544,7 +3545,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                             }}
                           >
                             <div
-                              className={`text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line transition-[opacity,transform] duration-540 ease-[cubic-bezier(0.2,1,0.34,1)] ${
+                              className={`site-body-text leading-[1.5] text-black/80 text-justify whitespace-pre-line transition-[opacity,transform] duration-540 ease-[cubic-bezier(0.2,1,0.34,1)] ${
                                 isEntryExpanded && additionalParagraphs.length > 0
                                   ? "translate-y-0 opacity-100 delay-460"
                                   : "translate-y-[0.5px] opacity-0 delay-0"
@@ -3565,7 +3566,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                         <div className="flex items-start justify-start">
                           <button
                             type="button"
-                            className="border-[0.5px] border-black/20 bg-[#F7F7F7] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black/80"
+                            className="border-[0.5px] border-black/20 bg-[#F7F7F7] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black/80"
                             onClick={(event) => {
                               event.stopPropagation();
                               if (isEntryExpanded) {
@@ -3592,7 +3593,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     className={`${index === 0 ? "" : "mt-6"} ${contextEducationReveal.className}`}
                     style={contextEducationReveal.style}
                   >
-                    <div className="grid gap-6 md:grid-cols-2 xl:gap-6">
+                    <div className="grid site-grid-gap md:grid-cols-2">
                       <div>
                         <SectionHeader
                           activeTab={activePanelTab}
@@ -3618,7 +3619,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
                         {!truncateModeActive || expandedInTruncate.contextEducation ? (
                           <p
-                            className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line"
+                            className="mt-2 site-body-text leading-[1.5] text-black/80 text-justify whitespace-pre-line"
                             style={{ fontFeatureSettings: "'salt' 1" }}
                           >
                             {educationBody}
@@ -3651,7 +3652,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
                         {!truncateModeActive || expandedInTruncate.contextExperience ? (
                           <p
-                            className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line"
+                            className="mt-2 site-body-text leading-[1.5] text-black/80 text-justify whitespace-pre-line"
                             style={{ fontFeatureSettings: "'salt' 1" }}
                           >
                             {experienceBody}
@@ -3671,7 +3672,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     className={`${index === 0 ? "" : "mt-6"} ${contextCurrentReveal.className}`}
                     style={contextCurrentReveal.style}
                   >
-                    <div className="grid gap-6 md:grid-cols-2 xl:gap-6">
+                    <div className="grid site-grid-gap md:grid-cols-2">
                       <div>
                         <SectionHeader
                           activeTab={activePanelTab}
@@ -3697,7 +3698,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
                         {!truncateModeActive || expandedInTruncate.contextStatus ? (
                           <p
-                            className="mt-2 max-w-[52rem] text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line"
+                            className="mt-2 site-body-text leading-[1.5] text-black/80 text-justify whitespace-pre-line"
                             style={{ fontFeatureSettings: "'salt' 1" }}
                             onMouseEnter={(event) => {
                               setIsContextStatusDescriptionHovered(true);
@@ -3737,7 +3738,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   style={workReveal.style}
                 >
                   <HeaderWithDivider className="mb-2">
-                    <div className="flex items-center justify-between text-[12px] font-medium tracking-[0.05em] text-muted">
+                    <div className="flex items-center justify-between site-ui-text font-medium tracking-[0.05em] text-muted">
                       <button
                         type="button"
                         className="inline-flex cursor-crosshair items-center gap-2 text-left"
@@ -3791,7 +3792,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                   </HeaderWithDivider>
 
                   {isExpanded ? (
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 site-work-grid sm:grid-cols-2 lg:grid-cols-3 min-[1900px]:grid-cols-4 min-[2600px]:grid-cols-5">
                       {orderedImages.slice(0, visibleCount).map((src) => (
                         <button
                           key={src}
@@ -3811,7 +3812,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                             src={src}
                             alt=""
                             fill
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            sizes="(min-width: 2600px) 20vw, (min-width: 1900px) 25vw, (max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                             className="no-save-media cursor-crosshair select-none object-cover"
                             draggable={false}
                             onContextMenu={(event) => {
@@ -3830,7 +3831,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
                     <div className="mt-2 flex justify-end">
                       <button
                         type="button"
-                        className="border-[0.5px] border-black/20 bg-[#F7F7F7] px-2 py-1 text-[10px] font-medium tracking-[0.05em] text-black/80"
+                        className="border-[0.5px] border-black/20 bg-[#F7F7F7] px-2 py-1 site-tiny-text font-medium tracking-[0.05em] text-black/80"
                         onClick={() =>
                           setVisibleWorkImageCountByProject((prev) => ({
                             ...prev,
@@ -3878,9 +3879,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
             />
 
             {!truncateModeActive || expandedInTruncate.contextProfile ? (
-              <div className="mt-2 columns-1 gap-6 md:columns-2 xl:gap-6">
+              <div className="mt-2 columns-1 site-column-gap md:columns-2">
                 <p
-                  className="max-w-[52rem] text-[16px] leading-[1.5] text-black/80 text-justify whitespace-pre-line"
+                  className="site-body-text leading-[1.5] text-black/80 text-justify whitespace-pre-line"
                   style={{ fontFeatureSettings: "'salt' 1" }}
                 >
                   {profileBody}
@@ -3892,9 +3893,9 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
         <div
           ref={footerRef}
-          className="ui-wide-letter-spacing order-last mt-6 border-t border-black/10 pt-2 text-[12px] leading-[1.5] text-black/80"
+          className="ui-wide-letter-spacing order-last mt-6 border-t border-black/10 pt-2 site-ui-text leading-[1.5] text-black/80"
         >
-          <div className="grid gap-6 min-[940px]:grid-cols-3 xl:gap-20">
+          <div className="grid site-wide-grid-gap min-[940px]:grid-cols-3">
           <button
             type="button"
             className="flex cursor-crosshair items-center justify-between text-left transition-colors hover:text-black/60"
@@ -3988,7 +3989,7 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
       {isProfileWindowOpen && profileWindowPosition ? (
         <button
           type="button"
-          className="fixed left-1/2 z-[115] inline-flex h-[26px] -translate-x-1/2 items-center justify-center border-[0.5px] border-black bg-[#00A1FF] px-2.5 text-[clamp(11px,0.76vw,12px)] font-medium leading-none text-white md:hidden"
+          className="fixed left-1/2 z-[115] inline-flex site-control-height -translate-x-1/2 items-center justify-center border-[0.5px] border-black bg-[#00A1FF] px-2.5 site-ui-text font-medium leading-none text-white md:hidden"
           style={{
             left: profileWindowPosition.x + profileWindowSize.width / 2,
             top: profileWindowPosition.y + profileWindowSize.height + 8,
