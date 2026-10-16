@@ -95,27 +95,6 @@ const panelCopyByTab: Record<PanelTabId, string> = {
   entries:
     "A running collection of thoughts. Fragments, notes, and ideas that don't belong anywhere else. Some unfinished, some unresolved. Mostly just things that don't need to be finished to be worth keeping.",
 };
-const topMarqueeItems = [
-  "Built by doing",
-  "Start before it makes sense",
-  "Clarity through iteration",
-  "Nothing here is final",
-  "Thinking happens through making",
-  "No single entry point",
-  "Content reorganizes on reload",
-  "Content order is not intentional",
-  "This is one of many possible versions",
-  "In progress, constantly evolving",
-  "MADE IN 2026",
-  "This version is not final",
-  "( •_•)O*¯`·.¸.·´¯`°Q(•_• )",
-  "•͡˘㇁•͡˘",
-  "୧༼ಠ益ಠ༽୨",
-  "ᕙ(⇀‸↼‶)ᕗ",
-  "ʕっ•ᴥ•ʔっ",
-  "ヽ(´ー｀)ノ",
-  "♪♪ ヽ(ˇ∀ˇ )ゞ",
-] as const;
 const cursorTrailPalette = [
   "#00C8FF",
   "#FF4FD9",
@@ -820,9 +799,6 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
     "identity",
     "external",
   ]);
-  const [topMarqueeDisplayItems] = useState(() =>
-    shuffleArray(topMarqueeItems).map((item) => item.toUpperCase()),
-  );
   const lastTrailTimeRef = useRef(0);
   const lastTrailPointRef = useRef({ x: 0, y: 0 });
   const trailIdRef = useRef(0);
@@ -2231,26 +2207,6 @@ export function SitePage({ defaultTab = null }: SitePageProps) {
 
   return (
     <main className="site-shell relative flex min-h-screen flex-col bg-background">
-      <div className="site-marquee w-full overflow-hidden bg-black/5 text-black/40">
-        <div className="top-news-marquee-track">
-          {[0, 1].map((copyIndex) => (
-            <div
-              key={copyIndex}
-              className="top-news-marquee-list"
-              aria-hidden={copyIndex === 1}
-            >
-              {topMarqueeDisplayItems.map((item) => (
-                <span
-                  key={`${copyIndex}-${item}`}
-                  className="whitespace-nowrap tracking-[0.11em]"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
       {cursorControlLabel ||
       cursorLocationLabel ||
       cursorDividerLabel ||

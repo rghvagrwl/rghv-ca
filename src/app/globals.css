@@ -14,7 +14,6 @@
   --site-gap: clamp(24px, 1.45vw, 44px);
   --site-wide-gap: clamp(80px, 4.75vw, 180px);
   --site-work-gap: clamp(8px, 0.48vw, 16px);
-  --site-marquee-gap: clamp(6.75rem, 6.4vw, 13rem);
   --site-text-tiny: clamp(10px, 0.6vw, 16px);
   --site-text-ui: clamp(12px, 0.72vw, 20px);
   --site-text-caption: clamp(14px, 0.84vw, 24px);
@@ -104,30 +103,6 @@ a[aria-disabled="true"] {
   position: fixed;
   opacity: 0.95;
   transform: translate3d(0, 0, 0);
-}
-
-.top-news-marquee-track {
-  display: flex;
-  width: max-content;
-  will-change: transform;
-  animation: top-news-marquee 210s linear infinite;
-}
-
-.top-news-marquee-list {
-  display: flex;
-  align-items: center;
-  gap: var(--site-marquee-gap);
-  padding-right: var(--site-marquee-gap);
-  flex-shrink: 0;
-}
-
-@keyframes top-news-marquee {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
 }
 
 .no-save-media {
@@ -400,13 +375,6 @@ a[aria-disabled="true"] {
 .site-shell {
   padding-top: var(--site-main-top);
   padding-bottom: var(--site-main-bottom);
-}
-
-.site-marquee {
-  margin-top: calc(var(--site-main-top) * -1);
-  margin-bottom: var(--site-main-top);
-  padding-block: clamp(4px, 0.24vw, 7px);
-  font-size: var(--site-text-tiny);
 }
 
 .site-wide-grid-gap {
