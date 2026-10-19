@@ -3431,3 +3431,22 @@ body[data-overlay] .nv-shell .nv-blob-lens {
     scale: 0.94;
   }
 }
+
+/* About copy: a tighter measure, with the opening thoughts on separate lines. */
+.nv-col.nv-about {
+  max-width: min(82vw, 460px);
+}
+
+.nv-about .nx-plain .nx-text {
+  font-size: 0.9375rem;
+}
+
+.nv-bio-line {
+  display: block;
+}
+
+@media (min-width: 761px) {
+  .nv-bio-line-short {
+    white-space: nowrap;
+  }
+}
