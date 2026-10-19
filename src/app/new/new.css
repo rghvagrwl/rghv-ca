@@ -286,20 +286,11 @@ body {
   color: rgba(29, 29, 27, 0.68);
 }
 
-/* Sentence swaps: the old letters blur away while the new ones condense in
-   at the same instant, sweeping left to right — a little unveil. */
+/* Sentence swaps condense in from left to right. */
 .nv-fsw {
   position: relative;
   display: inline-block;
   white-space: nowrap;
-}
-
-.nv-fold {
-  position: absolute;
-  top: 0;
-  left: 0;
-  white-space: nowrap;
-  pointer-events: none;
 }
 
 .nv-fl {
@@ -307,24 +298,10 @@ body {
   white-space: pre;
 }
 
-.nv-fold .nv-fl {
-  /* Departing letters dissolve HARD and fast — mid-stack they read as
-     soft haze, never as legible text overlapping the newcomer. */
-  animation: nv-flout 220ms cubic-bezier(0.55, 0, 0.7, 0.4) both;
-  animation-delay: calc(var(--fi, 0) * 5ms);
-}
-
 .nv-fnew .nv-fl {
   /* Arrivals hold deep blur until their sweep genuinely reveals them. */
   animation: nv-flin 520ms cubic-bezier(0.16, 0.6, 0.22, 1) both;
   animation-delay: calc(var(--fi, 0) * 7ms + 150ms);
-}
-
-@keyframes nv-flout {
-  to {
-    opacity: 0;
-    filter: blur(9px);
-  }
 }
 
 @keyframes nv-flin {
@@ -3412,4 +3389,3 @@ body[data-overlay] .nv-shell .nv-blob-lens {
     scale: 0.94;
   }
 }
-

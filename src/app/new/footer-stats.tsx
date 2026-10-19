@@ -68,73 +68,12 @@ function SwappingSentence({
   text: string;
   swapKey: number;
 }) {
-  // One reveal at a time, NEVER interrupted: a swap in flight always
-  // finishes its blur-reveal untouched. Faster clicks only change what
-  // the NEXT swap will reveal — the display then jumps straight to the
-  // latest target, skipping intermediates.
-  const [shown, setShown] = useState({ text, key: swapKey });
-  const [leaving, setLeaving] = useState<{ text: string; id: number } | null>(
-    null,
-  );
-  const latestRef = useRef({ text, key: swapKey });
-  const shownRef = useRef({ text, key: swapKey });
-  const busyRef = useRef(false);
-  const idRef = useRef(0);
-  const timerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    latestRef.current = { text, key: swapKey };
-    const trySwap = () => {
-      const latest = latestRef.current;
-      if (busyRef.current) {
-        // Counts can change during the reveal. Keep the visible sentence
-        // current without restarting its letter animations.
-        if (
-          latest.key === shownRef.current.key &&
-          latest.text !== shownRef.current.text
-        ) {
-          shownRef.current = { ...latest };
-          setShown({ ...latest });
-        }
-        return;
-      }
-      if (latest.key === shownRef.current.key) {
-        // Same state — live text updates (the ticking count) pass through
-        // without any swap animation.
-        if (latest.text !== shownRef.current.text) {
-          shownRef.current = { ...latest };
-          setShown({ ...latest });
-        }
-        return;
-      }
-      busyRef.current = true;
-      idRef.current += 1;
-      setLeaving({ text: shownRef.current.text, id: idRef.current });
-      shownRef.current = { ...latest };
-      setShown({ ...latest });
-      timerRef.current = window.setTimeout(() => {
-        timerRef.current = null;
-        busyRef.current = false;
-        setLeaving(null);
-        trySwap();
-      }, 760);
-    };
-    trySwap();
-  }, [swapKey, text]);
-
-  useEffect(() => () => {
-    if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-  }, []);
-
+  // A keyed entrance keeps the view in sync with every click. Updating the
+  // count within one view reuses its letter spans instead of restarting them.
   return (
     <span className="nv-fsw">
-      {leaving ? (
-        <span aria-hidden="true" className="nv-fold" key={leaving.id}>
-          <FooterLetters text={leaving.text} />
-        </span>
-      ) : null}
-      <span className="nv-fnew" key={shown.key}>
-        <FooterLetters text={shown.text} />
+      <span className="nv-fnew" key={swapKey}>
+        <FooterLetters text={text} />
       </span>
     </span>
   );
