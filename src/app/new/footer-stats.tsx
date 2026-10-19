@@ -41,7 +41,7 @@ function FooterLetters({ text }: { text: string }) {
     const letters = [...word].map((ch, j) => (
       <span
         className="nv-fl"
-        key={`${i + j}-${ch}`}
+        key={i + j}
         style={{ "--fi": i + j } as React.CSSProperties}
       >
         {ch}
@@ -80,13 +80,24 @@ function SwappingSentence({
   const shownRef = useRef({ text, key: swapKey });
   const busyRef = useRef(false);
   const idRef = useRef(0);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
     latestRef.current = { text, key: swapKey };
-    const cancelled = false;
     const trySwap = () => {
-      if (cancelled || busyRef.current) return;
       const latest = latestRef.current;
+      if (busyRef.current) {
+        // Counts can change during the reveal. Keep the visible sentence
+        // current without restarting its letter animations.
+        if (
+          latest.key === shownRef.current.key &&
+          latest.text !== shownRef.current.text
+        ) {
+          shownRef.current = { ...latest };
+          setShown({ ...latest });
+        }
+        return;
+      }
       if (latest.key === shownRef.current.key) {
         // Same state — live text updates (the ticking count) pass through
         // without any swap animation.
@@ -101,7 +112,8 @@ function SwappingSentence({
       setLeaving({ text: shownRef.current.text, id: idRef.current });
       shownRef.current = { ...latest };
       setShown({ ...latest });
-      window.setTimeout(() => {
+      timerRef.current = window.setTimeout(() => {
+        timerRef.current = null;
         busyRef.current = false;
         setLeaving(null);
         trySwap();
@@ -109,6 +121,10 @@ function SwappingSentence({
     };
     trySwap();
   }, [swapKey, text]);
+
+  useEffect(() => () => {
+    if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+  }, []);
 
   return (
     <span className="nv-fsw">
@@ -174,18 +190,29 @@ export default function SiteFooter() {
   const [count, setCount] = useState(0);
 
   const countRafRef = useRef<number | null>(null);
+  const countRef = useRef(0);
+  const modeRef = useRef(0);
 
-  const animateCount = useCallback((from: number, to: number) => {
+  const animateCount = useCallback((to: number, reset = false) => {
     if (countRafRef.current !== null) {
       window.cancelAnimationFrame(countRafRef.current);
+      countRafRef.current = null;
     }
+    const from = reset ? 0 : countRef.current;
+    countRef.current = from;
+    setCount(from);
+    if (from === to) return;
     const started = performance.now();
     const duration = 500;
     const step = (now: number) => {
       const progress = Math.min(1, (now - started) / duration);
-      setCount(Math.round(from + (to - from) * progress));
+      const value = Math.round(from + (to - from) * progress);
+      countRef.current = value;
+      setCount(value);
       if (progress < 1) {
         countRafRef.current = window.requestAnimationFrame(step);
+      } else {
+        countRafRef.current = null;
       }
     };
     countRafRef.current = window.requestAnimationFrame(step);
@@ -247,13 +274,18 @@ export default function SiteFooter() {
   ];
 
   const advance = () => {
-    const next = (mode + 1) % 4;
+    const next = (modeRef.current + 1) % 4;
+    modeRef.current = next;
     setMode(next);
     if (next === 1) {
       setWhenText(naturalAge(stats.lastVisitorSeenAt, Date.now()));
     }
-    if (next === 2) animateCount(0, stats.visitorsToday);
-    if (next === 3) animateCount(count, stats.visitorsAllTime);
+    if (next === 2) animateCount(stats.visitorsToday, true);
+    if (next === 3) animateCount(stats.visitorsAllTime);
+    if (next < 2 && countRafRef.current !== null) {
+      window.cancelAnimationFrame(countRafRef.current);
+      countRafRef.current = null;
+    }
   };
 
   return (
