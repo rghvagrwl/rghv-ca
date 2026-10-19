@@ -1,0 +1,3415 @@
+/* new.rghv.ca — scoped to .nv-* so it never touches the live rghv.ca styles. */
+
+/* Tokens live on :root, not .nv-shell — the cursor, hover preview, carousel,
+   reader, and lightbox are portalled to <body>, outside the shell, and still
+   need them. */
+html {
+  background: var(--nv-bg);
+  /* Natural vertical physics — rubber-banding and pull-to-refresh live;
+     the overscrolled area is painted the site's own colour anyway. */
+  /* Nothing ever scrolls the page sideways. */
+  overflow-x: clip;
+}
+
+body {
+  background: var(--nv-bg);
+  overflow-x: clip;
+}
+
+:root {
+  --nv-bg: #f0f0f0;
+  --nv-fg: #1d1d1b;
+  --nv-orange: #ff4b00;
+  --nv-accent: #1c4dff;
+  --nv-muted: rgba(29, 29, 27, 0.45);
+  --nv-faint: rgba(29, 29, 27, 0.28);
+  --nv-line: rgba(29, 29, 27, 0.12);
+  --nv-pad: clamp(20px, 2.2vw, 40px);
+  --nv-veil: rgba(247, 247, 247, 0.7);
+  --nv-ease: cubic-bezier(0.22, 0.61, 0.24, 1);
+}
+
+/* ---------------------------------------------------------------- cursor ---
+   Two parts, painted from cursor.tsx. The square tracks the pointer 1:1 with
+   no easing; over a [data-cursor-target] it disappears and the orange border
+   frame appears around the element instead. The frame glides when moving
+   between targets and fades out in place when leaving one. Inside the
+   carousel both hide and the native resize cursors take over. */
+
+.nv-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  background: var(--nv-fg);
+  opacity: 0;
+}
+
+.nv-cursor-dot[data-seen="true"][data-on="true"] {
+  opacity: 1;
+}
+
+.nv-cursor-frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  border: 1px solid var(--nv-orange);
+  opacity: 0;
+  transition:
+    transform 280ms var(--nv-ease),
+    width 280ms var(--nv-ease),
+    height 280ms var(--nv-ease),
+    border-color 140ms ease,
+    opacity 140ms ease;
+}
+
+.nv-cursor-frame[data-visible="true"] {
+  opacity: 1;
+}
+
+.nv-cursor-frame[data-external="true"] {
+  border-color: var(--nv-accent);
+}
+
+.nv-top-abbr {
+  display: none;
+}
+
+/* Keyboard focus mirrors the cursor frame instead of the UA's blue ring. */
+.nv-shell :focus-visible,
+.nv-carousel :focus-visible,
+.nv-reader :focus-visible,
+.nv-lightbox :focus-visible {
+  /* Ring bands, inside out: 1px gap (page colour), 1px solid orange,
+     1px faint orange echo. Box-shadow follows the border-radius. */
+  outline: none;
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 1px var(--nv-bg),
+    0 0 0 2px var(--nv-orange),
+    0 0 0 3px color-mix(in srgb, var(--nv-orange) 35%, transparent);
+}
+
+/* The native cursor must never appear anywhere on the site — except inside
+   the carousel, which uses the OS resize cursors for its tap zones. */
+@media (pointer: fine) {
+  .nv-carousel-zone[data-side="left"] {
+    cursor: w-resize;
+  }
+
+  .nv-carousel-zone[data-side="right"] {
+    cursor: e-resize;
+  }
+}
+
+/* ----------------------------------------------------------------- shell --- */
+
+.nv-shell {
+  min-height: 100dvh;
+  background: var(--nv-bg);
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+  transition:
+    filter 460ms ease,
+    opacity 460ms ease;
+  color: var(--nv-fg);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.nv-main {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 29, 27, 0.18) transparent;
+  /* Breathing room past the edge veils AND the floating dock: fully
+     scrolled content (and the footer) rests clear, always readable. */
+  padding-bottom: 164px;
+}
+
+.nv-content {
+  padding-top: 22px;
+}
+
+/* A quiet but REAL scrollbar — manual scrolling is a first-class way to
+   move through the lists, so the affordance shows. */
+.nv-main::-webkit-scrollbar {
+  width: 10px;
+}
+
+.nv-main::-webkit-scrollbar-thumb {
+  background: rgba(29, 29, 27, 0.18);
+  border: 3px solid var(--nv-bg);
+  border-radius: 999px;
+}
+
+.nv-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(29, 29, 27, 0.32);
+}
+
+.nv-main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nv-content {
+  flex: 1 0 auto;
+}
+
+/* ------------------------------------------------------------------ nav ---
+   Four section headings across the top, doubling as column markers: about,
+   photo, work, entries. Plain sentence-case text — gray, black when active. */
+
+.nv-top {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: var(--nv-pad) var(--nv-pad) 0;
+  animation: nx-blurin 950ms ease 60ms backwards;
+}
+
+.nv-top-cell {
+  display: flex;
+}
+
+.nv-top-link {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--nv-muted);
+  transition: color 180ms ease;
+}
+
+.nv-top-link:hover {
+  color: var(--nv-fg);
+}
+
+.nv-top-link[data-active="true"] {
+  color: var(--nv-fg);
+}
+
+/* ------------------------------------------------------------------ page --- */
+
+/* Pages swap instantly — no entry animation. Also keeps .nv-page from ever
+   being a stacking context, which the hovered work row's mix-blend against
+   the preview underneath depends on. */
+.nv-page {
+  padding: 1.5rem var(--nv-pad) var(--nv-pad);
+}
+
+.nv-col[data-col="1"] {
+  margin-left: 25%;
+}
+
+.nv-col[data-col="2"] {
+  margin-left: 50%;
+}
+
+.nv-col[data-col="3"] {
+  margin-left: 75%;
+}
+
+/* ----------------------------------------------------------------- about ---
+   Runs from the far left up to the photo column. Same type as the headings. */
+
+.nv-about {
+  max-width: calc(25% - 1.5rem);
+  font-size: 1rem;
+}
+
+/* Body copy styled exactly like the headings: black, medium. */
+.nv-bio {
+  margin: 0 0 1em;
+  line-height: 1.55;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #111111;
+  text-wrap: pretty;
+}
+
+/* External links inside running text: greyer than the body, black on hover —
+   the same interaction as the page headings. */
+.nv-inline-link {
+  color: var(--nv-muted);
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.nv-inline-link:hover {
+  color: var(--nv-fg);
+}
+
+/* ---------------------------------------------------------------- footer ---
+   Ported from rghv.ca: last-visitor block on the left, visitor count on the
+   right, each two stacked lines. Click toggles with a scramble; hover dims.
+   No cursor frame here. */
+
+.nv-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2em;
+  /* Sits right under the about text, reading as one more quiet
+     paragraph. */
+  padding: 1.6em 0 0;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  animation: nx-blurin 700ms ease both;
+}
+
+.nv-footer-stat {
+  display: block;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--nv-muted);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  transition: color 180ms ease;
+}
+
+.nv-footer-stat:hover {
+  /* A shade deeper, never full ink. */
+  color: rgba(29, 29, 27, 0.68);
+}
+
+/* Sentence swaps: the old letters blur away while the new ones condense in
+   at the same instant, sweeping left to right — a little unveil. */
+.nv-fsw {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.nv-fold {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.nv-fl {
+  display: inline-block;
+  white-space: pre;
+}
+
+.nv-fold .nv-fl {
+  /* Departing letters dissolve HARD and fast — mid-stack they read as
+     soft haze, never as legible text overlapping the newcomer. */
+  animation: nv-flout 220ms cubic-bezier(0.55, 0, 0.7, 0.4) both;
+  animation-delay: calc(var(--fi, 0) * 5ms);
+}
+
+.nv-fnew .nv-fl {
+  /* Arrivals hold deep blur until their sweep genuinely reveals them. */
+  animation: nv-flin 520ms cubic-bezier(0.16, 0.6, 0.22, 1) both;
+  animation-delay: calc(var(--fi, 0) * 7ms + 150ms);
+}
+
+@keyframes nv-flout {
+  to {
+    opacity: 0;
+    filter: blur(9px);
+  }
+}
+
+@keyframes nv-flin {
+  from {
+    opacity: 0;
+    filter: blur(11px);
+  }
+}
+
+/* ------------------------------------------------------------------ work ---
+   Borderless index rows in the same type as the headings. The hover
+   affordance is the cursor frame gliding from row to row, dimming of the
+   rest of the list, and the preview appearing underneath the text. */
+
+.nv-work-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Dimmed rows use a SOLID grey (not opacity) so text stays fully opaque
+   over the preview image instead of blending into it. */
+.nv-work-list:has([data-blob]) .nv-work-row:not([data-blob]),
+.nv-work-list:has([data-blob]) .nv-work-row:not([data-blob]) .nv-work-year {
+  color: #b9b9b7;
+}
+
+/* The active row is wherever the BLOB is (data-blob, set by hover-blob.tsx),
+   never raw :hover — text and blob always move together. */
+.nv-work-row[data-blob],
+.nv-work-row[data-blob] .nv-work-year {
+  color: var(--nv-fg);
+}
+
+.nv-work-row {
+  position: relative;
+  z-index: 2; /* text above the blob (1), blob above the preview (0) */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 1em;
+  width: calc(100% + 1.5em);
+  margin-inline: -0.75em;
+  padding: 0.58em 0.75em;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  transition: color 260ms ease;
+}
+
+.nv-work-title {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.nv-work-year {
+  font-size: 1rem;
+  color: var(--nv-muted);
+  font-variant-numeric: tabular-nums;
+  transition: color 260ms ease;
+}
+
+/* One random frame from the hovered project, centred over the viewport and
+   painting UNDER the list text (.nv-page carries z-index 1). On click,
+   work-index.tsx animates this same node out to the carousel slide's rect,
+   raising it above everything while it expands. */
+.nv-hover-preview {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: clamp(240px, 24vw, 400px);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--nv-bg);
+  opacity: 0;
+  filter: blur(16px);
+  transform: translate(-50%, -50%) scale(0.97);
+  /* Exit: the blur leads and the fade trails, so the image visibly melts
+     out of focus instead of just vanishing. */
+  transition:
+    opacity 400ms ease 70ms,
+    filter 300ms ease,
+    transform 380ms var(--nv-ease);
+}
+
+.nv-hover-preview[data-visible="true"] {
+  opacity: 1;
+  filter: blur(0);
+  transform: translate(-50%, -50%) scale(1);
+  /* Entrance keeps its own timing: quick fade, slower sharpen. */
+  transition:
+    opacity 240ms ease,
+    filter 420ms ease,
+    transform 340ms var(--nv-ease);
+}
+
+.nv-hover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* -------------------------------------------------------------- carousel ---
+   The list stays visible behind, blurred and faded. The strip loops (see
+   work-index.tsx) and the active slide is always viewport-centred. No
+   dragging: tapping the left/right half of the screen steps through, with
+   the OS resize cursors as the affordance. */
+
+.nv-carousel {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  color: var(--nv-fg);
+  font-family: var(--font-switzer), sans-serif;
+  animation: nv-fade 380ms var(--nv-ease) both;
+}
+
+@keyframes nv-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Styled like the page headings: sentence case, gray, black on hover. */
+.nv-carousel-close {
+  border: 0;
+  background: none;
+  color: var(--nv-muted);
+  font: inherit;
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  padding: 0.12em 0.3em;
+  margin: -0.12em -0.3em;
+  transition: transform 180ms ease-out, color 180ms ease;
+}
+
+.nv-carousel-close:hover,
+.nv-carousel-close[data-blob] {
+  color: var(--nv-fg);
+}
+
+/* No CSS scroll-snap — centring is done programmatically, and letting both
+   run caused a visible correction jump after each slide. The edges of the
+   strip fade out via mask so slides dissolve at the viewport edge. */
+.nv-carousel-track {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-pad);
+  flex: 1;
+  padding: var(--nv-pad);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  transition: opacity 300ms ease;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 3%,
+    #000 97%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 3%,
+    #000 97%,
+    transparent 100%
+  );
+}
+
+/* Progressive blur bands at the strip's edges: two stacked backdrop layers
+   with gradient masks — strong right at the edge, dissolving to sharp as the
+   image moves inward. The right band is the left one mirrored. */
+.nv-carousel-blur {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: clamp(90px, 13vw, 220px);
+  pointer-events: none;
+}
+
+.nv-carousel-blur[data-side="left"] {
+  left: 0;
+}
+
+.nv-carousel-blur[data-side="right"] {
+  right: 0;
+  transform: scaleX(-1);
+}
+
+.nv-carousel-blur::before,
+.nv-carousel-blur::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.nv-carousel-blur::before {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(to right, #000 25%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 25%, transparent 100%);
+}
+
+.nv-carousel-blur::after {
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  -webkit-mask-image: linear-gradient(to right, #000 0, transparent 55%);
+  mask-image: linear-gradient(to right, #000 0, transparent 55%);
+}
+
+.nv-carousel[data-entering="true"] .nv-carousel-track {
+  opacity: 0;
+}
+
+/* Once the carousel is in, every frame melts into focus — EXCEPT the
+   hero slide: the preview expansion already delivered that image sharp,
+   and re-running its entrance under the handoff reads as a flicker. */
+.nv-carousel:not([data-entering="true"])
+  .nv-carousel-slide:not([data-hero])
+  img {
+  animation: nv-imgblur 560ms ease both;
+}
+
+@keyframes nv-imgblur {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+  }
+}
+
+.nv-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* The blur itself lives in the stationary edge bands above; the slide only
+   carries the iridescent sheen, driven by --edge from the scroll handler. */
+.nv-carousel-slide {
+  position: relative;
+  flex: 0 0 auto;
+  height: min(72dvh, calc((100vw - 2 * var(--nv-pad)) * 9 / 16));
+  aspect-ratio: 16 / 9;
+}
+
+.nv-carousel-slide {
+  overflow: hidden;
+}
+
+.nv-carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+  user-select: none;
+  /* The blur-in entrance smears the image OUTSIDE its box — a white
+     photo halos glaringly on the dark ground. Clip the spill. */
+  clip-path: inset(0);
+}
+
+.nv-lightbox > img {
+  clip-path: inset(0);
+}
+
+.nv-carousel-slide::after {
+  content: none;
+}
+
+/* Stagnant image-count ticks, centred at the bottom; the active one darker.
+   They fade in together with the neighbouring slides. */
+.nv-carousel-ticks {
+  position: absolute;
+  bottom: calc(var(--nv-pad) / 2);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  gap: 5px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.nv-carousel[data-entering="false"] .nv-carousel-ticks {
+  opacity: 1;
+}
+
+.nv-carousel-ticks span {
+  width: 1.5px;
+  height: 8px;
+  background: var(--nv-faint);
+  transition: background-color 200ms ease;
+}
+
+.nv-carousel-ticks span[data-active="true"] {
+  background: var(--nv-fg);
+}
+
+.nv-carousel-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 50%;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+.nv-carousel-zone[data-side="left"] {
+  left: 0;
+}
+
+.nv-carousel-zone[data-side="right"] {
+  right: 0;
+}
+
+.nv-carousel-zone:focus-visible {
+  outline: none;
+}
+
+/* --------------------------------------------------------------- entries ---
+   Index rows in the same type as work. Opening an entry FLIPs its title into
+   the reader heading while the page fades out behind, then the text fades
+   in. */
+
+.nv-entry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nv-entry-list:has([data-blob]) .nv-entry-head:not([data-blob]),
+.nv-entry-list:has([data-blob])
+  .nv-entry-head:not([data-blob])
+  .nv-entry-year {
+  color: #b9b9b7;
+}
+
+.nv-entry-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 1em;
+  width: calc(100% + 1.5em);
+  margin-inline: -0.75em;
+  padding: 0.58em 0.75em;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  transition: color 260ms ease;
+}
+
+.nv-entry-title {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.nv-entry-year {
+  font-size: 1rem;
+  color: var(--nv-muted);
+  font-variant-numeric: tabular-nums;
+  transition: color 260ms ease;
+}
+
+.nv-reader {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow-y: auto;
+  color: var(--nv-fg);
+  font-family: var(--font-switzer), sans-serif;
+  animation: nv-fade 600ms var(--nv-ease) both;
+  scrollbar-width: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+.nv-reader::-webkit-scrollbar {
+  display: none;
+}
+
+.nv-reader-close {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: var(--nv-pad);
+}
+
+.nv-reader-inner {
+  max-width: 38rem;
+  margin: 0 auto;
+  padding: calc(var(--nv-pad) * 2.5) var(--nv-pad) calc(var(--nv-pad) * 2);
+}
+
+.nv-reader-heading-wrap {
+  position: relative;
+}
+
+.nv-reader-heading {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  opacity: 0;
+}
+
+.nv-reader[data-phase="open"] .nv-reader-heading {
+  opacity: 1;
+}
+
+.nv-reader-clone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 1;
+  transform-origin: top left;
+  white-space: nowrap;
+}
+
+.nv-reader[data-phase="open"] .nv-reader-clone {
+  opacity: 0;
+}
+
+.nv-reader-stage {
+  position: relative;
+  margin-top: 2em;
+}
+
+.nv-reader-body {
+  opacity: 0;
+}
+
+/* The body sharpens out of a blur, paragraph by paragraph — the whole site
+   speaks blur now. */
+.nv-reader[data-phase="assembling"] .nv-reader-body,
+.nv-reader[data-phase="open"] .nv-reader-body {
+  opacity: 1;
+}
+
+/* Hidden pre-assembly by the body-level opacity gate above — the word
+   animation ends at natural (visible) state. */
+.nv-rw {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+/* Words sweep in quickly, top-left to bottom-right, each out of a blur. */
+.nv-reader[data-phase="assembling"] .nv-rw,
+.nv-reader[data-phase="open"] .nv-rw {
+  /* A brisk rollout: still sweeps through the text, but the whole page
+     assembles in well under a second. */
+  /* A gentle rollout: each word eases in on a soft long-tailed curve —
+     never linear, never abrupt. */
+  animation: nv-wordblur 680ms cubic-bezier(0.22, 0.55, 0.25, 1) both;
+  animation-delay: var(--wd, min(calc(var(--wi, 0) * 5ms), 560ms));
+}
+
+@keyframes nv-wordblur {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+.nv-reader-body p {
+  margin: 0 0 1.2em;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: rgba(29, 29, 27, 0.8);
+  text-wrap: pretty;
+}
+
+/* ----------------------------------------------------------------- photo ---
+   Thumbnails in an even grid that always fills to the right edge, with
+   generous spacing and room for mixed aspect ratios. Clicking FLIPs the
+   thumbnail out into the lightbox, work-style. */
+
+.nv-photo-flow {
+  /* One photo per row, full column width — a single quiet stream. */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(28px, 2.6vw, 52px);
+  align-items: start;
+}
+
+.nv-photo {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(29, 29, 27, 0.04);
+}
+
+/* Thumbnails fade in as they decode, so the grid never pops mid page
+   blur-in — the placeholder grey carries until the pixels are ready. */
+.nv-photo img {
+  opacity: 0;
+  transition: opacity 320ms ease;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.nv-photo img[data-loaded="true"] {
+  opacity: 1;
+}
+
+.nv-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(247, 247, 247, 0.7);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  color: var(--nv-fg);
+  font-family: var(--font-switzer), sans-serif;
+  animation: nv-fade 380ms var(--nv-ease) both;
+}
+
+.nv-lightbox > img {
+  width: auto;
+  height: auto;
+  max-width: min(88vw, calc(100vw - 2 * var(--nv-pad)));
+  max-height: 84dvh;
+  opacity: 0;
+}
+
+.nv-lightbox[data-phase="open"] > img {
+  opacity: 1;
+}
+
+/* The flying thumbnail; removed once the full-size image has loaded. */
+.nv-photo-clone {
+  position: fixed;
+  z-index: 4;
+  overflow: hidden;
+  background: var(--nv-bg);
+}
+
+.nv-photo-clone img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Hidden neighbours, mounted only to warm the cache for instant stepping. */
+.nv-lightbox-prefetch {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.nv-lightbox-head {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  padding: var(--nv-pad);
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+.nv-lightbox[data-phase="open"] .nv-lightbox-head {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------- stacked ---
+   Below this width the columns give up: the page links sit in one row on the
+   left and every section runs full width. Kicks in early enough that entry
+   titles never wrap in their column. */
+
+@media (max-width: 1100px) {
+  .nv-main {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .nv-top {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 0.4em 1.4em;
+    min-width: 0;
+  }
+
+  .nv-top-cell {
+    flex-shrink: 0;
+  }
+
+  .nv-col[data-col="1"],
+  .nv-col[data-col="2"],
+  .nv-col[data-col="3"] {
+    margin-left: 0;
+  }
+
+  /* Runs exactly to the end of the last page button (measured in
+     shell.tsx) — but never wider than about two phones: on big phones and
+     small tablets the content keeps a readable measure and stays LEFT. */
+  /* The measure follows the viewport — a percentage of it, never below a
+     fixed floor — so bigger phones and small tablets breathe wider while
+     tiny screens keep a sane minimum. */
+  .nv-about {
+    max-width: min(var(--nv-top-span, 100%), clamp(340px, 78vw, 720px));
+  }
+
+  .nv-col {
+    max-width: clamp(340px, 78vw, 720px);
+    margin-right: auto;
+  }
+
+  /* Small on purpose: the expansion into the carousel reads as a real
+     scale-up. */
+  .nv-hover-preview {
+    width: min(54vw, 270px);
+  }
+
+  .nx-plain .nx-text {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+
+
+  .nv-reader-body p {
+    font-size: 1rem;
+  }
+
+  /* The nowrap footer line was pushing the page wider than the screen —
+     on phones it wraps and sits comfortably. */
+  .nv-footer {
+    font-size: 1rem;
+  }
+
+  .nv-footer {
+    display: block;
+  }
+
+  .nv-footer-stat {
+    display: block;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 3.2em;
+    white-space: normal;
+    text-align: left;
+  }
+
+  .nv-footer-stat .nv-fsw {
+    display: inline;
+    white-space: normal;
+  }
+
+  /* Page links collapse to initials and sit on the right — the name keeps
+     the left. */
+  .nv-top-full {
+    display: none;
+  }
+
+  .nv-top-abbr {
+    display: inline;
+  }
+
+  .nv-top-cell:nth-of-type(2) {
+    margin-left: auto;
+  }
+
+  /* Room between the P. W. E. initials. */
+  .nv-top-cell:nth-of-type(n + 3) {
+    margin-left: 1.5em;
+  }
+
+}
+
+/* The about prose arrives exactly like the nav — same blur-in, a breath
+   later. */
+.nv-about .nx-body {
+  animation: nx-blurin 950ms ease 180ms backwards;
+}
+
+/* ------------------------------------------------------- photo expansion ---
+   The photo stream breathes between the reading column and a
+   near-full-screen measure. One property animates (the column's width),
+   so every image scales in perfect unison — carousel easing, no delay. */
+.nv-page[data-photo-expanded] .nv-col {
+  transition:
+    max-width 850ms var(--nv-ease),
+    filter 480ms var(--nv-ease),
+    opacity 480ms var(--nv-ease);
+}
+
+.nv-page[data-photo-expanded="true"] .nv-col {
+  max-width: min(94vw, 1240px);
+}
+
+.nv-page[data-photo-expanded] .nv-photo-flow {
+  cursor: zoom-in !important;
+}
+
+
+
+.nv-page[data-photo-expanded="true"] .nv-photo-flow {
+  cursor: zoom-out !important;
+}
+
+/* ------------------------------------------------------------- list band ---
+   Overflowing lists clip to the viewport and glide with the pointer
+   instead of scrolling the page. */
+
+.nv-list-band {
+  /* Plain scrolling, generous landing ground: this spacer means the end
+     of the list can ALWAYS scroll fully above the bottom veil and the
+     dock — nothing ends its scroll blurred or hidden. */
+  padding-bottom: 300px;
+  position: relative;
+}
+
+
+.nv-list-band-inner {
+  will-change: transform;
+  /* will-change makes this a stacking context — without an explicit
+     level the fixed preview (later in the DOM) painted over the whole
+     list. The list, and the blob inside it, sit ABOVE the preview. */
+  position: relative;
+  z-index: 2;
+}
+
+/* ------------------------------------------------------------------ dock ---
+   The floating bottom nav: a dark glass pill on the light page. The blob
+   glides inside it as a lighter pill-in-a-pill; the orb keeps its rides. */
+.nv-dock {
+  position: fixed;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+  padding: 7px 9px;
+  border-radius: 999px;
+  /* Opaque milky ground. The lens inside refracts through an SVG
+     backdrop filter, which treats a translucent parent as grey-over-
+     black and darkened the lens; a solid ground keeps it true. */
+  background: #ebebea;
+  border: 1px solid rgba(29, 29, 27, 0.05);
+  box-shadow: 0 10px 26px rgba(29, 29, 27, 0.1);
+  animation: nx-blurin 950ms ease 60ms backwards;
+  /* Finger drags glide through the links (pointer stream stays ours). */
+  touch-action: none;
+  /* Symmetric breathing: bottom-origin scaling grew the pill upward only
+     and left the inner pill visually sunk toward the bottom edge. */
+  transform-origin: 50% 50%;
+}
+
+/* The pill's rounded corners exclude themselves from hit-testing — an
+   invisible, UNROUNDED halo restores a full-box (and then some) hit
+   region, so the whole vessel is always interactive. */
+.nv-dock::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+/* One cursor for the whole vessel — beats the blob's inline alias. */
+.nv-dock,
+.nv-dock * {
+  cursor: pointer !important;
+}
+
+.nv-dock-link {
+  position: relative;
+  z-index: 1;
+  padding: 0.48em 0.95em;
+}
+
+/* Every link's HITBOX fills the pill: full height, and the first/last
+   stretch over the end caps — anywhere inside the vessel you are on a
+   real page target. The visible pill still hugs only the text. */
+.nv-dock-link::before {
+  content: "";
+  position: absolute;
+  inset: -14px -0.25em;
+}
+
+.nv-dock-link:first-of-type::before {
+  left: -26px;
+}
+
+.nv-dock-link:last-of-type::before {
+  right: -26px;
+}
+
+.nv-dock-link {
+  border-radius: 999px;
+  color: var(--nv-muted);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: color 420ms cubic-bezier(0.25, 0.5, 0.25, 1);
+}
+
+/* The home item is the little orange orb itself, vertically centred on
+   the label line. */
+.nv-dock-orb {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  /* Grey at rest, ORANGE when home is the active page; softly out of
+     focus like the old nav dot. */
+  background: rgba(29, 29, 27, 0.32);
+  filter: blur(1.2px);
+  vertical-align: middle;
+  transform: translateY(-1px);
+  transition: background-color 420ms ease;
+}
+
+.nv-dock-link[data-active="true"] .nv-dock-orb {
+  background: var(--nv-orange);
+}
+
+/* Hover keeps the grey — only the ACTIVE page reads in full ink. */
+.nv-dock-link[data-active="true"] {
+  color: var(--nv-fg);
+}
+
+/* The inner pill: solid WHITE, resting on the selected item and gliding
+   to whatever you hover. No rims, no lens, no cyan. */
+/* The classic dock pill — the look browsers without lens support get,
+   and the base the glass rule below overrides on Chromium. */
+.nv-dock .nv-blob,
+.nv-dock .nv-blob[data-link="true"] {
+  background: #ffffff;
+  border: 1px solid rgba(29, 29, 27, 0.04);
+  border-radius: 999px;
+  box-shadow:
+    0 3px 12px rgba(29, 29, 27, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  backdrop-filter: blur(8px) saturate(1.05);
+}
+
+.nv-dock .nv-blob::after {
+  content: none;
+}
+
+.nv-dock .nv-blob-lens {
+  display: none;
+}
+
+/* The list blob paints OVER the hover preview image (rows stay above the
+   blob via DOM order at equal stacking) — denser glass with a real
+   backdrop blur so the image reads THROUGH it, softly. */
+.nv-work-list .nv-blob {
+  z-index: 1;
+  background: radial-gradient(
+    130% 130% at 50% 35%,
+    rgba(255, 255, 255, 0.94),
+    rgba(255, 255, 255, 0.84) 62%,
+    rgba(240, 240, 240, 0.46) 100%
+  );
+  -webkit-backdrop-filter: blur(10px) saturate(1.12);
+  backdrop-filter: blur(10px) saturate(1.12);
+}
+
+@media (max-width: 760px) {
+  /* The pill HUGS its text on phones too — centred, compact, a little
+     taller for thumbs. */
+  .nv-dock-link {
+    padding-top: 0.78em;
+    padding-bottom: 0.78em;
+  }
+}
+
+/* Everything reads in ONE narrow centred viewport, every page, every
+   screen size. */
+.nv-col[data-col],
+.nv-col {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: clamp(340px, 86vw, 500px);
+}
+
+.nv-about {
+  max-width: clamp(340px, 86vw, 500px);
+}
+
+.nv-content {
+  padding-top: clamp(28px, 6vh, 60px);
+}
+
+/* Desktop reads closer to the vertical centre. */
+@media (min-width: 761px) {
+  .nv-content {
+    padding-top: clamp(64px, 17vh, 200px);
+  }
+}
+
+/* -------------------------------------------------------------- pinned nav ---
+   The nav stays put while anything scrolls; content approaching it fades
+   and blurs out progressively under a veil with enough weight that the
+   bar always reads clean. Same at the bottom edge. */
+.nv-top {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+}
+
+
+
+.nv-shell::before,
+.nv-shell::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* The colour fade only — the blur lives in .nv-veil below it. */
+.nv-shell::before {
+  top: 0;
+  height: 72px;
+  background: linear-gradient(var(--nv-bg) 20%, transparent);
+}
+
+.nv-shell::after {
+  bottom: 0;
+  height: 184px;
+  background: linear-gradient(transparent, var(--nv-bg) 92%);
+}
+
+/* ------------------------------------------------------ progressive blur ---
+   Each layer blurs the backdrop a little more than the last and is masked
+   to a band that overlaps its neighbours, so the strength ramps smoothly
+   from nothing at the veil's inner edge to a deep blur at the screen edge.
+   Layer bands (0% = inner edge, 100% = screen edge):
+     L0 1px   0–33%    L1 2px  17–50%   L2 4px  33–67%
+     L3 8px  50–83%    L4 16px 67–100% (held to the edge). */
+.nv-veil {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 39;
+  pointer-events: none;
+}
+
+.nv-veil[data-edge="top"] {
+  top: 0;
+  height: 72px;
+}
+
+.nv-veil[data-edge="bottom"] {
+  bottom: 0;
+  height: 184px;
+}
+
+.nv-veil > span {
+  position: absolute;
+  inset: 0;
+}
+
+.nv-veil > [data-layer="0"] {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 0%,
+    #000 17%,
+    #000 33%,
+    transparent 50%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 0%,
+    #000 17%,
+    #000 33%,
+    transparent 50%
+  );
+}
+
+.nv-veil > [data-layer="1"] {
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 17%,
+    #000 33%,
+    #000 50%,
+    transparent 67%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 17%,
+    #000 33%,
+    #000 50%,
+    transparent 67%
+  );
+}
+
+.nv-veil > [data-layer="2"] {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 33%,
+    #000 50%,
+    #000 67%,
+    transparent 83%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 33%,
+    #000 50%,
+    #000 67%,
+    transparent 83%
+  );
+}
+
+.nv-veil > [data-layer="3"] {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 50%,
+    #000 67%,
+    #000 83%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 50%,
+    #000 67%,
+    #000 83%,
+    transparent 100%
+  );
+}
+
+.nv-veil > [data-layer="4"] {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 67%,
+    #000 83%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 67%,
+    #000 83%,
+    #000 100%
+  );
+}
+
+/* Direction: the gradient runs from the veil's INNER edge toward the
+   screen edge, so the same band math serves both veils. */
+.nv-veil[data-edge="top"] {
+  --nv-veil-dir: to top;
+}
+
+.nv-veil[data-edge="bottom"] {
+  --nv-veil-dir: to bottom;
+}
+
+/* -------------------------------------------------------- large screens ---
+   Everything rem-based swells gently on very large displays instead of
+   floating tiny in a sea of background. */
+@media (min-width: 1800px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 2300px) {
+  html {
+    font-size: 21px;
+  }
+}
+
+/* ------------------------------------------------------------ dark mode ---
+   #121212 ground, #1e1e1e glass. Everything var-driven follows along.
+   PARKED for now — the site always ships light. To re-enable system dark
+   mode, delete the `and (min-width: 100000px)` clause below (and flip the
+   two parked spots marked "dark parked" in ink-dust.tsx and layout.tsx). */
+@media (prefers-color-scheme: dark) and (min-width: 100000px) {
+  :root {
+    --nv-bg: #121212;
+    --nv-fg: #e8e8e6;
+    --nv-muted: rgba(238, 238, 236, 0.66);
+    --nv-faint: rgba(232, 232, 230, 0.32);
+    --nv-line: rgba(232, 232, 230, 0.12);
+    --nv-veil: rgba(18, 18, 18, 0.74);
+  }
+
+  .nv-blob {
+    background: radial-gradient(
+      130% 130% at 50% 35%,
+      #262626,
+      #1e1e1e 62%,
+      rgba(18, 18, 18, 0.12) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.55),
+      0 1px 3px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+      inset 0 0 16px rgba(255, 255, 255, 0.03);
+  }
+
+  .nv-blob::after {
+    opacity: 0.25;
+  }
+
+  /* The link ring's white inner lip reads as a stray line on dark glass. */
+  .nv-blob[data-link="true"] {
+    box-shadow:
+      0 2px 14px rgba(0, 204, 255, 0.2),
+      inset 0 1px 0 #1e1e1e;
+  }
+
+  .nx-plain .nx-t,
+  .nx-plain .nx-r[data-blur] .nx-t[data-scrub="on"] {
+    text-decoration-color: rgba(232, 232, 230, 0.18);
+  }
+
+  .nx-plain .nx-r[data-blur] .nx-l[data-rv] {
+    color: rgb(232 232 230 / var(--rv, 0));
+  }
+
+  .nv-lightbox {
+    background: var(--nv-veil);
+  }
+
+  .nv-cursor-dot {
+    background: rgba(232, 232, 230, 0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nv-cursor-frame,
+  .nv-hover-preview,
+  .nv-carousel-track,
+  .nv-carousel-close,
+  .nv-reader-body {
+    transition-duration: 1ms;
+  }
+
+  .nv-carousel,
+  .nv-reader,
+  .nv-lightbox,
+  .nv-lightbox img {
+    animation-duration: 1ms;
+  }
+}
+
+/* ------------------------------------------------------- expanding about ---
+   The /v3 interaction ported to the landing page: chips, orange doodles, and
+   word-by-word inline expansion — scaled to Switzer body size. Type stays
+   exactly the site's own; only the marks come along. */
+
+.nx-text {
+  line-height: 2.35; /* airy enough that chips on adjacent lines never touch */
+  word-spacing: 0.09em;
+  /* Plain prose stays quiet grey so the expandable phrases stand out. */
+  color: var(--nv-muted);
+}
+
+@keyframes nx-blurin {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+  }
+}
+
+/* Once every word has landed the chips arrive with a little blob pop:
+   a breath of shadow, the text swelling a touch, then settling. */
+.nx-body[data-pop] .nx-t {
+  pointer-events: none;
+  animation: nx-chippop 700ms cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+@keyframes nx-chippop {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(29, 29, 27, 0);
+  }
+  45% {
+    transform: scale(1.05);
+    box-shadow: 0 3px 12px rgba(29, 29, 27, 0.1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(29, 29, 27, 0);
+  }
+}
+
+/* While a previous visit is being restored, nothing animates — words,
+   chips, and doodles all snap straight into place. */
+.nx-body[data-restore] .nx-w,
+.nx-body[data-restore] .nx-t,
+.nx-body[data-restore] .nx-t .nx-icon {
+  animation: none !important;
+}
+
+.nx-body[data-restore] .nx-r,
+.nx-body[data-restore] .nx-r .nx-w,
+.nx-body[data-restore] .nx-r .nx-t {
+  transition: none !important;
+}
+
+.nx-body[data-restore] .nx-draw {
+  animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
+}
+
+/* During the intro the chips are invisible and untouchable; they fade in
+   only once every doodle has drawn itself. */
+.nx-body[data-intro] .nx-t {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.nx-body[data-intro] .nx-fill .nx-frame path {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nx-pop 420ms ease calc(var(--dd, 150ms) + var(--si, 0) * 220ms)
+    backwards;
+}
+
+/* Once the spacing settles, each doodle draws itself in, in reading order
+   (--dd is set per doodle from about-text.tsx). */
+.nx-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: nx-drawin 750ms ease var(--dd, 150ms) forwards;
+}
+
+@keyframes nx-drawin {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nx-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Annotated plain text (v0): a doodle rides along, but nothing to click. */
+.nx-m {
+  position: relative;
+  display: inline-block;
+  line-height: 1.25;
+  white-space: nowrap;
+  animation: nx-hidden var(--wd, 0ms) steps(1, end);
+}
+
+.nx-m .nx-icon {
+  animation: nx-hidden var(--wd, 0ms) steps(1, end);
+}
+
+.nx-t {
+  position: relative;
+  display: inline-block;
+  /* Hug the glyphs so doodles centre on the word, not the tall line box. */
+  line-height: 1.12;
+  vertical-align: baseline;
+  padding: 0.02em 0.22em;
+  margin: 0;
+  /* The list blob's glass, shrunk to a chip. */
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  border: 1px solid rgba(29, 29, 27, 0.06);
+  box-shadow:
+    0 2px 10px rgba(29, 29, 27, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  border-radius: 0.35em;
+  color: var(--nv-fg);
+  font: inherit;
+  letter-spacing: inherit;
+  white-space: nowrap;
+  transition:
+    color 500ms ease,
+    background-color 550ms ease,
+    border-color 550ms ease,
+    box-shadow 550ms ease,
+    transform 160ms ease-out;
+}
+
+a.nx-t {
+  text-decoration: none;
+  cursor: alias;
+}
+
+/* Contact links (LinkedIn, X, email) wear an orbit: a gap of clear page,
+   then a soft blurred border ringing the chip. */
+a.nx-t::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 1.5px solid rgba(29, 29, 27, 0.28);
+  border-radius: 0.55em;
+  filter: blur(2px);
+  pointer-events: none;
+  transition: opacity 550ms ease;
+}
+
+.nx-body[data-intro] a.nx-t::after {
+  opacity: 0;
+}
+
+/* The plain (v3) variant keeps its links as bare text. */
+.nx-plain a.nx-t::after {
+  content: none;
+}
+
+.nx-t {
+  cursor: pointer;
+}
+
+.nx-t[data-spent] {
+  cursor: default;
+}
+
+/* Keeps a trigger and its trailing punctuation on the same line. */
+.nx-nowrap {
+  white-space: nowrap;
+}
+
+/* Once spent: greyer text, no hover reaction of any kind. */
+/* Spent chips settle back to flat, quiet grey — no glass, no lean. */
+.nx-t[data-spent],
+.nx-t[data-spent]:hover {
+  color: var(--nv-muted);
+  background: rgba(29, 29, 27, 0.04);
+  border-color: transparent;
+  box-shadow: none;
+  transform: none !important;
+}
+
+.nx-doodle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  overflow: visible; /* ink displacement pushes strokes past the viewBox */
+  filter: url(#nx-ink) saturate(1.15);
+}
+
+.nx-doodle path {
+  fill: none;
+  stroke: var(--nv-orange);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* A second, softer pass gives the line a pencil-like texture. */
+.nx-doodle .nx-thin {
+  stroke-width: 1.1;
+  opacity: 0.6;
+}
+
+/* Sticky-note flipbook, driven from about-text.tsx: the current tracing is
+   picked by data-frame; the frame rate eases up and down like a hand-cranked
+   flipbook. */
+.nx-frame {
+  opacity: 0;
+}
+
+.nx-doodle:not([data-frame]) .nx-f0,
+.nx-doodle[data-frame="0"] .nx-f0 {
+  opacity: 1;
+}
+
+.nx-doodle[data-frame="1"] .nx-f1 {
+  opacity: 1;
+}
+
+.nx-doodle[data-frame="2"] .nx-f2 {
+  opacity: 1;
+}
+
+/* Frames 1 and 2 carry a whisper of weight difference; the cycle ping-pongs
+   f0 → f1 → f2 → f1 like a four-frame pencil test. */
+.nx-f1 path {
+  stroke-width: 1.6;
+}
+
+.nx-f2 path {
+  stroke-width: 1.4;
+}
+
+/* Filled icons (sparkles): solid orange. */
+.nx-fill path {
+  fill: var(--nv-orange);
+  stroke: none;
+}
+
+/* Little inline icons sit just after their word — before it for Vercel. */
+.nx-icon {
+  position: relative;
+  display: inline-block;
+  width: 1.14em;
+  height: 1.14em;
+  margin-left: 0.18em;
+  vertical-align: -0.22em;
+  overflow: visible;
+}
+
+/* Sparkles read a touch larger than the other icons. */
+.nx-icon[data-kind="sparkles"] {
+  width: 1.32em;
+  height: 1.32em;
+  vertical-align: -0.28em;
+}
+
+/* The exclamation mark runs tall and a touch bolder than the other icons. */
+.nx-icon[data-kind="bang"] {
+  width: 0.72em;
+  height: 1.34em;
+  vertical-align: -0.3em;
+  margin-left: 0.08em;
+}
+
+.nx-doodle[data-kind="bang"] path {
+  stroke-width: 2;
+}
+
+.nx-icon[data-kind="smiley"] {
+  width: 1.26em;
+  height: 1.26em;
+  vertical-align: -0.26em;
+}
+
+.nx-t .nx-icon:first-child {
+  margin-left: 0;
+  margin-right: 0.18em;
+}
+
+/* Spent marks dry to grey with the text. */
+.nx-t[data-spent] .nx-doodle path {
+  stroke: #b9b8b4;
+  transition: stroke 700ms ease 250ms;
+}
+
+.nx-t[data-spent] .nx-fill path {
+  fill: #b9b8b4;
+  stroke: none;
+  transition: fill 700ms ease 250ms;
+}
+
+.nx-w {
+  display: inline-block;
+  white-space: pre;
+}
+
+/* A closed reveal is fully on the page, just out of focus; opening it melts
+   the words in. Nested reveals stack their blurs, clearing layer by layer. */
+.nx-r {
+  transition:
+    filter 750ms ease,
+    opacity 750ms ease;
+}
+
+.nx-r[data-blur] {
+  filter: blur(7px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Sweep variant (v1 + v3): the blur lives on the words themselves, each with
+   a rising delay, so an opening reveal sharpens left to right. */
+.nx-sweep .nx-r {
+  transition: none;
+}
+
+.nx-sweep .nx-r[data-blur] {
+  filter: none;
+  opacity: 1;
+}
+
+/* -------------------------------------------------------- invisible ink ---
+   Hidden reveals render as clouds of tiny drifting ink specks — iMessage
+   invisible-ink style. The text itself is transparent; each word wears a
+   shimmering dust field that fades away as the reveal sweeps in. */
+
+.nx-sweep .nx-r .nx-w,
+.nx-sweep .nx-r .nx-t {
+  position: relative;
+  transition:
+    color 800ms ease var(--ud, 0ms),
+    filter 800ms ease var(--ud, 0ms),
+    opacity 800ms ease var(--ud, 0ms),
+    transform 160ms ease-out;
+}
+
+.nx-sweep .nx-r .nx-t {
+  transition:
+    color 800ms ease var(--ud, 0ms),
+    filter 800ms ease var(--ud, 0ms),
+    opacity 800ms ease var(--ud, 0ms),
+    background-color 800ms ease var(--ud, 0ms),
+    border-color 800ms ease var(--ud, 0ms),
+    box-shadow 800ms ease var(--ud, 0ms),
+    text-decoration-color 800ms ease var(--ud, 0ms),
+    transform 160ms ease-out;
+}
+
+/* While re-veiling after inactivity, everything melts out much more
+   slowly — a long blurred exhale back into the dust. The trigger underlines
+   hold their breath too, only dotting back in once the attribute lifts,
+   well after the words have fully gone. */
+.nx-r[data-reveil] .nx-w,
+.nx-r[data-reveil] .nx-t,
+.nx-r[data-reveil] .nx-l {
+  transition-duration: 1500ms;
+  /* Front-loaded: the blur is clearly underway while the dust condenses on
+     top — the two halves of one exhale. */
+  transition-timing-function: cubic-bezier(0.25, 0.55, 0.45, 1);
+}
+
+.nx-r[data-reveil] .nx-t {
+  text-decoration-color: transparent;
+}
+
+/* Hidden words are invisible AND pre-blurred, so the reveal is a magic
+   blur-fade-in: ink condenses out of the dust into focus. */
+.nx-sweep .nx-r[data-blur] .nx-w,
+.nx-sweep .nx-r[data-blur] .nx-t {
+  color: transparent;
+  filter: blur(7px);
+}
+
+/* The dust itself is painted by ink-dust.tsx on a canvas overlay — real
+   randomness, soft cloud edges, layered blur depths, per-word dissolves. */
+.nx-ink-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* While veiled, a link is pure dust like everything else — its ink and
+   dots only arrive once scrubbed into focus. */
+.nx-sweep .nx-r[data-blur] .nx-t:not([data-scrub="on"]) {
+  color: transparent;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  text-decoration-color: transparent;
+  pointer-events: none;
+}
+
+/* The scrub: a brush stroke — individual letters condense into focus where
+   the cursor passes. Word-level veiling is neutralised in the plain variant;
+   the LETTERS carry the ink. */
+.nx-plain .nx-r[data-blur] {
+  pointer-events: auto;
+}
+
+/* While dust remains, the pointer is an open HAND — you are brushing it
+   away. The moment a run is fully revealed (data-wave) it reads as plain
+   text again and the cursor returns to normal; a melt brings the hand
+   back with the dust. */
+.nx-plain .nx-r[data-blur]:not([data-wave]),
+.nx-plain .nx-r[data-blur]:not([data-wave]) * {
+  cursor: grab;
+}
+
+/* During the settling beat there is nothing to brush yet — no hand. */
+.nx-plain[data-ink-settle] .nx-r[data-blur],
+.nx-plain[data-ink-settle] .nx-r[data-blur] * {
+  cursor: auto;
+}
+
+/* Touch: a drag that STARTS on unrevealed ink is a brush, never a
+   scroll — the browser hands us the whole pointer stream. Everywhere
+   else (and over revealed text) scrolling behaves normally.
+   touch-action needs non-inline boxes, so it rides on the word and
+   letter spans. */
+.nx-plain .nx-r[data-blur]:not([data-wave]) .nx-w,
+.nx-plain .nx-r[data-blur]:not([data-wave]) .nx-l,
+.nx-plain .nx-r[data-blur]:not([data-wave]) .nx-t {
+  touch-action: none;
+}
+
+/* No long-press selection or callout fighting the brush on veiled runs. */
+.nx-plain .nx-r[data-blur]:not([data-wave]) {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Doubled class beats the sweep veil's specificity tie — the WORD must
+   never carry blur, or revealed letters inside stay smudged. */
+.nx-plain.nx-sweep .nx-r[data-blur] .nx-w {
+  color: inherit;
+  filter: none;
+  opacity: 1;
+  animation: none;
+}
+
+/* Letters carry NO filter, ever: a ripple animates ~100 letters at once,
+   and per-letter blur means a hundred GPU layers re-rastered every frame
+   for two seconds — that IS jank. The dust dispersal carries the
+   condense effect; letters simply ink in. */
+.nx-plain .nx-r[data-blur] .nx-l {
+  color: transparent;
+  transition:
+    color 420ms ease,
+    filter 420ms ease;
+}
+
+/* Brush-edge letters carry fractional ink — the frontier of a partial
+   reveal is a gradient, not a cliff. Placed before the full-reveal rule
+   so data-scrub always wins. */
+.nx-plain .nx-r[data-blur] .nx-l[data-rv] {
+  color: rgb(17 17 17 / var(--rv, 0));
+  /* The frontier stays a touch OUT OF FOCUS in proportion to how faint
+     it still is — fade and blur together at the reveal's edge. */
+  filter: blur(calc((1 - var(--rv, 0)) * 2.4px));
+}
+
+.nx-plain .nx-r[data-blur] .nx-l[data-scrub="on"] {
+  color: inherit;
+}
+
+.nx-plain.nx-sweep .nx-r[data-blur] .nx-t {
+  filter: none;
+}
+
+.nx-plain .nx-r[data-blur] .nx-t[data-scrub="on"] {
+  color: var(--nv-muted);
+  filter: none;
+  opacity: 1;
+  text-decoration-color: rgba(29, 29, 27, 0.14);
+  transition:
+    color 250ms ease,
+    filter 380ms ease,
+    opacity 380ms ease,
+    text-decoration-color 380ms ease,
+    transform 160ms ease-out;
+}
+
+.nx-plain .nx-r[data-blur] .nx-t[data-scrub="on"][data-blob] {
+  color: var(--nv-fg);
+}
+
+/* A just-revealed link reads as ordinary prose for a beat — full ink, no
+   dots, no pointer — then eases into linkhood via the transitions above. */
+.nx-plain .nx-r[data-blur] .nx-t[data-scrub="on"][data-fresh] {
+  color: inherit;
+  text-decoration-color: transparent;
+  pointer-events: none;
+}
+
+.nx-sweep .nx-r .nx-doodle {
+  transition: opacity 500ms ease var(--ud, 0ms);
+}
+
+.nx-sweep .nx-r[data-blur] .nx-doodle {
+  opacity: 0;
+}
+
+/* Legacy hold animation, still used by the .nx-m mark. */
+@keyframes nx-hidden {
+  0%,
+  100% {
+    width: 0;
+    opacity: 0;
+  }
+}
+
+/* The about prose arrives exactly like the nav — same blur-in, a breath
+   later. */
+.nv-about .nx-body {
+  animation: nx-blurin 950ms ease 180ms backwards;
+}
+
+/* ------------------------------------------------------------- list band ---
+   Overflowing lists clip to the viewport and glide with the pointer
+   instead of scrolling the page. */
+.nv-list-band {
+  /* Plain scrolling, generous landing ground: this spacer means the end
+     of the list can ALWAYS scroll fully above the bottom veil and the
+     dock — nothing ends its scroll blurred or hidden. */
+  padding-bottom: 300px;
+  position: relative;
+}
+
+
+.nv-list-band-inner {
+  will-change: transform;
+  /* will-change makes this a stacking context — without an explicit
+     level the fixed preview (later in the DOM) painted over the whole
+     list. The list, and the blob inside it, sit ABOVE the preview. */
+  position: relative;
+  z-index: 2;
+}
+
+/* ------------------------------------------------------------------ dock ---
+   The floating bottom nav: a dark glass pill on the light page. The blob
+   glides inside it as a lighter pill-in-a-pill; the orb keeps its rides. */
+.nv-dock {
+  position: fixed;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+  padding: 7px 9px;
+  border-radius: 999px;
+  /* Opaque milky ground. The lens inside refracts through an SVG
+     backdrop filter, which treats a translucent parent as grey-over-
+     black and darkened the lens; a solid ground keeps it true. */
+  background: #ebebea;
+  border: 1px solid rgba(29, 29, 27, 0.05);
+  box-shadow: 0 10px 26px rgba(29, 29, 27, 0.1);
+  animation: nx-blurin 950ms ease 60ms backwards;
+  /* Finger drags glide through the links (pointer stream stays ours). */
+  touch-action: none;
+  /* Symmetric breathing: bottom-origin scaling grew the pill upward only
+     and left the inner pill visually sunk toward the bottom edge. */
+  transform-origin: 50% 50%;
+}
+
+/* The pill's rounded corners exclude themselves from hit-testing — an
+   invisible, UNROUNDED halo restores a full-box (and then some) hit
+   region, so the whole vessel is always interactive. */
+.nv-dock::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+/* One cursor for the whole vessel — beats the blob's inline alias. */
+.nv-dock,
+.nv-dock * {
+  cursor: pointer !important;
+}
+
+.nv-dock-link {
+  position: relative;
+  z-index: 1;
+  padding: 0.48em 0.95em;
+}
+
+/* Every link's HITBOX fills the pill: full height, and the first/last
+   stretch over the end caps — anywhere inside the vessel you are on a
+   real page target. The visible pill still hugs only the text. */
+.nv-dock-link::before {
+  content: "";
+  position: absolute;
+  inset: -14px -0.25em;
+}
+
+.nv-dock-link:first-of-type::before {
+  left: -26px;
+}
+
+.nv-dock-link:last-of-type::before {
+  right: -26px;
+}
+
+.nv-dock-link {
+  border-radius: 999px;
+  color: var(--nv-muted);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: color 420ms cubic-bezier(0.25, 0.5, 0.25, 1);
+}
+
+/* Hover keeps the grey — only the ACTIVE page reads in full ink. */
+.nv-dock-link[data-active="true"] {
+  color: var(--nv-fg);
+}
+
+/* The inner pill: solid WHITE, resting on the selected item and gliding
+   to whatever you hover. No rims, no lens, no cyan. */
+/* The classic dock pill — the look browsers without lens support get,
+   and the base the glass rule below overrides on Chromium. */
+.nv-dock .nv-blob,
+.nv-dock .nv-blob[data-link="true"] {
+  background: #ffffff;
+  border: 1px solid rgba(29, 29, 27, 0.04);
+  border-radius: 999px;
+  box-shadow:
+    0 3px 12px rgba(29, 29, 27, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  backdrop-filter: blur(8px) saturate(1.05);
+}
+
+.nv-dock .nv-blob::after {
+  content: none;
+}
+
+.nv-dock .nv-blob-lens {
+  display: none;
+}
+
+/* The list blob paints OVER the hover preview image (rows stay above the
+   blob via DOM order at equal stacking) — denser glass with a real
+   backdrop blur so the image reads THROUGH it, softly. */
+.nv-work-list .nv-blob {
+  z-index: 1;
+  background: radial-gradient(
+    130% 130% at 50% 35%,
+    rgba(255, 255, 255, 0.94),
+    rgba(255, 255, 255, 0.84) 62%,
+    rgba(240, 240, 240, 0.46) 100%
+  );
+  -webkit-backdrop-filter: blur(10px) saturate(1.12);
+  backdrop-filter: blur(10px) saturate(1.12);
+}
+
+@media (max-width: 760px) {
+  /* The pill HUGS its text on phones too — centred, compact, a little
+     taller for thumbs. */
+  .nv-dock-link {
+    padding-top: 0.78em;
+    padding-bottom: 0.78em;
+  }
+}
+
+/* Everything reads in ONE narrow centred viewport, every page, every
+   screen size. */
+.nv-col[data-col],
+.nv-col {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: clamp(340px, 86vw, 500px);
+}
+
+.nv-about {
+  max-width: clamp(340px, 86vw, 500px);
+}
+
+.nv-content {
+  padding-top: clamp(28px, 6vh, 60px);
+}
+
+/* Desktop reads closer to the vertical centre. */
+@media (min-width: 761px) {
+  .nv-content {
+    padding-top: clamp(64px, 17vh, 200px);
+  }
+}
+
+/* -------------------------------------------------------------- pinned nav ---
+   The nav stays put while anything scrolls; content approaching it fades
+   and blurs out progressively under a veil with enough weight that the
+   bar always reads clean. Same at the bottom edge. */
+.nv-top {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+}
+
+
+
+.nv-shell::before,
+.nv-shell::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* The colour fade only — the blur lives in .nv-veil below it. */
+.nv-shell::before {
+  top: 0;
+  height: 72px;
+  background: linear-gradient(var(--nv-bg) 20%, transparent);
+}
+
+.nv-shell::after {
+  bottom: 0;
+  height: 184px;
+  background: linear-gradient(transparent, var(--nv-bg) 92%);
+}
+
+/* ------------------------------------------------------ progressive blur ---
+   Each layer blurs the backdrop a little more than the last and is masked
+   to a band that overlaps its neighbours, so the strength ramps smoothly
+   from nothing at the veil's inner edge to a deep blur at the screen edge.
+   Layer bands (0% = inner edge, 100% = screen edge):
+     L0 1px   0–33%    L1 2px  17–50%   L2 4px  33–67%
+     L3 8px  50–83%    L4 16px 67–100% (held to the edge). */
+.nv-veil {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 39;
+  pointer-events: none;
+}
+
+.nv-veil[data-edge="top"] {
+  top: 0;
+  height: 72px;
+}
+
+.nv-veil[data-edge="bottom"] {
+  bottom: 0;
+  height: 184px;
+}
+
+.nv-veil > span {
+  position: absolute;
+  inset: 0;
+}
+
+.nv-veil > [data-layer="0"] {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 0%,
+    #000 17%,
+    #000 33%,
+    transparent 50%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 0%,
+    #000 17%,
+    #000 33%,
+    transparent 50%
+  );
+}
+
+.nv-veil > [data-layer="1"] {
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 17%,
+    #000 33%,
+    #000 50%,
+    transparent 67%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 17%,
+    #000 33%,
+    #000 50%,
+    transparent 67%
+  );
+}
+
+.nv-veil > [data-layer="2"] {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 33%,
+    #000 50%,
+    #000 67%,
+    transparent 83%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 33%,
+    #000 50%,
+    #000 67%,
+    transparent 83%
+  );
+}
+
+.nv-veil > [data-layer="3"] {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 50%,
+    #000 67%,
+    #000 83%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 50%,
+    #000 67%,
+    #000 83%,
+    transparent 100%
+  );
+}
+
+.nv-veil > [data-layer="4"] {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 67%,
+    #000 83%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 67%,
+    #000 83%,
+    #000 100%
+  );
+}
+
+/* Direction: the gradient runs from the veil's INNER edge toward the
+   screen edge, so the same band math serves both veils. */
+.nv-veil[data-edge="top"] {
+  --nv-veil-dir: to top;
+}
+
+.nv-veil[data-edge="bottom"] {
+  --nv-veil-dir: to bottom;
+}
+
+/* -------------------------------------------------------- large screens ---
+   Everything rem-based swells gently on very large displays instead of
+   floating tiny in a sea of background. */
+@media (min-width: 1800px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 2300px) {
+  html {
+    font-size: 21px;
+  }
+}
+
+/* ------------------------------------------------------------ dark mode ---
+   #121212 ground, #1e1e1e glass. Everything var-driven follows along.
+   PARKED for now — the site always ships light. To re-enable system dark
+   mode, delete the `and (min-width: 100000px)` clause below (and flip the
+   two parked spots marked "dark parked" in ink-dust.tsx and layout.tsx). */
+@media (prefers-color-scheme: dark) and (min-width: 100000px) {
+  :root {
+    --nv-bg: #121212;
+    --nv-fg: #e8e8e6;
+    --nv-muted: rgba(238, 238, 236, 0.66);
+    --nv-faint: rgba(232, 232, 230, 0.32);
+    --nv-line: rgba(232, 232, 230, 0.12);
+    --nv-veil: rgba(18, 18, 18, 0.74);
+  }
+
+  .nv-blob {
+    background: radial-gradient(
+      130% 130% at 50% 35%,
+      #262626,
+      #1e1e1e 62%,
+      rgba(18, 18, 18, 0.12) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.55),
+      0 1px 3px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+      inset 0 0 16px rgba(255, 255, 255, 0.03);
+  }
+
+  .nv-blob::after {
+    opacity: 0.25;
+  }
+
+  /* The link ring's white inner lip reads as a stray line on dark glass. */
+  .nv-blob[data-link="true"] {
+    box-shadow:
+      0 2px 14px rgba(0, 204, 255, 0.2),
+      inset 0 1px 0 #1e1e1e;
+  }
+
+  .nx-plain .nx-t,
+  .nx-plain .nx-r[data-blur] .nx-t[data-scrub="on"] {
+    text-decoration-color: rgba(232, 232, 230, 0.18);
+  }
+
+  .nx-plain .nx-r[data-blur] .nx-l[data-rv] {
+    color: rgb(232 232 230 / var(--rv, 0));
+  }
+
+  .nv-lightbox {
+    background: var(--nv-veil);
+  }
+
+  .nv-cursor-dot {
+    background: rgba(232, 232, 230, 0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-w,
+  .nx-t,
+  .nx-t .nx-icon,
+  .nx-text,
+  .nx-draw,
+  .nx-doodle.nx-fill,
+  .nx-sweep .nx-r .nx-w::before,
+  .nx-plain .nx-r .nx-t::before {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}
+
+/* ------------------------------------------------------ fluid hover blob ---
+   iOS-style list highlight: a grey squircle appears under the hovered row
+   and springs to the next one — a tiny bit bouncy, still rigid. The rows
+   swap their text; the blob persists. Painted by hover-blob.tsx, which also
+   plays the blooorp as it slides. The native cursor disappears over these
+   lists, same as it used to. */
+
+.nv-work-list,
+.nv-entry-list {
+  position: relative;
+}
+
+.nv-blob {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+  /* Real glass: a white heart melting toward the page colour at the rim,
+     so the edge reads as curvature rather than a card. */
+  background: radial-gradient(
+    130% 130% at 50% 35%,
+    rgba(255, 255, 255, 0.97),
+    rgba(255, 255, 255, 0.82) 62%,
+    rgba(240, 240, 240, 0.34) 100%
+  );
+  backdrop-filter: blur(5px) saturate(1.12);
+  -webkit-backdrop-filter: blur(5px) saturate(1.12);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  /* Thickness: lifted diffuse shadow below, bright top lip, faint dark
+     bottom lip, and an inner glow like light caught in the pane. */
+  box-shadow:
+    0 4px 12px rgba(29, 29, 27, 0.055),
+    0 1px 2px rgba(29, 29, 27, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(29, 29, 27, 0.05),
+    inset 0 0 16px rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  overflow: hidden;
+  opacity: 0;
+  /* Only visibility eases — the link/non-link identity (border colour,
+     shadow) snaps instantly so a switch never wears the old outfit. */
+  visibility: hidden;
+  transition:
+    opacity 320ms ease,
+    visibility 0s linear 320ms;
+}
+
+/* Lens rim: anything crossing the blob's edge smears through a much heavier
+   blur that fades toward the clear centre — the refraction of thick glass. */
+.nv-blob::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(16px) saturate(1.4) brightness(1.05);
+  backdrop-filter: blur(16px) saturate(1.4) brightness(1.05);
+  -webkit-mask-image: radial-gradient(
+    130% 130% at 50% 50%,
+    transparent 46%,
+    #000 82%
+  );
+  mask-image: radial-gradient(130% 130% at 50% 50%, transparent 46%, #000 82%);
+  pointer-events: none;
+}
+
+/* Specular glare: a curved streak of caught light along the upper edge. */
+.nv-blob::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      90% 52% at 30% -8%,
+      rgba(255, 255, 255, 0.65),
+      rgba(255, 255, 255, 0) 70%
+    ),
+    radial-gradient(
+      60% 42% at 85% 108%,
+      rgba(255, 255, 255, 0.28),
+      rgba(255, 255, 255, 0) 70%
+    );
+  pointer-events: none;
+}
+
+/* The hovered title leans and swells with the blob (inline transform from
+   hover-blob.tsx rides on top of this transition), and squishes on press. */
+.nv-work-title,
+.nv-entry-title {
+  display: inline-block;
+  /* Scaling around the title's OWN centre keeps the swell to a few px per
+     side — a distant origin (like the blob's centre) acts as a long lever
+     and slides the text sideways. */
+  transform-origin: center;
+  transition: transform 170ms ease-out;
+}
+
+/* v1's glass chips have no blob, so they keep a CSS press squish — but a
+   spent trigger is just text now and doesn't react to presses at all. */
+.nx-t:active:not([data-blob]):not([data-spent]) {
+  scale: 0.95;
+  transition: scale 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nx-t[data-spent]:active {
+  scale: none;
+}
+
+/* Row air lives in the rows' own padding, so there is never a dead strip
+   between rows — the pointer always has a row under it. */
+
+.nv-blob[data-on="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 320ms ease;
+}
+
+/* The refraction layer riding above the text: clear through the centre, a
+   soft smear around the rim for anything crossing the frame. */
+/* ------------------------------------------------------------ glass blobs ---
+   A blob in glass mode is a vaso lens: the shell paints NOTHING of its own
+   (no fill, border, shadow or blur) so the refraction reads through, and
+   it rides ABOVE the text it captures — the word sits under the glass,
+   crisp in the clear centre and refracted, with chromatic fringing, at
+   the bezel. Pointer events pass through, so rows stay clickable. */
+.nv-blob[data-glass="true"],
+.nv-blob[data-glass="true"][data-link="true"],
+.nv-dock .nv-blob[data-glass="true"],
+.nv-dock .nv-blob[data-glass="true"][data-link="true"],
+.nv-work-list .nv-blob[data-glass="true"],
+.nv-work-list .nv-blob[data-glass="true"][data-link="true"],
+.nv-entry-list .nv-blob[data-glass="true"],
+.nv-entry-list .nv-blob[data-glass="true"][data-link="true"] {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  overflow: visible;
+  z-index: 3;
+}
+
+/* Links keep their cyan frame around the glass: the ring sits on the
+   shell, outside the lens, so the refraction stays clean inside it. */
+/* Only the ABOUT links wear the ring — the dock's home link and list
+   rows are glass alone. */
+.nx-body .nv-blob[data-glass="true"][data-link="true"] {
+  border: 2px solid rgba(0, 204, 255, 0.8);
+  box-shadow: 0 2px 14px rgba(0, 204, 255, 0.2);
+}
+
+/* Vaso's own rim highlights, with a softer drop shadow than its default. */
+.nv-blob[data-glass="true"] [data-vaso] {
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.3),
+    inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, 0.6),
+    inset -1.5px -1.5px 1px -1px rgba(255, 255, 255, 0.36),
+    0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.nv-blob-lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+  border-radius: 16px;
+  -webkit-backdrop-filter: blur(4px) saturate(1.25) brightness(1.05);
+  backdrop-filter: blur(4px) saturate(1.25) brightness(1.05);
+  -webkit-mask-image: radial-gradient(
+    120% 120% at 50% 50%,
+    transparent 55%,
+    #000 92%
+  );
+  mask-image: radial-gradient(120% 120% at 50% 50%, transparent 55%, #000 92%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 320ms ease,
+    visibility 0s linear 320ms;
+}
+
+.nv-blob-lens[data-on="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 320ms ease;
+}
+
+/* Over a link the blob announces itself in bright cyan, a touch thicker. */
+.nv-blob[data-link="true"] {
+  border: 2px solid rgba(0, 204, 255, 0.8);
+  box-shadow:
+    0 2px 14px rgba(0, 204, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* Press squash/release pop is driven by the spring engine in
+   hover-blob.tsx — composed inside the transform so it scales purely in
+   place. */
+
+/* Row text paints above the blob. */
+.nv-entry-head {
+  position: relative;
+  z-index: 1;
+}
+
+/* The cursor stays VISIBLE over the lists — the blob sets alias or
+   crosshair while it holds a row. */
+
+/* ---------------------------------------------------- about v3 (uifork) ---
+   No doodles: expandable phrases are quiet grey text, and the frosted list
+   blob glides in behind whichever one you hover — same spring, same
+   magnetism, same blorp. */
+
+.nx-plain {
+  position: relative;
+  /* The prose itself is full ink; the links sit back in quiet grey. */
+  color: #111111;
+}
+
+/* Beats .nx-text's own quiet-grey rule so the plain variant's prose is
+   genuinely black. Links keep their muted rule below. With no chips or
+   doodles to clear, the plain variant also returns to the site's normal
+   text rhythm. */
+.nx-plain .nx-text {
+  color: inherit;
+  /* A touch more air than body default, well short of the old chip-era
+     spread. */
+  line-height: 1.85;
+  word-spacing: 0.03em;
+  text-align: left;
+}
+
+.nx-plain .nx-t {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0.35em;
+  /* No padding: an invisible chip must occupy exactly the space the words
+     would as plain prose, so spacing stays cohesive once opened. */
+  padding: 0;
+  /* Triggers read as prose with a grey dotted underline; ink arrives on
+     hover while the dots stay grey. */
+  color: var(--nv-muted);
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(29, 29, 27, 0.14);
+  text-decoration-thickness: 0.085em;
+  text-underline-offset: 0.24em;
+  z-index: 1;
+  transition:
+    color 250ms ease,
+    text-decoration-color 250ms ease,
+    transform 160ms ease-out;
+}
+
+.nx-plain .nx-t[data-blob] {
+  color: var(--nv-fg);
+}
+
+/* Hovering must ink instantly — the slow, delayed sweep transition belongs
+   to unveiling only, not to pointer feedback on links inside reveals. */
+.nx-plain .nx-r .nx-t[data-blob],
+.nx-plain .nx-r .nx-t:hover {
+  transition:
+    color 180ms ease,
+    text-decoration-color 250ms ease,
+    transform 160ms ease-out;
+}
+
+.nx-plain .nx-t[data-spent],
+.nx-plain .nx-t[data-spent]:hover {
+  color: var(--nv-muted);
+  background: transparent;
+  text-decoration: none;
+  transform: none !important;
+}
+
+.nx-plain .nv-blob {
+  border-radius: 10px;
+}
+
+/* The close blob matches the link blob exactly — same corner radius, no
+   pill; only the crimson ring differs. */
+.nv-reader-close .nv-blob,
+.nv-reader-close .nv-blob-lens,
+.nv-lightbox-head .nv-blob,
+.nv-lightbox-head .nv-blob-lens {
+  border-radius: 10px;
+}
+
+
+/* ------------------------------------------------------ page transitions ---
+   Every page swap speaks blur: the old content melts out, the new one melts
+   in, and the orange dot leaps across the nav to the new page's name. */
+
+.nv-content {
+  /* Entry waits a beat after the swap, then melts in from the blur. */
+  /* backwards, not both: a finished entry animation kept OWNING filter
+     and opacity, which blocked the overlay's smooth blur transition and
+     made it fire instantly right after a page navigation. */
+  animation: nv-pagein 520ms ease 90ms backwards;
+}
+
+@keyframes nv-pagein {
+  from {
+    opacity: 0;
+    filter: blur(12px);
+  }
+}
+
+/* Exit is an ANIMATION too — replacing the animation property cancels the
+   entry's fill (which would otherwise own opacity/filter and block any
+   transition), so the old page reliably melts out before the swap. */
+.nv-content.nv-leaving {
+  animation: nv-pageout 300ms ease both;
+  pointer-events: none;
+}
+
+@keyframes nv-pageout {
+  to {
+    opacity: 0;
+    filter: blur(12px);
+  }
+}
+
+.nv-top-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  /* Resting grey; it lights up orange whenever ANY nav name is hovered. */
+  background: #b9b8b4;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  /* Softly blurred: a little orb, not a hard pixel. */
+  filter: blur(1.3px);
+  transition: background-color 250ms ease;
+}
+
+.nv-top:has(.nv-top-link:hover) .nv-top-dot {
+  background: var(--nv-orange);
+}
+
+
+/* The about prose arrives exactly like the nav — same blur-in, a breath
+   later. */
+.nv-about .nx-body {
+  animation: nx-blurin 950ms ease 180ms backwards;
+}
+
+/* ------------------------------------------------------------- list band ---
+   Overflowing lists clip to the viewport and glide with the pointer
+   instead of scrolling the page. */
+.nv-list-band {
+  /* Plain scrolling, generous landing ground: this spacer means the end
+     of the list can ALWAYS scroll fully above the bottom veil and the
+     dock — nothing ends its scroll blurred or hidden. */
+  padding-bottom: 300px;
+  position: relative;
+}
+
+
+.nv-list-band-inner {
+  will-change: transform;
+  /* will-change makes this a stacking context — without an explicit
+     level the fixed preview (later in the DOM) painted over the whole
+     list. The list, and the blob inside it, sit ABOVE the preview. */
+  position: relative;
+  z-index: 2;
+}
+
+/* ------------------------------------------------------------------ dock ---
+   The floating bottom nav: a dark glass pill on the light page. The blob
+   glides inside it as a lighter pill-in-a-pill; the orb keeps its rides. */
+.nv-dock {
+  position: fixed;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+  padding: 7px 9px;
+  border-radius: 999px;
+  /* Opaque milky ground. The lens inside refracts through an SVG
+     backdrop filter, which treats a translucent parent as grey-over-
+     black and darkened the lens; a solid ground keeps it true. */
+  background: #ebebea;
+  border: 1px solid rgba(29, 29, 27, 0.05);
+  box-shadow: 0 10px 26px rgba(29, 29, 27, 0.1);
+  animation: nx-blurin 950ms ease 60ms backwards;
+  /* Finger drags glide through the links (pointer stream stays ours). */
+  touch-action: none;
+  /* Symmetric breathing: bottom-origin scaling grew the pill upward only
+     and left the inner pill visually sunk toward the bottom edge. */
+  transform-origin: 50% 50%;
+}
+
+/* The pill's rounded corners exclude themselves from hit-testing — an
+   invisible, UNROUNDED halo restores a full-box (and then some) hit
+   region, so the whole vessel is always interactive. */
+.nv-dock::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+/* One cursor for the whole vessel — beats the blob's inline alias. */
+.nv-dock,
+.nv-dock * {
+  cursor: pointer !important;
+}
+
+.nv-dock-link {
+  position: relative;
+  z-index: 1;
+  padding: 0.48em 0.95em;
+}
+
+/* Every link's HITBOX fills the pill: full height, and the first/last
+   stretch over the end caps — anywhere inside the vessel you are on a
+   real page target. The visible pill still hugs only the text. */
+.nv-dock-link::before {
+  content: "";
+  position: absolute;
+  inset: -14px -0.25em;
+}
+
+.nv-dock-link:first-of-type::before {
+  left: -26px;
+}
+
+.nv-dock-link:last-of-type::before {
+  right: -26px;
+}
+
+.nv-dock-link {
+  border-radius: 999px;
+  color: var(--nv-muted);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: color 420ms cubic-bezier(0.25, 0.5, 0.25, 1);
+}
+
+/* Hover keeps the grey — only the ACTIVE page reads in full ink. */
+.nv-dock-link[data-active="true"] {
+  color: var(--nv-fg);
+}
+
+/* The inner pill: solid WHITE, resting on the selected item and gliding
+   to whatever you hover. No rims, no lens, no cyan. */
+/* The classic dock pill — the look browsers without lens support get,
+   and the base the glass rule below overrides on Chromium. */
+.nv-dock .nv-blob,
+.nv-dock .nv-blob[data-link="true"] {
+  background: #ffffff;
+  border: 1px solid rgba(29, 29, 27, 0.04);
+  border-radius: 999px;
+  box-shadow:
+    0 3px 12px rgba(29, 29, 27, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  backdrop-filter: blur(8px) saturate(1.05);
+}
+
+.nv-dock .nv-blob::after {
+  content: none;
+}
+
+.nv-dock .nv-blob-lens {
+  display: none;
+}
+
+/* The list blob paints OVER the hover preview image (rows stay above the
+   blob via DOM order at equal stacking) — denser glass with a real
+   backdrop blur so the image reads THROUGH it, softly. */
+.nv-work-list .nv-blob {
+  z-index: 1;
+  background: radial-gradient(
+    130% 130% at 50% 35%,
+    rgba(255, 255, 255, 0.94),
+    rgba(255, 255, 255, 0.84) 62%,
+    rgba(240, 240, 240, 0.46) 100%
+  );
+  -webkit-backdrop-filter: blur(10px) saturate(1.12);
+  backdrop-filter: blur(10px) saturate(1.12);
+}
+
+@media (max-width: 760px) {
+  /* The pill HUGS its text on phones too — centred, compact, a little
+     taller for thumbs. */
+  .nv-dock-link {
+    padding-top: 0.78em;
+    padding-bottom: 0.78em;
+  }
+}
+
+/* Everything reads in ONE narrow centred viewport, every page, every
+   screen size. */
+.nv-col[data-col],
+.nv-col {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: clamp(340px, 86vw, 500px);
+}
+
+.nv-about {
+  max-width: clamp(340px, 86vw, 500px);
+}
+
+.nv-content {
+  padding-top: clamp(28px, 6vh, 60px);
+}
+
+/* Desktop reads closer to the vertical centre. */
+@media (min-width: 761px) {
+  .nv-content {
+    padding-top: clamp(64px, 17vh, 200px);
+  }
+}
+
+/* -------------------------------------------------------------- pinned nav ---
+   The nav stays put while anything scrolls; content approaching it fades
+   and blurs out progressively under a veil with enough weight that the
+   bar always reads clean. Same at the bottom edge. */
+.nv-top {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+}
+
+
+
+.nv-shell::before,
+.nv-shell::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* The colour fade only — the blur lives in .nv-veil below it. */
+.nv-shell::before {
+  top: 0;
+  height: 72px;
+  background: linear-gradient(var(--nv-bg) 20%, transparent);
+}
+
+.nv-shell::after {
+  bottom: 0;
+  height: 184px;
+  background: linear-gradient(transparent, var(--nv-bg) 92%);
+}
+
+/* ------------------------------------------------------ progressive blur ---
+   Each layer blurs the backdrop a little more than the last and is masked
+   to a band that overlaps its neighbours, so the strength ramps smoothly
+   from nothing at the veil's inner edge to a deep blur at the screen edge.
+   Layer bands (0% = inner edge, 100% = screen edge):
+     L0 1px   0–33%    L1 2px  17–50%   L2 4px  33–67%
+     L3 8px  50–83%    L4 16px 67–100% (held to the edge). */
+.nv-veil {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 39;
+  pointer-events: none;
+}
+
+.nv-veil[data-edge="top"] {
+  top: 0;
+  height: 72px;
+}
+
+.nv-veil[data-edge="bottom"] {
+  bottom: 0;
+  height: 184px;
+}
+
+.nv-veil > span {
+  position: absolute;
+  inset: 0;
+}
+
+.nv-veil > [data-layer="0"] {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 0%,
+    #000 17%,
+    #000 33%,
+    transparent 50%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 0%,
+    #000 17%,
+    #000 33%,
+    transparent 50%
+  );
+}
+
+.nv-veil > [data-layer="1"] {
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 17%,
+    #000 33%,
+    #000 50%,
+    transparent 67%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 17%,
+    #000 33%,
+    #000 50%,
+    transparent 67%
+  );
+}
+
+.nv-veil > [data-layer="2"] {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 33%,
+    #000 50%,
+    #000 67%,
+    transparent 83%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 33%,
+    #000 50%,
+    #000 67%,
+    transparent 83%
+  );
+}
+
+.nv-veil > [data-layer="3"] {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 50%,
+    #000 67%,
+    #000 83%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 50%,
+    #000 67%,
+    #000 83%,
+    transparent 100%
+  );
+}
+
+.nv-veil > [data-layer="4"] {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  -webkit-mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 67%,
+    #000 83%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    var(--nv-veil-dir),
+    transparent 67%,
+    #000 83%,
+    #000 100%
+  );
+}
+
+/* Direction: the gradient runs from the veil's INNER edge toward the
+   screen edge, so the same band math serves both veils. */
+.nv-veil[data-edge="top"] {
+  --nv-veil-dir: to top;
+}
+
+.nv-veil[data-edge="bottom"] {
+  --nv-veil-dir: to bottom;
+}
+
+/* -------------------------------------------------------- large screens ---
+   Everything rem-based swells gently on very large displays instead of
+   floating tiny in a sea of background. */
+@media (min-width: 1800px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 2300px) {
+  html {
+    font-size: 21px;
+  }
+}
+
+/* ------------------------------------------------------------ dark mode ---
+   #121212 ground, #1e1e1e glass. Everything var-driven follows along.
+   PARKED for now — the site always ships light. To re-enable system dark
+   mode, delete the `and (min-width: 100000px)` clause below (and flip the
+   two parked spots marked "dark parked" in ink-dust.tsx and layout.tsx). */
+@media (prefers-color-scheme: dark) and (min-width: 100000px) {
+  :root {
+    --nv-bg: #121212;
+    --nv-fg: #e8e8e6;
+    --nv-muted: rgba(238, 238, 236, 0.66);
+    --nv-faint: rgba(232, 232, 230, 0.32);
+    --nv-line: rgba(232, 232, 230, 0.12);
+    --nv-veil: rgba(18, 18, 18, 0.74);
+  }
+
+  .nv-blob {
+    background: radial-gradient(
+      130% 130% at 50% 35%,
+      #262626,
+      #1e1e1e 62%,
+      rgba(18, 18, 18, 0.12) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.55),
+      0 1px 3px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+      inset 0 0 16px rgba(255, 255, 255, 0.03);
+  }
+
+  .nv-blob::after {
+    opacity: 0.25;
+  }
+
+  /* The link ring's white inner lip reads as a stray line on dark glass. */
+  .nv-blob[data-link="true"] {
+    box-shadow:
+      0 2px 14px rgba(0, 204, 255, 0.2),
+      inset 0 1px 0 #1e1e1e;
+  }
+
+  .nx-plain .nx-t,
+  .nx-plain .nx-r[data-blur] .nx-t[data-scrub="on"] {
+    text-decoration-color: rgba(232, 232, 230, 0.18);
+  }
+
+  .nx-plain .nx-r[data-blur] .nx-l[data-rv] {
+    color: rgb(232 232 230 / var(--rv, 0));
+  }
+
+  .nv-lightbox {
+    background: var(--nv-veil);
+  }
+
+  .nv-cursor-dot {
+    background: rgba(232, 232, 230, 0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nv-rw,
+  .nv-carousel-slide img {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}
+
+
+/* -------------------------------------------------------- overlay focus ---
+   The overlay carries its own frosted backdrop layer (kept OFF the
+   scroller so fixed children like the close button stay pinned), and the
+   whole page behind eases out of focus. */
+.nv-carousel::before,
+.nv-reader::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--nv-veil);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* The overlay blur lives on the PARTS, never on .nv-shell: a filter on
+   an ancestor re-anchors position:fixed descendants (the nav, the edge
+   veils) to that ancestor — the nav visibly jumped. A filter on the
+   fixed element itself is safe. */
+.nv-dock,
+.nv-col {
+  transition:
+    filter 480ms var(--nv-ease),
+    opacity 480ms var(--nv-ease);
+}
+
+/* While a photo is being carried toward dismissal, the overlay dissolves
+   in step with the drag and the page behind sharpens back — all driven
+   by one continuously-updated variable, no transitions in the loop. */
+.nv-carousel[data-dragfade]::before {
+  opacity: calc(1 - var(--nv-dragfade, 0) * 0.92);
+}
+
+.nv-carousel[data-dragfade] .nv-carousel-slide:not([data-dragging]) img,
+.nv-carousel[data-dragfade] .nv-reader-close,
+.nv-carousel[data-dragfade] .nv-carousel-ticks {
+  opacity: calc(1 - var(--nv-dragfade, 0) * 0.9);
+}
+
+body[data-dragfade][data-overlay] .nv-dock,
+body[data-dragfade][data-overlay] .nv-col {
+  transition: none;
+  filter: blur(calc(10px * (1 - var(--nv-dragfade, 0))));
+  opacity: var(--nv-dragfade, 0);
+}
+
+/* The masked track ghosts trails behind a fast-moving composited photo —
+   the mask lifts while a drag is live. */
+.nv-carousel[data-dragfade] .nv-carousel-track {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+body[data-overlay] .nv-dock,
+body[data-overlay] .nv-col {
+  /* The page clears the stage COMPLETELY — fade and blur to nothing
+     before the image finishes scaling up; it breathes back in only after
+     the image recedes (exit uses the slower base transition). */
+  filter: blur(10px);
+  opacity: 0;
+  transition-duration: 520ms;
+}
+
+body[data-overlay] .nv-shell {
+  /* The dimmed page is scenery — hovering it mid-close must not wake
+     previews or blobs underneath the departing overlay. */
+  pointer-events: none;
+}
+
+/* Blobs must never glow through under the overlay — except the one that
+   belongs to the clicked row, alive and crisp in the hole. */
+body[data-overlay] .nv-shell .nv-blob,
+body[data-overlay] .nv-shell .nv-blob-lens {
+  opacity: 0 !important;
+  transition: opacity 60ms ease;
+}
+
+
+
+/* Touch devices swipe the strip natively — the tap zones step aside so
+   fingers reach the scroller, and the track only pans horizontally. */
+@media (pointer: coarse) {
+  .nv-carousel-zone {
+    display: none;
+  }
+
+  .nv-carousel-track {
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  .nv-carousel-slide {
+    scroll-snap-align: center;
+  }
+
+  /* The stationary edge-blur bands strobed against fast native swipes. */
+  .nv-carousel-blur {
+    display: none;
+  }
+
+  /* Mobile lists are PLAIN: native scroll, tap to open — no drag
+     previews, so nothing hijacks the pan gesture. */
+  .nv-hover-preview {
+    display: none !important;
+  }
+
+  /* Photos expanded on a phone zoom well past the screen: pan sideways
+     within the row, scroll vertically as usual. */
+  .nv-page[data-photo-expanded="true"] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nv-page[data-photo-expanded="true"] .nv-col {
+    max-width: none;
+  }
+
+  .nv-page[data-photo-expanded="true"] .nv-photo-flow {
+    width: 210vw;
+  }
+}
+
+/* Until the carousel is fully open the step zones are inert: no resize
+   cursor, no clicks — the viewer waits for the image. */
+.nv-carousel:not([data-ready="true"]) .nv-carousel-zone {
+  pointer-events: none;
+  cursor: default;
+}
+
+/* Closing is an ANIMATION — replacing the animation property cancels the
+   entry fade (whose fill otherwise owns opacity and blocks transitions),
+   so the overlay reliably recedes: shrink + blur + fade as one. */
+.nv-carousel[data-closing],
+.nv-reader[data-closing],
+.nv-lightbox[data-closing] {
+  animation: nv-overlayout 560ms cubic-bezier(0.3, 0, 0.35, 1) both;
+  pointer-events: none;
+}
+
+@keyframes nv-overlayout {
+  to {
+    opacity: 0;
+    filter: blur(14px);
+    scale: 0.94;
+  }
+}
+

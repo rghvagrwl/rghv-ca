@@ -1,0 +1,271 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+
+// Site footer: two quiet sentences in the site's own type. Left — where (or
+// how long ago) the last visitor was. Right — the visitor count, spoken
+// plainly. Clicking swaps each sentence through a soft fade-blur. Data comes
+// from the existing /api/footer-stats route (which also registers the visit).
+
+const NUMBER_WORDS = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+];
+
+function numberWord(value: number) {
+  return value < 10 ? NUMBER_WORDS[value] : String(value);
+}
+
+function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+// A sentence as letter spans, each with a rising delay index. During a
+// swap the OLD sentence's letters blur away at the same moment the new
+// sentence's letters condense in — a simultaneous unveil.
+function FooterLetters({ text }: { text: string }) {
+  // Letters grouped into unbreakable words so the sentence wraps at
+  // spaces, never mid-word, on narrow screens.
+  const out: React.ReactNode[] = [];
+  let i = 0;
+  for (const word of text.split(/(\s+)/)) {
+    if (!word) continue;
+    const letters = [...word].map((ch, j) => (
+      <span
+        className="nv-fl"
+        key={`${i + j}-${ch}`}
+        style={{ "--fi": i + j } as React.CSSProperties}
+      >
+        {ch}
+      </span>
+    ));
+    out.push(
+      /^\s+$/.test(word) ? (
+        <span key={`s${i}`}>{letters}</span>
+      ) : (
+        <span key={`w${i}`} style={{ whiteSpace: "nowrap" }}>
+          {letters}
+        </span>
+      ),
+    );
+    i += word.length;
+  }
+  return <>{out}</>;
+}
+
+function SwappingSentence({
+  text,
+  swapKey,
+}: {
+  text: string;
+  swapKey: number;
+}) {
+  // One reveal at a time, NEVER interrupted: a swap in flight always
+  // finishes its blur-reveal untouched. Faster clicks only change what
+  // the NEXT swap will reveal — the display then jumps straight to the
+  // latest target, skipping intermediates.
+  const [shown, setShown] = useState({ text, key: swapKey });
+  const [leaving, setLeaving] = useState<{ text: string; id: number } | null>(
+    null,
+  );
+  const latestRef = useRef({ text, key: swapKey });
+  const shownRef = useRef({ text, key: swapKey });
+  const busyRef = useRef(false);
+  const idRef = useRef(0);
+  latestRef.current = { text, key: swapKey };
+
+  useEffect(() => {
+    const cancelled = false;
+    const trySwap = () => {
+      if (cancelled || busyRef.current) return;
+      const latest = latestRef.current;
+      if (latest.key === shownRef.current.key) {
+        // Same state — live text updates (the ticking count) pass through
+        // without any swap animation.
+        if (latest.text !== shownRef.current.text) {
+          shownRef.current = { ...latest };
+          setShown({ ...latest });
+        }
+        return;
+      }
+      busyRef.current = true;
+      idRef.current += 1;
+      setLeaving({ text: shownRef.current.text, id: idRef.current });
+      shownRef.current = { ...latest };
+      setShown({ ...latest });
+      window.setTimeout(() => {
+        busyRef.current = false;
+        setLeaving(null);
+        trySwap();
+      }, 760);
+    };
+    trySwap();
+  }, [swapKey, text]);
+
+  return (
+    <span className="nv-fsw">
+      {leaving ? (
+        <span aria-hidden="true" className="nv-fold" key={leaving.id}>
+          <FooterLetters text={leaving.text} />
+        </span>
+      ) : null}
+      <span className="nv-fnew" key={shown.key}>
+        <FooterLetters text={shown.text} />
+      </span>
+    </span>
+  );
+}
+
+type Stats = {
+  visitorsToday: number;
+  visitorsAllTime: number;
+  lastVisitorLabel: string;
+  lastVisitorSeenAt: number | null;
+};
+
+function titleCase(label: string) {
+  return (
+    label
+      .toLowerCase()
+      // Unicode-aware: capitalise only after spaces, hyphens, and slashes
+      // — accents and apostrophes are NOT word boundaries, so Montréal,
+      // St. John's, and São Paulo case correctly.
+      .replace(
+        /(^|[\s\-/(])(\p{L})/gu,
+        (_, prefix: string, letter: string) => prefix + letter.toUpperCase(),
+      )
+      // Acronym countries stay ALL CAPS through the title-casing.
+      .replace(/(^|[\s,])(usa|uk|uae)(?=$|[\s,.])/gi, (match) =>
+        match.toUpperCase(),
+      )
+      // Intl's mouthful for HK reads terribly in a sentence.
+      .replace(/Hong Kong Sar China/g, "Hong Kong")
+  );
+}
+
+function naturalAge(seenAt: number | null, nowMs: number) {
+  if (!seenAt || Number.isNaN(seenAt)) return "a little while ago";
+  const seconds = Math.max(0, Math.floor((nowMs - seenAt) / 1000));
+  if (seconds < 10) return "just now";
+  if (seconds < 60) return `${numberWord(seconds)} seconds ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60)
+    return minutes === 1 ? "a minute ago" : `${numberWord(minutes)} minutes ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24)
+    return hours === 1 ? "an hour ago" : `${numberWord(hours)} hours ago`;
+  const days = Math.floor(hours / 24);
+  return days === 1 ? "a day ago" : `${numberWord(days)} days ago`;
+}
+
+export default function SiteFooter() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  // One quiet line, four states, cycled by clicking: where the last
+  // visitor was from, when they were here, today's count, all-time count.
+  const [mode, setMode] = useState(0);
+  const [count, setCount] = useState(0);
+
+  const countRafRef = useRef<number | null>(null);
+
+  const animateCount = useCallback((from: number, to: number) => {
+    if (countRafRef.current !== null) {
+      window.cancelAnimationFrame(countRafRef.current);
+    }
+    const started = performance.now();
+    const duration = 500;
+    const step = (now: number) => {
+      const progress = Math.min(1, (now - started) / duration);
+      setCount(Math.round(from + (to - from) * progress));
+      if (progress < 1) {
+        countRafRef.current = window.requestAnimationFrame(step);
+      }
+    };
+    countRafRef.current = window.requestAnimationFrame(step);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/footer-stats", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        setStats({
+          visitorsToday:
+            typeof data.visitorsToday === "number" ? data.visitorsToday : 0,
+          visitorsAllTime:
+            typeof data.visitorsAllTime === "number" ? data.visitorsAllTime : 0,
+          lastVisitorLabel:
+            typeof data.lastVisitorLabel === "string" && data.lastVisitorLabel
+              ? data.lastVisitorLabel
+              : "",
+          lastVisitorSeenAt:
+            typeof data.lastVisitorSeenAt === "number"
+              ? data.lastVisitorSeenAt
+              : null,
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      if (countRafRef.current !== null) {
+        window.cancelAnimationFrame(countRafRef.current);
+      }
+    };
+  }, []);
+
+  // The age line is computed at click time (render stays pure).
+  const [whenText, setWhenText] = useState("a little while ago");
+
+  if (!stats) {
+    return null;
+  }
+
+  const place =
+    stats.lastVisitorLabel && !stats.lastVisitorLabel.startsWith("UNKNOWN")
+      ? titleCase(stats.lastVisitorLabel)
+      : "somewhere unknown";
+
+  const sentences = [
+    `The last visitor was from ${place}.`,
+    `The last visit was ${whenText}.`,
+    capitalize(
+      `${numberWord(count)} ${count === 1 ? "visitor" : "visitors"} so far today.`,
+    ),
+    capitalize(
+      `${numberWord(count)} ${
+        count === 1 ? "visitor" : "visitors"
+      } since this site was made.`,
+    ),
+  ];
+
+  const advance = () => {
+    const next = (mode + 1) % 4;
+    setMode(next);
+    if (next === 1) {
+      setWhenText(naturalAge(stats.lastVisitorSeenAt, Date.now()));
+    }
+    if (next === 2) animateCount(0, stats.visitorsToday);
+    if (next === 3) animateCount(count, stats.visitorsAllTime);
+  };
+
+  return (
+    <footer className="nv-footer">
+      <button
+        aria-label="Cycle visitor stats"
+        className="nv-footer-stat"
+        onClick={advance}
+        type="button"
+      >
+        <SwappingSentence swapKey={mode} text={sentences[mode]} />
+      </button>
+    </footer>
+  );
+}
