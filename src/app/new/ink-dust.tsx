@@ -785,9 +785,18 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
     let scrubQueued = false;
     let scrubX = 0;
     let scrubY = 0;
+    let pressed: { x: number; y: number; moved: boolean } | null = null;
     const onScrubMove = (event: Event) => {
-      if (performance.now() < brushAt) return;
       const pointer = event as PointerEvent;
+      if (pointer.type === "pointerdown") {
+        pressed = { x: pointer.clientX, y: pointer.clientY, moved: false };
+      } else if (
+        pressed &&
+        Math.hypot(pointer.clientX - pressed.x, pointer.clientY - pressed.y) > 12
+      ) {
+        pressed.moved = true;
+      }
+      if (performance.now() < brushAt) return;
       scrubX = pointer.clientX;
       scrubY = pointer.clientY;
       if (scrubQueued) return;
@@ -797,9 +806,22 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
         scrubAt(scrubX, scrubY);
       });
     };
+    const onPressEnd = (event: PointerEvent) => {
+      if (
+        pressed &&
+        Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) > 12
+      ) {
+        pressed.moved = true;
+      }
+    };
+    const onPressCancel = () => {
+      pressed = null;
+    };
     const onRevealClick = (event: MouseEvent) => {
       const t = performance.now();
-      if (t < settleUntil || event.button !== 0) return;
+      const wasDrag = pressed?.moved ?? false;
+      pressed = null;
+      if (t < settleUntil || event.button !== 0 || wasDrag) return;
       if (
         event.target instanceof Element &&
         event.target.closest("a, button, [role='button']")
@@ -819,6 +841,8 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
     if (scrub) {
       body.addEventListener("pointermove", onScrubMove, { passive: true });
       body.addEventListener("pointerdown", onScrubMove, { passive: true });
+      body.addEventListener("pointerup", onPressEnd, { passive: true });
+      body.addEventListener("pointercancel", onPressCancel, { passive: true });
       body.addEventListener("click", onRevealClick);
       idleInterval = window.setInterval(() => {
         const now = performance.now();
@@ -926,6 +950,8 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
       if (scrub) {
         body.removeEventListener("pointermove", onScrubMove);
         body.removeEventListener("pointerdown", onScrubMove);
+        body.removeEventListener("pointerup", onPressEnd);
+        body.removeEventListener("pointercancel", onPressCancel);
         body.removeEventListener("click", onRevealClick);
       }
       body.removeEventListener("nx-reveil", onReveil);
