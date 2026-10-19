@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// Site footer: two quiet sentences in the site's own type. Left — where (or
-// how long ago) the last visitor was. Right — the visitor count, spoken
-// plainly. Clicking swaps each sentence through a soft fade-blur. Data comes
-// from the existing /api/footer-stats route (which also registers the visit).
+// Site footer: a quiet sentence that cycles through the last visit and
+// visitor totals. Clicking swaps sentences through a soft fade-blur. Data
+// comes from /api/footer-stats (which also registers the visit).
 
 const NUMBER_WORDS = [
   "zero",
@@ -68,12 +67,60 @@ function SwappingSentence({
   text: string;
   swapKey: number;
 }) {
-  // A keyed entrance keeps the view in sync with every click. Updating the
-  // count within one view reuses its letter spans instead of restarting them.
+  // Keep the departing sentence visible while the next one sweeps in.
+  // If clicked again mid-swap, finish this sweep and then show the latest
+  // requested sentence, without exposing an empty frame between them.
+  const [shown, setShown] = useState({ text, key: swapKey });
+  const [leaving, setLeaving] = useState<{ text: string; id: number } | null>(
+    null,
+  );
+  const latestRef = useRef({ text, key: swapKey });
+  const shownRef = useRef({ text, key: swapKey });
+  const busyRef = useRef(false);
+  const idRef = useRef(0);
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    latestRef.current = { text, key: swapKey };
+    const trySwap = () => {
+      if (busyRef.current) return;
+      const latest = latestRef.current;
+      if (latest.key === shownRef.current.key) {
+        if (latest.text !== shownRef.current.text) {
+          shownRef.current = { ...latest };
+          setShown({ ...latest });
+        }
+        return;
+      }
+      busyRef.current = true;
+      idRef.current += 1;
+      setLeaving({ text: shownRef.current.text, id: idRef.current });
+      shownRef.current = { ...latest };
+      setShown({ ...latest });
+      timerRef.current = window.setTimeout(() => {
+        timerRef.current = null;
+        busyRef.current = false;
+        setLeaving(null);
+        trySwap();
+      }, 760);
+    };
+    trySwap();
+  }, [swapKey, text]);
+
+  useEffect(() => () => {
+    if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+  }, []);
+
   return (
     <span className="nv-fsw">
-      <span className="nv-fnew" key={swapKey}>
-        <FooterLetters text={text} />
+      <span
+        aria-hidden="true"
+        className={`nv-fold${leaving ? ` nv-fold-${leaving.id % 2}` : ""}`}
+      >
+        {leaving ? <FooterLetters text={leaving.text} /> : null}
+      </span>
+      <span className="nv-fnew" key={shown.key}>
+        <FooterLetters text={shown.text} />
       </span>
     </span>
   );
@@ -126,36 +173,7 @@ export default function SiteFooter() {
   // One quiet line, four states, cycled by clicking: where the last
   // visitor was from, when they were here, today's count, all-time count.
   const [mode, setMode] = useState(0);
-  const [count, setCount] = useState(0);
-
-  const countRafRef = useRef<number | null>(null);
-  const countRef = useRef(0);
   const modeRef = useRef(0);
-
-  const animateCount = useCallback((to: number, reset = false) => {
-    if (countRafRef.current !== null) {
-      window.cancelAnimationFrame(countRafRef.current);
-      countRafRef.current = null;
-    }
-    const from = reset ? 0 : countRef.current;
-    countRef.current = from;
-    setCount(from);
-    if (from === to) return;
-    const started = performance.now();
-    const duration = 500;
-    const step = (now: number) => {
-      const progress = Math.min(1, (now - started) / duration);
-      const value = Math.round(from + (to - from) * progress);
-      countRef.current = value;
-      setCount(value);
-      if (progress < 1) {
-        countRafRef.current = window.requestAnimationFrame(step);
-      } else {
-        countRafRef.current = null;
-      }
-    };
-    countRafRef.current = window.requestAnimationFrame(step);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -181,9 +199,6 @@ export default function SiteFooter() {
       .catch(() => {});
     return () => {
       cancelled = true;
-      if (countRafRef.current !== null) {
-        window.cancelAnimationFrame(countRafRef.current);
-      }
     };
   }, []);
 
@@ -203,11 +218,11 @@ export default function SiteFooter() {
     `The last visitor was from ${place}.`,
     `The last visit was ${whenText}.`,
     capitalize(
-      `${numberWord(count)} ${count === 1 ? "visitor" : "visitors"} so far today.`,
+      `${numberWord(stats.visitorsToday)} ${stats.visitorsToday === 1 ? "visitor" : "visitors"} so far today.`,
     ),
     capitalize(
-      `${numberWord(count)} ${
-        count === 1 ? "visitor" : "visitors"
+      `${numberWord(stats.visitorsAllTime)} ${
+        stats.visitorsAllTime === 1 ? "visitor" : "visitors"
       } since this site was made.`,
     ),
   ];
@@ -218,12 +233,6 @@ export default function SiteFooter() {
     setMode(next);
     if (next === 1) {
       setWhenText(naturalAge(stats.lastVisitorSeenAt, Date.now()));
-    }
-    if (next === 2) animateCount(stats.visitorsToday, true);
-    if (next === 3) animateCount(stats.visitorsAllTime);
-    if (next < 2 && countRafRef.current !== null) {
-      window.cancelAnimationFrame(countRafRef.current);
-      countRafRef.current = null;
     }
   };
 

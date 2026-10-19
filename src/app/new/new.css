@@ -248,9 +248,7 @@ body {
 }
 
 /* ---------------------------------------------------------------- footer ---
-   Ported from rghv.ca: last-visitor block on the left, visitor count on the
-   right, each two stacked lines. Click toggles with a scramble; hover dims.
-   No cursor frame here. */
+   A single visitor-stat sentence cycles through four views. No cursor frame. */
 
 .nv-footer {
   position: relative;
@@ -286,11 +284,20 @@ body {
   color: rgba(29, 29, 27, 0.68);
 }
 
-/* Sentence swaps condense in from left to right. */
+/* Old letters dissolve as the next sentence condenses in from left to right. */
 .nv-fsw {
   position: relative;
   display: inline-block;
   white-space: nowrap;
+}
+
+.nv-fold {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
 }
 
 .nv-fl {
@@ -298,10 +305,45 @@ body {
   white-space: pre;
 }
 
+.nv-fold-0,
+.nv-fold-1 {
+  opacity: 1;
+}
+
+.nv-fold-0 .nv-fl,
+.nv-fold-1 .nv-fl {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.55, 0, 0.7, 0.4);
+  animation-fill-mode: both;
+  animation-delay: calc(var(--fi, 0) * 5ms);
+}
+
+.nv-fold-0 .nv-fl {
+  animation-name: nv-flout-0;
+}
+
+.nv-fold-1 .nv-fl {
+  animation-name: nv-flout-1;
+}
+
 .nv-fnew .nv-fl {
   /* Arrivals hold deep blur until their sweep genuinely reveals them. */
   animation: nv-flin 520ms cubic-bezier(0.16, 0.6, 0.22, 1) both;
   animation-delay: calc(var(--fi, 0) * 7ms + 150ms);
+}
+
+@keyframes nv-flout-0 {
+  to {
+    opacity: 0;
+    filter: blur(9px);
+  }
+}
+
+@keyframes nv-flout-1 {
+  to {
+    opacity: 0;
+    filter: blur(9px);
+  }
 }
 
 @keyframes nv-flin {
