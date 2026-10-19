@@ -5,6 +5,8 @@
    need them. */
 html {
   background: var(--nv-bg);
+  /* Keep the page centered when stacked routes start or stop scrolling. */
+  scrollbar-gutter: stable both-edges;
   /* Natural vertical physics — rubber-banding and pull-to-refresh live;
      the overscrolled area is painted the site's own colour anyway. */
   /* Nothing ever scrolls the page sideways. */
@@ -128,6 +130,8 @@ body {
   flex-direction: column;
   height: 100dvh;
   overflow-y: auto;
+  /* Desktop routes scroll here instead of on the document. */
+  scrollbar-gutter: stable both-edges;
   scrollbar-width: thin;
   scrollbar-color: rgba(29, 29, 27, 0.18) transparent;
   /* Breathing room past the edge veils AND the floating dock: fully
