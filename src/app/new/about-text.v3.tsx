@@ -6,9 +6,8 @@ import HoverBlob from "./hover-blob";
 import InkDust from "./ink-dust";
 
 // v3 of the about: no expanding, no triggers. The hidden passages are
-// invisible ink — run your cursor over the dust and the words condense into
-// focus where you touch, iMessage-style; after ten idle seconds they exhale
-// back into dust. Dotted underlines and the glass blob belong to LINKS only.
+// invisible ink — brush the dust to reveal a passage or click to ripple all
+// passages into focus. Dotted underlines and the glass blob belong to LINKS only.
 
 type Node =
   | string

@@ -556,7 +556,13 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
 
     // One swipe is enough: the touched letters reveal instantly and the
     // rest of that run unfolds as a RIPPLE outward from the brush point.
-    const rippleReveal = (run: RunInfo, px: number, py: number, t: number) => {
+    const rippleReveal = (
+      run: RunInfo,
+      px: number,
+      py: number,
+      t: number,
+      maxWaveDelay = 950,
+    ) => {
       const runEl = run.el;
       if (runEl.hasAttribute("data-wave")) return;
       runEl.setAttribute("data-wave", "");
@@ -575,7 +581,7 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
         if (letter.el.hasAttribute("data-scrub")) continue;
         const dist = Math.hypot(letter.cx - px, letter.cy - py);
         // The rollout spreads with a little resistance, but briskly.
-        const delay = Math.min(950, dist * 1.5);
+        const delay = Math.min(maxWaveDelay, dist * 1.5);
         maxDelay = Math.max(maxDelay, delay);
         letter.el.style.transitionDelay = `${Math.round(delay)}ms`;
         letter.el.setAttribute("data-scrub", "on");
@@ -606,7 +612,8 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
             cloud.x + speck.ox - px,
             cloud.y + speck.oy - py,
           );
-          speck.deadAt = t + Math.min(950, dist * 1.5) + Math.random() * 160;
+          speck.deadAt =
+            t + Math.min(maxWaveDelay, dist * 1.5) + Math.random() * 160;
         }
       }
     };
@@ -790,10 +797,29 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
         scrubAt(scrubX, scrubY);
       });
     };
+    const onRevealClick = (event: MouseEvent) => {
+      const t = performance.now();
+      if (t < settleUntil || event.button !== 0) return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest("a, button, [role='button']")
+      ) {
+        return;
+      }
+      if (window.getSelection()?.toString()) return;
+      const rect = body.getBoundingClientRect();
+      const px = event.clientX - rect.left;
+      const py = event.clientY - rect.top;
+      for (const run of runsCache) {
+        if (run.el.isConnected) rippleReveal(run, px, py, t, 1500);
+      }
+      kick();
+    };
     let idleInterval = 0;
     if (scrub) {
       body.addEventListener("pointermove", onScrubMove, { passive: true });
       body.addEventListener("pointerdown", onScrubMove, { passive: true });
+      body.addEventListener("click", onRevealClick);
       idleInterval = window.setInterval(() => {
         const now = performance.now();
         for (const cloud of clouds.values()) healCloud(cloud, now);
@@ -900,6 +926,7 @@ export default function InkDust({ scrub = false }: { scrub?: boolean }) {
       if (scrub) {
         body.removeEventListener("pointermove", onScrubMove);
         body.removeEventListener("pointerdown", onScrubMove);
+        body.removeEventListener("click", onRevealClick);
       }
       body.removeEventListener("nx-reveil", onReveil);
       document.removeEventListener("visibilitychange", onVisibility);
