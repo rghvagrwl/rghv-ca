@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { photos } from "../content";
 import { triplet } from "../sound";
@@ -74,7 +74,6 @@ export default function PhotoPage() {
     <div className="nv-page" data-photo-expanded={expanded}>
       <div className="nv-col" data-col="1">
         {/* Gaps count: the whole flow is the click surface. */}
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
         <div
           className="nv-photo-flow"
           onClick={handleFlowClick}

@@ -80,9 +80,9 @@ function SwappingSentence({
   const shownRef = useRef({ text, key: swapKey });
   const busyRef = useRef(false);
   const idRef = useRef(0);
-  latestRef.current = { text, key: swapKey };
 
   useEffect(() => {
+    latestRef.current = { text, key: swapKey };
     const cancelled = false;
     const trySwap = () => {
       if (cancelled || busyRef.current) return;

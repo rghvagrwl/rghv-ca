@@ -1,11 +1,10 @@
 import type { NextConfig } from "next";
 
-// new.rghv.ca — and the standalone rghv-new Vercel project — serve the
-// /new section at their root.
+// The main domain and the standalone new-site hosts serve /new at their root.
 const newHost = [
   {
     type: "host" as const,
-    value: "new\\.rghv\\.ca|rghv-new.*\\.vercel\\.app",
+    value: "(www\\.)?rghv\\.ca|new\\.rghv\\.ca|rghv-new.*\\.vercel\\.app",
   },
 ];
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { navLinks } from "./content";
 import HoverBlob from "./hover-blob";
@@ -15,9 +15,7 @@ export default function Shell({
   const pathname = usePathname();
   const router = useRouter();
 
-  // On rghv.ca these pages live under /new. On new.rghv.ca a host rewrite makes
-  // that prefix implicit, so the browser path is bare. Derive it either way so
-  // the same links work on both hosts.
+  // Canonical hosts rewrite root URLs to /new; direct /new URLs also work.
   const prefix = pathname === "/new" || pathname.startsWith("/new/") ? "/new" : "";
   const homeHref = prefix || "/";
   const topRef = useRef<HTMLDivElement>(null);
