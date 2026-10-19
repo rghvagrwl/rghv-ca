@@ -3,8 +3,6 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
-import { tick, unlockAudio } from "./sound";
-
 const subscribeToNothing = () => () => {};
 
 // Custom cursor in two parts: a small filled square that tracks the pointer
@@ -96,7 +94,6 @@ export default function Cursor() {
 
     const setTarget = (target: Element, x: number, y: number) => {
       cancelDeparture();
-      if (targetRef.current !== target) tick();
       targetRef.current = target;
       dot.dataset.on = "false";
       // Keep the hidden dot tracking so it reappears exactly under the pointer.
@@ -189,7 +186,6 @@ export default function Cursor() {
     // covers the clicked row), which would leave the frame stranded on the
     // old rect. Re-resolve once the new frame has painted.
     const onClick = (event: MouseEvent) => {
-      unlockAudio();
       const { clientX, clientY } = event;
       window.setTimeout(() => {
         targetRef.current = null; // drop the latch — re-resolve from scratch
@@ -206,10 +202,6 @@ export default function Cursor() {
 
     document.addEventListener("mousemove", onMouseMove, { passive: true });
     document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("pointerdown", unlockAudio, {
-      capture: true,
-      passive: true,
-    });
     document.addEventListener("click", onClick, true);
     document.addEventListener("scroll", onScroll, {
       capture: true,
@@ -221,9 +213,6 @@ export default function Cursor() {
       cancelDeparture();
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("pointerdown", unlockAudio, {
-        capture: true,
-      });
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("scroll", onScroll, { capture: true });
       document.documentElement.removeEventListener("mouseleave", onMouseLeave);

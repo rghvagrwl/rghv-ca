@@ -6,7 +6,6 @@ import { useEffect, useRef } from "react";
 
 import { navLinks } from "./content";
 import HoverBlob from "./hover-blob";
-import { tap } from "./sound";
 import "./new.css";
 
 export default function Shell({
@@ -160,7 +159,6 @@ export default function Shell({
                 href={href}
                 key={link.label}
                 onClick={(event) => {
-                  tap();
                   if (event.detail > 0) event.currentTarget.blur();
                   if (href === pathname) return;
                   event.preventDefault();

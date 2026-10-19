@@ -4,7 +4,6 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { Vaso } from "vaso";
 
 import { hapticTick } from "./haptics";
-import { blorp } from "./sound";
 
 // iOS-style fluid list highlight: a grey squircle appears under the hovered
 // row and glides to the next one on a slightly bouncy — but still rigid —
@@ -469,8 +468,6 @@ export default function HoverBlob({
         s.vw = 0;
         s.vh = 0;
         paint();
-      } else if (wasOn && !silent) {
-        blorp();
       }
       s.on = true;
       blob.setAttribute("data-on", "true");

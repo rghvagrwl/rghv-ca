@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { photos } from "../content";
-import { triplet } from "../sound";
 
 // One quiet stream of photos. Clicking anywhere in the stream — an image
 // or the gaps between them — toggles the whole column between the reading
@@ -16,7 +15,6 @@ export default function PhotoPage() {
   const [expanded, setExpanded] = useState(false);
   const handleFlowClick = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
-    triplet();
     // Zoom RELATIVE to the click: whichever photo you clicked (or the one
     // nearest a gap click) holds its place on screen while the whole
     // column breathes — the scroll tracks it through the transition.

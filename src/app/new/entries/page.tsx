@@ -13,7 +13,6 @@ import {
 
 import { entries, type Entry } from "../content";
 import MagneticButton from "../magnetic";
-import { triplet } from "../sound";
 import { lockScroll, unlockScroll } from "../scroll-lock";
 
 const subscribeToNothing = () => () => {};
@@ -74,7 +73,6 @@ export default function EntriesPage() {
     entry: Entry,
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    triplet();
     const title = event.currentTarget.querySelector(".nv-entry-title");
     const rect = title?.getBoundingClientRect();
     setOpen({

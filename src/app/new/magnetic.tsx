@@ -2,11 +2,9 @@
 
 import { useRef } from "react";
 
-import { tap } from "./sound";
-
 // A text button that leans toward the cursor while hovered and springs back
 // on leave. No cursor frame — the pull is the whole affordance. Used for the
-// close buttons, which share the page buttons' thunk.
+// close buttons.
 export default function MagneticButton({
   children,
   className,
@@ -21,10 +19,7 @@ export default function MagneticButton({
   return (
     <button
       className={className}
-      onClick={() => {
-        tap();
-        onClick();
-      }}
+      onClick={onClick}
       onMouseLeave={() => {
         const node = ref.current;
         if (node) node.style.transform = "";

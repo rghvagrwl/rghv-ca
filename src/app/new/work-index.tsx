@@ -16,7 +16,6 @@ import {
 
 import { workProjects } from "./content";
 import MagneticButton from "./magnetic";
-import { triplet } from "./sound";
 import { lockScroll, unlockScroll } from "./scroll-lock";
 
 const subscribeToNothing = () => () => {};
@@ -138,7 +137,6 @@ export default function WorkIndex() {
   // expansion happens every time, with the right image.
   const handleOpen = useCallback(
     (id: string, images: string[]) => {
-      triplet();
       const src =
         hovered?.id === id
           ? hovered.src
