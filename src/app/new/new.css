@@ -3449,6 +3449,10 @@ body[data-overlay] .nv-shell .nv-blob-lens {
   display: block;
 }
 
+.nv-bio-line + .nv-bio-line {
+  margin-top: 1em;
+}
+
 @media (min-width: 761px) {
   .nv-bio-line-short {
     white-space: nowrap;
