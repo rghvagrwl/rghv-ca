@@ -26,7 +26,8 @@ const siteDescription =
   "Raghav Agarwal is a designer working across product, brand, and digital interfaces.";
 
 export const metadata: Metadata = {
-  title: "raghav agarwal",
+  metadataBase: new URL("https://rghv.ca"),
+  title: "Raghav Agarwal",
   description: siteDescription,
   openGraph: {
     title: "raghav agarwal",

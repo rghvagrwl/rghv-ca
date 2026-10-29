@@ -1,0 +1,117 @@
+{
+  "home": {
+    "title": "Raghav Agarwal",
+    "description": "A designer working across product, brand, and digital interfaces.",
+    "image": "/og/home.png"
+  },
+  "work": {
+    "title": "Selected work \u2014 Raghav Agarwal",
+    "description": "Product, brand, and digital interfaces.",
+    "image": "/og/work.png"
+  },
+  "captures": {
+    "title": "Captures \u2014 Raghav Agarwal",
+    "description": "Places, people, and moments along the way.",
+    "image": "/og/captures.png"
+  },
+  "work-vercel": {
+    "title": "Vercel \u2014 Raghav Agarwal",
+    "description": "Vercel, 2026. A design project by Raghav Agarwal.",
+    "image": "/og/work-vercel.png"
+  },
+  "work-ando": {
+    "title": "Ando \u2014 Raghav Agarwal",
+    "description": "Ando, 2026. A design project by Raghav Agarwal.",
+    "image": "/og/work-ando.png"
+  },
+  "work-chrono": {
+    "title": "Chrono \u2014 Raghav Agarwal",
+    "description": "Chrono, 2026. A design project by Raghav Agarwal.",
+    "image": "/og/work-chrono.png"
+  },
+  "work-socratica": {
+    "title": "Socratica \u2014 Raghav Agarwal",
+    "description": "Socratica, 2025. A design project by Raghav Agarwal.",
+    "image": "/og/work-socratica.png"
+  },
+  "work-tembo": {
+    "title": "Tembo \u2014 Raghav Agarwal",
+    "description": "Tembo, 2026. A design project by Raghav Agarwal.",
+    "image": "/og/work-tembo.png"
+  },
+  "work-context": {
+    "title": "Context \u2014 Raghav Agarwal",
+    "description": "Context, 2025. A design project by Raghav Agarwal.",
+    "image": "/og/work-context.png"
+  },
+  "work-instafleet": {
+    "title": "Instafleet \u2014 Raghav Agarwal",
+    "description": "Instafleet, 2025. A design project by Raghav Agarwal.",
+    "image": "/og/work-instafleet.png"
+  },
+  "work-merge-club": {
+    "title": "Merge \u2014 Raghav Agarwal",
+    "description": "Merge, 2025. A design project by Raghav Agarwal.",
+    "image": "/og/work-merge-club.png"
+  },
+  "work-on-deck-founders": {
+    "title": "ODF \u2014 Raghav Agarwal",
+    "description": "ODF, 2025. A design project by Raghav Agarwal.",
+    "image": "/og/work-on-deck-founders.png"
+  },
+  "work-prism-collective": {
+    "title": "Prism Collective \u2014 Raghav Agarwal",
+    "description": "Prism Collective, 2025. A design project by Raghav Agarwal.",
+    "image": "/og/work-prism-collective.png"
+  },
+  "work-unordinary": {
+    "title": "Unordinary \u2014 Raghav Agarwal",
+    "description": "Unordinary, 2024. A design project by Raghav Agarwal.",
+    "image": "/og/work-unordinary.png"
+  },
+  "work-crisped": {
+    "title": "Crisped \u2014 Raghav Agarwal",
+    "description": "Crisped, 2024. A design project by Raghav Agarwal.",
+    "image": "/og/work-crisped.png"
+  },
+  "work-zero-email": {
+    "title": "Zero \u2014 Raghav Agarwal",
+    "description": "Zero, 2024. A design project by Raghav Agarwal.",
+    "image": "/og/work-zero-email.png"
+  },
+  "work-minimum": {
+    "title": "Minimum \u2014 Raghav Agarwal",
+    "description": "Minimum, 2022. A design project by Raghav Agarwal.",
+    "image": "/og/work-minimum.png"
+  },
+  "work-faktor": {
+    "title": "Faktor \u2014 Raghav Agarwal",
+    "description": "Faktor, 2022. A design project by Raghav Agarwal.",
+    "image": "/og/work-faktor.png"
+  },
+  "work-para": {
+    "title": "Para \u2014 Raghav Agarwal",
+    "description": "Para, 2022. A design project by Raghav Agarwal.",
+    "image": "/og/work-para.png"
+  },
+  "work-no-category": {
+    "title": "Miscellaneous \u2014 Raghav Agarwal",
+    "description": "Miscellaneous, selected work. A design project by Raghav Agarwal.",
+    "image": "/og/work-no-category.png"
+  },
+  "capture-tonys-pizza-in-sf": {
+    "title": "Tony's pizza for dinner \u2014 Raghav Agarwal",
+    "description": "Tony's pizza for dinner. Photographs by Raghav Agarwal, June 29, 2026.",
+    "image": "/og/capture-tonys-pizza-in-sf.png"
+  },
+  "capture-over-the-bridge": {
+    "title": "First-time over the bridge \u2014 Raghav Agarwal",
+    "description": "First-time over the bridge. Photographs by Raghav Agarwal, June 20, 2026.",
+    "image": "/og/capture-over-the-bridge.png"
+  },
+  "capture-vancouver": {
+    "title": "A week in Vancouver \u2014 Raghav Agarwal",
+    "description": "A week in Vancouver. Photographs by Raghav Agarwal, May 2026.",
+    "image": "/og/capture-vancouver.png"
+  }
+}
