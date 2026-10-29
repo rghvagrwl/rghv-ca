@@ -1,10 +1,17 @@
 import type { NextConfig } from "next";
 
-// The main domain and the standalone new-site hosts serve /new at their root.
-const newHost = [
+// Keep the current site on /new while the fresh site gets its own canvas.
+const currentSiteHost = [
   {
     type: "host" as const,
-    value: "(www\\.)?rghv\\.ca|new\\.rghv\\.ca|rghv-new.*\\.vercel\\.app",
+    value: "(www\\.)?rghv\\.ca|new\\.rghv\\.ca",
+  },
+];
+
+const canvasHost = [
+  {
+    type: "host" as const,
+    value: "rghv-new.*\\.vercel\\.app|localhost(?::\\d+)?|127\\.0\\.0\\.1(?::\\d+)?",
   },
 ];
 
@@ -22,13 +29,43 @@ const nextConfig: NextConfig = {
       // /new itself (which would otherwise become /new/new).
       beforeFiles: [
         {
+          source: "/writing/:slug",
+          has: canvasHost,
+          destination: "/canvas/writing/:slug",
+        },
+        {
+          source: "/work/:slug",
+          has: canvasHost,
+          destination: "/canvas/work/:slug",
+        },
+        {
+          source: "/work",
+          has: canvasHost,
+          destination: "/canvas/work",
+        },
+        {
+          source: "/captures/:slug",
+          has: canvasHost,
+          destination: "/canvas/captures/:slug",
+        },
+        {
+          source: "/captures",
+          has: canvasHost,
+          destination: "/canvas/captures",
+        },
+        {
           source: "/",
-          has: newHost,
+          has: canvasHost,
+          destination: "/canvas",
+        },
+        {
+          source: "/",
+          has: currentSiteHost,
           destination: "/new",
         },
         {
           source: "/:path((?!_next/|api/|new/|new$)(?!.*\\.).*)",
-          has: newHost,
+          has: currentSiteHost,
           destination: "/new/:path",
         },
       ],

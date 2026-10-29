@@ -1,0 +1,169 @@
+.story {
+  --closing-gap: 72px;
+  width: 100%;
+  color: var(--body-ink);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.prose,
+.closingNote {
+  max-width: 512px;
+  margin-inline: auto;
+}
+
+.prose p,
+.closingNote p {
+  margin: 0;
+}
+
+.prose p + p,
+.closingNote p + p {
+  margin-top: 22px;
+}
+
+.story a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 180ms ease;
+}
+
+.prose a {
+  color: var(--secondary-ink);
+  text-decoration-color: var(--muted-ink);
+}
+
+.story a:hover,
+.story a:focus-visible {
+  color: var(--ink);
+}
+
+.mediaGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 56px;
+}
+
+.media {
+  margin: 0;
+}
+
+.videoFrame {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+  padding: 4.022917% 3.891667%;
+  border-radius: 8px;
+  background: white;
+}
+
+.videoCrop {
+  width: 100%;
+  overflow: hidden;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto 16 / 9;
+}
+
+.videoHitArea {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.videoHitArea:focus-visible {
+  outline: 2px solid white;
+  outline-offset: -4px;
+}
+
+.videoControl {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(224 224 224 / 76%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #000;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.92);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.videoControlVisible,
+.videoHitArea:focus-visible .videoControl {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.videoControl svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 120ms ease-out;
+}
+
+.videoHitArea:active .videoControl svg {
+  transform: scale(0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .videoControl,
+  .videoControl svg {
+    transition: none;
+  }
+}
+
+.divider {
+  width: min(100%, 512px);
+  height: 1px;
+  margin: 72px auto;
+  border: 0;
+  background: var(--rule);
+}
+
+.endDivider {
+  margin-bottom: var(--closing-gap);
+}
+
+.closingNote {
+  color: var(--muted-ink);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+@media (max-width: 700px) {
+  .story {
+    --closing-gap: 56px;
+  }
+
+  .mediaGroup {
+    margin-top: 40px;
+  }
+
+  .divider {
+    margin-block: 56px;
+  }
+}
