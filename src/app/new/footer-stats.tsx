@@ -128,18 +128,20 @@ function SwappingSentence({
 
 function VisitorRow({ stats }: { stats: Stats }) {
   const [mode, setMode] = useState(0);
+  const [visitorAge, setVisitorAge] = useState("a little while ago");
   const [phase, setPhase] = useState<"idle" | "out" | "in">("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const place = stats.lastVisitorLabel && !stats.lastVisitorLabel.startsWith("UNKNOWN")
     ? titleCase(stats.lastVisitorLabel) : "Somewhere unknown";
   const facts = [
     { label: "Last visitor from", value: place },
+    { label: "Last visitor was", value: visitorAge },
     { label: "Visitors so far today", value: stats.visitorsToday.toLocaleString("en-US") },
     { label: "Visitors since this site was made", value: stats.visitorsAllTime.toLocaleString("en-US") },
   ];
   const fact = facts[mode];
-  const waveDuration = (index: number, animationMs: number) =>
-    (facts[index].label.length + facts[index].value.length) * 11 + animationMs;
+  const waveDuration = (index: number, animationMs: number, value = facts[index].value) =>
+    (facts[index].label.length + value.length) * 11 + animationMs;
 
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
@@ -148,6 +150,8 @@ function VisitorRow({ stats }: { stats: Stats }) {
   function cycle() {
     if (timer.current) return;
     const next = (mode + 1) % facts.length;
+    const nextAge = naturalAge(stats.lastVisitorSeenAt, Date.now());
+    if (next === 1) setVisitorAge(nextAge);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setMode(next);
       return;
@@ -159,7 +163,7 @@ function VisitorRow({ stats }: { stats: Stats }) {
       timer.current = setTimeout(() => {
         setPhase("idle");
         timer.current = null;
-      }, waveDuration(next, 360));
+      }, waveDuration(next, 360, next === 1 ? nextAge : facts[next].value));
     }, waveDuration(mode, 180));
   }
 
