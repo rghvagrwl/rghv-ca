@@ -30,7 +30,7 @@ function capitalize(text: string) {
 // A sentence as letter spans, each with a rising delay index. During a
 // swap the OLD sentence's letters blur away at the same moment the new
 // sentence's letters condense in — a simultaneous unveil.
-function FooterLetters({ text }: { text: string }) {
+function FooterLetters({ text, offset = 0 }: { text: string; offset?: number }) {
   // Letters grouped into unbreakable words so the sentence wraps at
   // spaces, never mid-word, on narrow screens.
   const out: React.ReactNode[] = [];
@@ -41,7 +41,7 @@ function FooterLetters({ text }: { text: string }) {
       <span
         className="nv-fl"
         key={i + j}
-        style={{ "--fi": i + j } as React.CSSProperties}
+        style={{ "--fi": offset + i + j } as React.CSSProperties}
       >
         {ch}
       </span>
@@ -126,6 +126,52 @@ function SwappingSentence({
   );
 }
 
+function VisitorRow({ stats }: { stats: Stats }) {
+  const [mode, setMode] = useState(0);
+  const [phase, setPhase] = useState<"idle" | "out" | "in">("idle");
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const place = stats.lastVisitorLabel && !stats.lastVisitorLabel.startsWith("UNKNOWN")
+    ? titleCase(stats.lastVisitorLabel) : "Somewhere unknown";
+  const facts = [
+    { label: "Last visitor from", value: place },
+    { label: "Visitors so far today", value: stats.visitorsToday.toLocaleString("en-US") },
+    { label: "Visitors since this site was made", value: stats.visitorsAllTime.toLocaleString("en-US") },
+  ];
+  const fact = facts[mode];
+  const waveDuration = (index: number, animationMs: number) =>
+    (facts[index].label.length + facts[index].value.length) * 11 + animationMs;
+
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
+
+  function cycle() {
+    if (timer.current) return;
+    const next = (mode + 1) % facts.length;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setMode(next);
+      return;
+    }
+    setPhase("out");
+    timer.current = setTimeout(() => {
+      setMode(next);
+      setPhase("in");
+      timer.current = setTimeout(() => {
+        setPhase("idle");
+        timer.current = null;
+      }, waveDuration(next, 360));
+    }, waveDuration(mode, 180));
+  }
+
+  return (
+    <button className={`nv-footer-stat nv-footer-row nv-footer-${phase}`} type="button" onClick={cycle}
+      aria-label={`${fact.label}: ${fact.value}. Click to show ${facts[(mode + 1) % facts.length].label.toLowerCase()}`}>
+      <span className="nv-footer-label" aria-hidden="true"><FooterLetters text={fact.label} /></span>
+      <span className="nv-footer-number" aria-hidden="true"><FooterLetters text={fact.value} offset={fact.label.length} /></span>
+    </button>
+  );
+}
+
 type Stats = {
   visitorsToday: number;
   visitorsAllTime: number;
@@ -168,7 +214,7 @@ function naturalAge(seenAt: number | null, nowMs: number) {
   return days === 1 ? "a day ago" : `${numberWord(days)} days ago`;
 }
 
-export default function SiteFooter({ omitFinalPeriod = false }: { omitFinalPeriod?: boolean }) {
+export default function SiteFooter({ omitFinalPeriod = false, listStyle = false }: { omitFinalPeriod?: boolean; listStyle?: boolean }) {
   const [stats, setStats] = useState<Stats | null>(null);
   // One quiet line, four states, cycled by clicking: where the last
   // visitor was from, when they were here, today's count, all-time count.
@@ -208,6 +254,8 @@ export default function SiteFooter({ omitFinalPeriod = false }: { omitFinalPerio
   if (!stats) {
     return null;
   }
+
+  if (listStyle) return <footer className="nv-footer"><VisitorRow stats={stats} /></footer>;
 
   const place =
     stats.lastVisitorLabel && !stats.lastVisitorLabel.startsWith("UNKNOWN")

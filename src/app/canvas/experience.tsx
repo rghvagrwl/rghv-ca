@@ -17,7 +17,8 @@ const work = workProjects.map((project) => ({
   images: project.images,
 }));
 
-const writingPlaceholders = [1, 2];
+const homeItemLimit = 3;
+const writingPlaceholders = [1, 2, 3];
 const transitionOutMs = 520;
 const transitionPauseMs = 130;
 
@@ -83,7 +84,8 @@ type Selection =
   | { kind: "work"; index: number }
   | { kind: "capture"; index: number }
   | { kind: "workAll" }
-  | { kind: "captureAll" };
+  | { kind: "captureAll" }
+  | { kind: "writingAll" };
 
 function getTitle(selection: Selection) {
   switch (selection.kind) {
@@ -91,6 +93,7 @@ function getTitle(selection: Selection) {
     case "capture": return captures[selection.index].title;
     case "workAll": return "Work";
     case "captureAll": return "Captures";
+    case "writingAll": return "Writing";
   }
 }
 
@@ -357,7 +360,7 @@ function DetailContent({ selection }: { selection: Selection }) {
     return <VercelStory />;
   }
 
-  if (selection.kind === "workAll" || selection.kind === "captureAll") return null;
+  if (selection.kind === "workAll" || selection.kind === "captureAll" || selection.kind === "writingAll") return null;
 
   const images: readonly string[] = selection.kind === "work"
     ? work[selection.index].images
@@ -382,6 +385,7 @@ function DetailContent({ selection }: { selection: Selection }) {
 }
 
 function selectionFromPath(pathname: string): Selection | null {
+  if (/^\/writing\/?$/.test(pathname)) return { kind: "writingAll" };
   if (/^\/work\/?$/.test(pathname)) return { kind: "workAll" };
   if (/^\/captures\/?$/.test(pathname)) return { kind: "captureAll" };
   const match = pathname.match(/^\/(work|captures)\/([^/]+)\/?$/);
@@ -401,6 +405,7 @@ function pathFor(selection: Selection | null) {
     case "capture": return `/captures/${captures[selection.index].slug}`;
     case "workAll": return "/work";
     case "captureAll": return "/captures";
+    case "writingAll": return "/writing";
   }
 }
 
@@ -414,7 +419,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   useEffect(() => {
     function parentFromHistory() {
       const parent = selectionFromPath(window.history.state?.canvasParent ?? "/");
-      return parent?.kind === "workAll" || parent?.kind === "captureAll" ? parent : null;
+      return parent?.kind === "workAll" || parent?.kind === "captureAll" || parent?.kind === "writingAll" ? parent : null;
     }
     function syncFromHistory() {
       if (transitionTimer.current) clearTimeout(transitionTimer.current);
@@ -436,7 +441,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
 
   function openDetail(next: Selection) {
     if (phase !== "home" && phase !== "detail") return;
-    const fromList = phase === "detail" && (selection?.kind === "workAll" || selection?.kind === "captureAll");
+    const fromList = phase === "detail" && (selection?.kind === "workAll" || selection?.kind === "captureAll" || selection?.kind === "writingAll");
     const parent = fromList ? selection : null;
     setParentSelection(parent);
     window.history.pushState({ ...window.history.state, canvasParent: pathFor(parent) }, "", pathFor(next));
@@ -499,37 +504,49 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
         <div className={styles.navigation}>
           <div className={styles.group}>
             <div className={styles.section}>Work</div>
-            {work.slice(0, 3).map((project, index) => (
+            {work.slice(0, homeItemLimit).map((project, index) => (
               <button className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={project.name} type="button" onClick={() => openDetail({ kind: "work", index })}>
                 <Arrow />
                 <span className={styles.arrowTitle}>{project.name}</span>
                 {project.id === "vercel-2026" ? <NewLabel /> : project.year ? <span className={styles.date}>{project.year}</span> : null}
               </button>
             ))}
+            {work.length > homeItemLimit && (
             <button className={`${styles.viewAll} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} type="button" onClick={() => openDetail({ kind: "workAll" })}>
               <Arrow />
               <span className={styles.arrowTitle}>View all</span>
             </button>
+            )}
           </div>
 
           <div className={styles.group}>
             <div className={styles.section}>Writing</div>
-            {writingPlaceholders.map((placeholder) => (
+            {writingPlaceholders.slice(0, homeItemLimit).map((placeholder) => (
               <div className={`${styles.item} ${styles.listItem} ${styles.placeholderItem}`} key={placeholder}>
                 <span>Placeholder</span>
               </div>
             ))}
+            {writingPlaceholders.length > homeItemLimit && (
+            <button className={`${styles.viewAll} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} type="button" onClick={() => openDetail({ kind: "writingAll" })}>
+              <Arrow /><span className={styles.arrowTitle}>View all</span>
+            </button>
+            )}
           </div>
 
           <div className={styles.group}>
             <div className={styles.section}>Captures</div>
-            {captures.map((capture, index) => (
+            {captures.slice(0, homeItemLimit).map((capture, index) => (
               <CaptureRow capture={capture} index={index} key={capture.title} onClick={() => openDetail({ kind: "capture", index })} />
             ))}
+            {captures.length > homeItemLimit && (
+            <button className={`${styles.viewAll} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} type="button" onClick={() => openDetail({ kind: "captureAll" })}>
+              <Arrow /><span className={styles.arrowTitle}>View all</span>
+            </button>
+            )}
           </div>
         </div>
         <div className={visitorFooterStyles.area}>
-          <SiteFooter omitFinalPeriod />
+          <SiteFooter omitFinalPeriod listStyle />
         </div>
       </div>
       </div>
@@ -544,7 +561,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
                   {isVercelWork ? <NewLabel /> : navigationDate ? <span className={styles.detailDate}>{navigationDate}</span> : null}
                 </button>
               </h1>
-              {selection.kind === "workAll" || selection.kind === "captureAll" ? (
+              {selection.kind === "workAll" || selection.kind === "captureAll" || selection.kind === "writingAll" ? (
                   <div className={`${styles.detailList} ${styles.navigation}`}>
                     {selection.kind === "workAll" ? work.map((project, index) => (
                       <button className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={project.id} type="button" onClick={() => openDetail({ kind: "work", index })}>
@@ -552,13 +569,15 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
                         <span className={styles.arrowTitle}>{project.name}</span>
                         {project.id === "vercel-2026" ? <NewLabel /> : project.year ? <span className={styles.date}>{project.year}</span> : null}
                       </button>
+                    )) : selection.kind === "writingAll" ? writingPlaceholders.map((placeholder) => (
+                      <div className={`${styles.item} ${styles.listItem} ${styles.placeholderItem}`} key={placeholder}><span>Placeholder</span></div>
                     )) : captures.map((capture, index) => (
                       <CaptureRow capture={capture} index={index} key={capture.title} onClick={() => openDetail({ kind: "capture", index })} />
                     ))}
                   </div>
               ) : null}
             </div>
-            {selection.kind !== "workAll" && selection.kind !== "captureAll" && (
+            {selection.kind !== "workAll" && selection.kind !== "captureAll" && selection.kind !== "writingAll" && (
               <div className={`${styles.detailContent} ${selection.kind === "capture" ? styles.captureContent : ""} ${selection.kind === "work" && work[selection.index].id === "vercel-2026" ? styles.storyContent : ""}`}>
                 <DetailContent selection={selection} />
               </div>

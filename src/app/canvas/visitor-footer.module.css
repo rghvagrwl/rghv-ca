@@ -17,7 +17,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--muted-ink);
+  color: rgb(0 0 0 / 25%);
   cursor: pointer;
   font: inherit;
   font-variant-numeric: tabular-nums;
@@ -27,7 +27,7 @@
 }
 
 .area :global(.nv-footer-stat:hover) {
-  color: var(--secondary-ink);
+  color: rgb(0 0 0 / 40%);
 }
 
 .area :global(.nv-footer-stat:focus-visible) {
@@ -93,6 +93,59 @@
 
   .area :global(.nv-fold .nv-fl),
   .area :global(.nv-fnew .nv-fl) {
+    animation: none;
+  }
+}
+
+.area :global(.nv-footer-row) {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  min-height: 32px;
+  padding: 4px 0;
+}
+
+.area :global(.nv-footer-number) {
+  order: 2;
+  flex: 0 1 auto;
+  text-align: right;
+  min-width: 3ch;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.area :global(.nv-footer-label) {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+/* Keep the resting fact still; only clicks trigger the letter wave. */
+.area :global(.nv-footer-row .nv-fl) {
+  animation: none;
+}
+
+.area :global(.nv-footer-out .nv-fl) {
+  animation: factOut 180ms ease-in both;
+  animation-delay: calc(var(--fi, 0) * 11ms);
+}
+
+.area :global(.nv-footer-in .nv-fl) {
+  animation: factIn 360ms ease-out both;
+  animation-delay: calc(var(--fi, 0) * 11ms);
+}
+
+@keyframes factOut {
+  to { opacity: 0; filter: blur(6px); }
+}
+
+@keyframes factIn {
+  from { opacity: 0; filter: blur(6px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .area :global(.nv-footer-row .nv-fl) {
     animation: none;
   }
 }

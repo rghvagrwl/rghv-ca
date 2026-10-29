@@ -34,6 +34,11 @@ const nextConfig: NextConfig = {
           destination: "/canvas/work/:slug",
         },
         {
+          source: "/writing",
+          has: canvasHost,
+          destination: "/canvas/writing",
+        },
+        {
           source: "/work",
           has: canvasHost,
           destination: "/canvas/work",
