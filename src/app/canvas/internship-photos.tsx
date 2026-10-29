@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
 import pageStyles from "./page.module.css";
 import styles from "./internship-photos.module.css";
@@ -218,17 +218,26 @@ export default function InternshipPhotos() {
             </button>
           </div>
           <div className={styles.galleryScroll}>
-            <div className={styles.gallery} onClick={(event) => event.stopPropagation()}>
+            <div className={`${pageStyles.gallery} ${pageStyles.captureGallery} ${styles.gallery}`} onClick={(event) => event.stopPropagation()}>
               {photos.map((photo, index) => (
-                <figure className={styles.photo} key={photo.src}>
+                <figure
+                  className={pageStyles.galleryFigure}
+                  key={photo.src}
+                  style={{
+                    "--capture-aspect": `${photo.width} / ${photo.height}`,
+                    "--capture-tilt": index % 2 === 0 ? "-0.5deg" : "0.5deg",
+                  } as CSSProperties}
+                >
+                  <span className={pageStyles.detailImageFrame}>
                   <Image
                     src={photo.src}
                     alt={photo.alt}
                     width={photo.width}
                     height={photo.height}
-                    sizes="(max-width: 760px) calc(100vw - 40px), 720px"
+                    sizes="(max-width: 552px) calc(100vw - 40px), 512px"
                     loading={index === 0 && open ? "eager" : "lazy"}
                   />
+                  </span>
                 </figure>
               ))}
             </div>

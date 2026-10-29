@@ -151,11 +151,7 @@
 }
 
 .gallery {
-  display: flex;
-  width: min(720px, calc(100% - 40px));
-  flex-direction: column;
-  gap: 24px;
-  margin-inline: auto;
+  width: min(512px, calc(100% - 40px));
   padding: 48px 0 80px;
   opacity: 0;
   filter: blur(16px);
@@ -169,14 +165,7 @@
   transition-delay: 560ms;
 }
 
-.photo {
-  margin: 0;
-  padding: 2px;
-  background: white;
-  box-shadow: 0 3px 12px rgb(0 0 0 / 10%);
-}
-
-.photo img {
+.gallery img {
   display: block;
   width: 100%;
   height: auto;
@@ -188,7 +177,6 @@
   }
 
   .gallery {
-    gap: 16px;
     padding-top: 32px;
     padding-bottom: 40px;
   }

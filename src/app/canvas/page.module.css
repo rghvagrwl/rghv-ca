@@ -1,4 +1,6 @@
 .page {
+  --site-top-space: clamp(80px, 10vh, 120px);
+  --home-top-space: clamp(48px, 7vh, 80px);
   --paper: color-mix(in srgb, white 97%, black 3%);
   --ink: rgb(0 0 0 / 100%);
   --body-ink: rgb(0 0 0 / 80%);
@@ -8,7 +10,7 @@
   --rule: rgb(0 0 0 / 10%);
   --image-surface: rgb(0 0 0 / 5%);
   min-height: 100dvh;
-  padding: clamp(80px, 10vh, 120px) 20px 20px;
+  padding: var(--site-top-space) 20px 20px;
   background: var(--paper);
   color: var(--ink);
   color-scheme: light;
@@ -22,6 +24,7 @@
 
 .page[data-home] {
   min-height: calc(100dvh + 80px);
+  padding-bottom: calc(var(--site-top-space) + var(--home-top-space));
 }
 
 .page ::selection {
@@ -52,7 +55,7 @@
 }
 
 .home {
-  padding-top: clamp(48px, 7vh, 80px);
+  padding-top: var(--home-top-space);
 }
 
 .detail {
@@ -221,15 +224,10 @@
   gap: 16px;
 }
 
-.name,
 .bio {
   margin: 0;
   font-weight: inherit;
   line-height: inherit;
-}
-
-.name {
-  font-size: 18px;
 }
 
 .bio {
@@ -263,6 +261,14 @@
   --dimmed-text: var(--faint-ink);
   overflow: clip;
   font-size: 16px;
+}
+
+.column > .navigation {
+  gap: 24px;
+}
+
+.column > .navigation > .group > :last-child {
+  border-bottom: 0;
 }
 
 .section,

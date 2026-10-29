@@ -168,7 +168,7 @@ function naturalAge(seenAt: number | null, nowMs: number) {
   return days === 1 ? "a day ago" : `${numberWord(days)} days ago`;
 }
 
-export default function SiteFooter() {
+export default function SiteFooter({ omitFinalPeriod = false }: { omitFinalPeriod?: boolean }) {
   const [stats, setStats] = useState<Stats | null>(null);
   // One quiet line, four states, cycled by clicking: where the last
   // visitor was from, when they were here, today's count, all-time count.
@@ -244,7 +244,7 @@ export default function SiteFooter() {
         onClick={advance}
         type="button"
       >
-        <SwappingSentence swapKey={mode} text={sentences[mode]} />
+        <SwappingSentence swapKey={mode} text={omitFinalPeriod ? sentences[mode].replace(/\.$/, "") : sentences[mode]} />
       </button>
     </footer>
   );

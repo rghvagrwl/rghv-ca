@@ -3,10 +3,12 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { workProjects } from "../new/content";
+import SiteFooter from "../new/footer-stats";
 import ArticlePage, { articles } from "./articles";
 import InternshipPhotos from "./internship-photos";
 import styles from "./page.module.css";
 import storyStyles from "./vercel-story.module.css";
+import visitorFooterStyles from "./visitor-footer.module.css";
 
 const work = workProjects.map((project) => ({
   id: project.id,
@@ -493,12 +495,13 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
       <div className={styles.stage}>
       <div className={`${styles.home} ${phase !== "home" ? styles.homeInactive : ""}`} inert={phase !== "home"}>
       <div className={styles.column}>
-        <header className={styles.introduction}>
-          <h1 className={styles.name}>Raghav Agarwal</h1>
+        <div className={styles.introduction}>
+          <p className={styles.bio}>My name is Raghav Agarwal.</p>
           <p className={styles.bio}>
-            I&apos;m a designer and student from Calgary, Canada, studying at the
-            University of Waterloo. I began learning design independently
-            through the internet four years ago.
+            I&apos;m 18 years old and born in Calgary, Canada.
+          </p>
+          <p className={styles.bio}>
+            I&apos;m a designer who began learning design independently through the internet four years ago. I&apos;m also a student at the University of Waterloo studying Global Business and Digital Arts, where I&apos;m starting my second year.
           </p>
           <p className={styles.bio}>
             I&apos;m currently looking for new opportunities. You can reach out on{" "}
@@ -506,7 +509,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
             <a className={styles.bioLink} href="https://x.com/varksed" target="_blank" rel="noopener noreferrer">X</a>, or by{" "}
             <a className={styles.bioLink} href="mailto:rghvagwl@gmail.com">Email</a>.
           </p>
-        </header>
+        </div>
 
         <div className={styles.navigation}>
           <div className={styles.group}>
@@ -549,11 +552,10 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
             {captures.map((capture, index) => (
               <CaptureRow capture={capture} index={index} key={capture.title} onClick={() => openDetail({ kind: "capture", index })} />
             ))}
-            <button className={`${styles.viewAll} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} type="button" onClick={() => openDetail({ kind: "captureAll" })}>
-              <Arrow />
-              <span className={styles.arrowTitle}>View all</span>
-            </button>
           </div>
+        </div>
+        <div className={visitorFooterStyles.area}>
+          <SiteFooter omitFinalPeriod />
         </div>
       </div>
       </div>
