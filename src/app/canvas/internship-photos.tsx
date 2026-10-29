@@ -24,8 +24,10 @@ export default function InternshipPhotos() {
   const unlockTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function resetTracking() {
-    stackRef.current?.style.removeProperty("--stack-x");
-    stackRef.current?.style.removeProperty("--stack-y");
+    stackRef.current?.querySelectorAll<HTMLElement>("[data-stack-photo]").forEach((photo) => {
+      photo.style.removeProperty("--pull-x");
+      photo.style.removeProperty("--pull-y");
+    });
   }
 
   function trackPointer(event: PointerEvent<HTMLButtonElement>) {
@@ -33,10 +35,18 @@ export default function InternshipPhotos() {
 
     const button = event.currentTarget;
     const bounds = button.getBoundingClientRect();
-    const x = Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1));
-    const y = Math.max(-1, Math.min(1, (event.clientY - bounds.top) / bounds.height * 2 - 1));
-    button.style.setProperty("--stack-x", `${x * 3}px`);
-    button.style.setProperty("--stack-y", `${y * 3}px`);
+    button.querySelectorAll<HTMLElement>("[data-stack-photo]").forEach((photo, index) => {
+      // Measure from each photo's hover position without including its magnetic offset.
+      const spreadX = index === 0 ? -6 : index === 1 ? 6 : 0;
+      const spreadY = index === 2 ? 6 : -4;
+      const centerX = bounds.left + photo.offsetLeft + photo.offsetWidth / 2 + spreadX;
+      const centerY = bounds.top + photo.offsetTop + photo.offsetHeight / 2 + spreadY;
+      const x = Math.max(-1, Math.min(1, (event.clientX - centerX) / (bounds.width / 2)));
+      const y = Math.max(-1, Math.min(1, (event.clientY - centerY) / (bounds.height / 2)));
+      const strength = [1.2, 1.6, 2][index];
+      photo.style.setProperty("--pull-x", `${x * strength}px`);
+      photo.style.setProperty("--pull-y", `${y * strength}px`);
+    });
   }
 
   const close = useCallback(() => {
@@ -110,7 +120,7 @@ export default function InternshipPhotos() {
         >
           <span className={styles.stack} aria-hidden="true">
             {photos.slice(0, 3).map((photo, index) => (
-              <span className={`${styles.stackPhoto} ${styles[`stackPhoto${index + 1}`]}`} key={photo.src}>
+              <span className={`${styles.stackPhoto} ${styles[`stackPhoto${index + 1}`]}`} key={photo.src} data-stack-photo>
                 <Image src={photo.src} alt="" width={68} height={48} sizes="68px" />
               </span>
             ))}
