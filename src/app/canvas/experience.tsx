@@ -486,7 +486,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
       <div className={`${styles.home} ${phase !== "home" ? styles.homeInactive : ""}`} inert={phase !== "home"}>
       <div className={styles.column}>
         <div className={styles.introduction}>
-          <p className={styles.bio}>My name is Raghav Agarwal.</p>
+          <p className={styles.bio}>raghav agarwal</p>
           <p className={styles.bio}>
             I&apos;m 18 years old and born in Calgary, Canada.
           </p>
