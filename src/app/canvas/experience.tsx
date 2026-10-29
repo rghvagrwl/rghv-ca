@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { workProjects } from "../new/content";
 import SiteFooter from "../new/footer-stats";
-import ArticlePage, { articles } from "./articles";
 import InternshipPhotos from "./internship-photos";
 import styles from "./page.module.css";
 import storyStyles from "./vercel-story.module.css";
@@ -18,7 +17,6 @@ const work = workProjects.map((project) => ({
   images: project.images,
 }));
 
-const writing = articles.map(({ id, title, date, listDate }) => ({ id, title, date: listDate ?? date }));
 const writingPlaceholders = [1, 2];
 const transitionOutMs = 520;
 const transitionPauseMs = 130;
@@ -83,7 +81,6 @@ const pilePeeks = [9, 14, 19, 23, 27, 23, 19, 14, 9];
 
 type Selection =
   | { kind: "work"; index: number }
-  | { kind: "writing"; index: number }
   | { kind: "capture"; index: number }
   | { kind: "workAll" }
   | { kind: "captureAll" };
@@ -91,7 +88,6 @@ type Selection =
 function getTitle(selection: Selection) {
   switch (selection.kind) {
     case "work": return work[selection.index].name;
-    case "writing": return writing[selection.index].title;
     case "capture": return captures[selection.index].title;
     case "workAll": return "Work";
     case "captureAll": return "Captures";
@@ -357,10 +353,6 @@ function VercelStory() {
 }
 
 function DetailContent({ selection }: { selection: Selection }) {
-  if (selection.kind === "writing") {
-    return <ArticlePage key={writing[selection.index].id} article={articles[selection.index]} />;
-  }
-
   if (selection.kind === "work" && work[selection.index].id === "vercel-2026") {
     return <VercelStory />;
   }
@@ -392,12 +384,8 @@ function DetailContent({ selection }: { selection: Selection }) {
 function selectionFromPath(pathname: string): Selection | null {
   if (/^\/work\/?$/.test(pathname)) return { kind: "workAll" };
   if (/^\/captures\/?$/.test(pathname)) return { kind: "captureAll" };
-  const match = pathname.match(/^\/(writing|work|captures)\/([^/]+)\/?$/);
+  const match = pathname.match(/^\/(work|captures)\/([^/]+)\/?$/);
   if (!match) return null;
-  if (match[1] === "writing") {
-    const index = writing.findIndex((article) => article.id === match[2]);
-    return index < 0 ? null : { kind: "writing", index };
-  }
   if (match[1] === "work") {
     const index = work.findIndex((project) => project.slug === match[2] || project.id === match[2]);
     return index < 0 ? null : { kind: "work", index };
@@ -409,7 +397,6 @@ function selectionFromPath(pathname: string): Selection | null {
 function pathFor(selection: Selection | null) {
   if (!selection) return "/";
   switch (selection.kind) {
-    case "writing": return `/writing/${writing[selection.index].id}`;
     case "work": return `/work/${work[selection.index].slug}`;
     case "capture": return `/captures/${captures[selection.index].slug}`;
     case "workAll": return "/work";
@@ -484,9 +471,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   }, [phase, goBack]);
 
   const navigationLabel = selection ? getTitle(selection) : "Raghav Agarwal";
-  const navigationDate = selection?.kind === "writing"
-    ? articles[selection.index].date
-    : selection?.kind === "capture" ? captures[selection.index].date
+  const navigationDate = selection?.kind === "capture" ? captures[selection.index].date
     : selection?.kind === "work" ? work[selection.index].year : null;
   const isVercelWork = selection?.kind === "work" && work[selection.index].id === "vercel-2026";
 
@@ -529,17 +514,6 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
 
           <div className={styles.group}>
             <div className={styles.section}>Writing</div>
-            {writing.map((article, index) => (
-              <a className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={article.id} href={`/writing/${article.id}`} onClick={(event) => {
-                if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-                event.preventDefault();
-                openDetail({ kind: "writing", index });
-              }}>
-                <Arrow />
-                <span className={styles.arrowTitle}>{article.title}</span>
-                <span className={styles.date}>{article.date}</span>
-              </a>
-            ))}
             {writingPlaceholders.map((placeholder) => (
               <div className={`${styles.item} ${styles.listItem} ${styles.placeholderItem}`} key={placeholder}>
                 <span>Placeholder</span>
@@ -555,14 +529,14 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
           </div>
         </div>
         <div className={visitorFooterStyles.area}>
-          <SiteFooter omitFinalPeriod />
+          <SiteFooter omitFinalPeriod listStyle />
         </div>
       </div>
       </div>
       <div className={`${styles.detail} ${phase === "detail" ? styles.detailActive : ""}`} inert={phase !== "detail"}>
         {selection && (
           <>
-            <div className={`${styles.detailSidebar} ${selection.kind === "writing" ? styles.writingSidebar : ""}`}>
+            <div className={styles.detailSidebar}>
               <h1 className={styles.detailHeading} aria-label={navigationLabel}>
                 <button className={`${styles.detailBackRow} ${styles.arrowItem}`} type="button" onClick={goBack} aria-label={parentSelection ? `Back to ${getTitle(parentSelection)}` : "Back to home"}>
                   <BackArrow />
@@ -585,7 +559,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
               ) : null}
             </div>
             {selection.kind !== "workAll" && selection.kind !== "captureAll" && (
-              <div className={`${styles.detailContent} ${selection.kind === "writing" ? styles.writingContent : ""} ${selection.kind === "capture" ? styles.captureContent : ""} ${selection.kind === "work" && work[selection.index].id === "vercel-2026" ? styles.storyContent : ""}`}>
+              <div className={`${styles.detailContent} ${selection.kind === "capture" ? styles.captureContent : ""} ${selection.kind === "work" && work[selection.index].id === "vercel-2026" ? styles.storyContent : ""}`}>
                 <DetailContent selection={selection} />
               </div>
             )}

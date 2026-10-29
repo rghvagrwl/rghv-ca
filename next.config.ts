@@ -1,17 +1,17 @@
 import type { NextConfig } from "next";
 
-// Keep the current site on /new while the fresh site gets its own canvas.
-const currentSiteHost = [
+// The previous site remains available on its separate new.rghv.ca host.
+const previousSiteHost = [
   {
     type: "host" as const,
-    value: "(www\\.)?rghv\\.ca|new\\.rghv\\.ca",
+    value: "new\\.rghv\\.ca",
   },
 ];
 
 const canvasHost = [
   {
     type: "host" as const,
-    value: "rghv-new.*\\.vercel\\.app|localhost(?::\\d+)?|127\\.0\\.0\\.1(?::\\d+)?",
+    value: "(www\\.)?rghv\\.ca|rghv-new.*\\.vercel\\.app|localhost(?::\\d+)?|127\\.0\\.0\\.1(?::\\d+)?",
   },
 ];
 
@@ -28,11 +28,6 @@ const nextConfig: NextConfig = {
       // Next internals, the API, anything with a file extension in /public, and
       // /new itself (which would otherwise become /new/new).
       beforeFiles: [
-        {
-          source: "/writing/:slug",
-          has: canvasHost,
-          destination: "/canvas/writing/:slug",
-        },
         {
           source: "/work/:slug",
           has: canvasHost,
@@ -60,12 +55,12 @@ const nextConfig: NextConfig = {
         },
         {
           source: "/",
-          has: currentSiteHost,
+          has: previousSiteHost,
           destination: "/new",
         },
         {
           source: "/:path((?!_next/|api/|new/|new$)(?!.*\\.).*)",
-          has: currentSiteHost,
+          has: previousSiteHost,
           destination: "/new/:path",
         },
       ],
