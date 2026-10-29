@@ -529,7 +529,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
           </div>
         </div>
         <div className={visitorFooterStyles.area}>
-          <SiteFooter omitFinalPeriod listStyle />
+          <SiteFooter omitFinalPeriod />
         </div>
       </div>
       </div>
