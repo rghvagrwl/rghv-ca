@@ -7,11 +7,72 @@ import pageStyles from "./page.module.css";
 import styles from "./internship-photos.module.css";
 
 const photos = [
-  { src: "/photo/hill-pink-sky.webp", width: 2000, height: 1125, alt: "Two people on a hill at sunset" },
-  { src: "/photo/cafe-window.webp", width: 2000, height: 1333, alt: "Friends sitting by a cafe window" },
-  { src: "/photo/silhouette-sunset.webp", width: 2000, height: 1500, alt: "A silhouette against a sunset" },
-  { src: "/photo/bay-bridge-pier.webp", width: 2000, height: 1500, alt: "A view from the pier toward the Bay Bridge" },
-  { src: "/photo/city-hall-dusk.webp", width: 2000, height: 1127, alt: "City Hall at dusk" },
+  {
+    "src": "/photo/vercel-internship/01.webp",
+    "width": 1800,
+    "height": 1350,
+    "alt": "The stage at a Figma conference"
+  },
+  {
+    "src": "/photo/vercel-internship/02.webp",
+    "width": 1800,
+    "height": 1350,
+    "alt": "A sunlit covered walkway"
+  },
+  {
+    "src": "/photo/vercel-internship/03.webp",
+    "width": 1800,
+    "height": 1013,
+    "alt": "Friends at an ocean overlook"
+  },
+  {
+    "src": "/photo/vercel-internship/04.webp",
+    "width": 1800,
+    "height": 1350,
+    "alt": "A Vercel One stop ship billboard"
+  },
+  {
+    "src": "/photo/vercel-internship/05.webp",
+    "width": 1800,
+    "height": 1350,
+    "alt": "San Francisco skyline at dusk"
+  },
+  {
+    "src": "/photo/vercel-internship/06.webp",
+    "width": 1350,
+    "height": 1800,
+    "alt": "An event outside Chase Center"
+  },
+  {
+    "src": "/photo/vercel-internship/07.webp",
+    "width": 1350,
+    "height": 1800,
+    "alt": "Friends playing a video game at the office"
+  },
+  {
+    "src": "/photo/vercel-internship/08.webp",
+    "width": 1350,
+    "height": 1800,
+    "alt": "Watching the sunset above the clouds"
+  },
+  {
+    "src": "/photo/vercel-internship/09.webp",
+    "width": 1800,
+    "height": 1350,
+    "alt": "Sunset over a blanket of clouds"
+  },
+  {
+    "src": "/photo/vercel-internship/10.webp",
+    "width": 1800,
+    "height": 1350,
+    "alt": "Ice cream at Dolores Park"
+  },
+  {
+    "src": "/photo/vercel-internship/11.webp",
+    "width": 1800,
+    "height": 1013,
+    "alt": "Friends hiking above the clouds"
+  }
 ];
 
 export default function InternshipPhotos() {
