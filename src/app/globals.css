@@ -457,3 +457,17 @@ a[aria-disabled="true"] {
   width: clamp(12px, 0.72vw, 18px);
   height: clamp(12px, 0.72vw, 18px);
 }
+
+/* Pointer focus and browser-selected containers should not acquire a box. */
+:focus:not(:focus-visible) {
+  outline: none !important;
+}
+:focus-visible {
+  outline: none !important;
+}
+/* Keep keyboard navigation legible without rectangular focus borders. */
+:is(button, a[href], [role="button"]):focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}

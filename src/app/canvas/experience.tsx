@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { workProjects } from "../new/content";
 import SiteFooter from "../new/footer-stats";
 import InternshipPhotos from "./internship-photos";
+import Portrait from "./portrait";
 import styles from "./page.module.css";
 import storyStyles from "./vercel-story.module.css";
 import visitorFooterStyles from "./visitor-footer.module.css";
@@ -486,7 +487,8 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
       <div className={`${styles.home} ${phase !== "home" ? styles.homeInactive : ""}`} inert={phase !== "home"}>
       <div className={styles.column}>
         <div className={styles.introduction}>
-          <p className={styles.bio}>raghav agarwal</p>
+          <Portrait />
+          <p className={`${styles.bio} ${styles.name}`}>Raghav Agarwal</p>
           <p className={styles.bio}>
             I&apos;m 18 years old and born in Calgary, Canada.
           </p>

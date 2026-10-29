@@ -660,3 +660,7 @@
     padding-bottom: 8px;
   }
 }
+
+.name {
+  color: var(--ink);
+}
