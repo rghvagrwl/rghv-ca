@@ -134,7 +134,7 @@ function CaptureRow({ capture, index, onClick }: { capture: typeof captures[numb
       const photoX = (0.09 + photoIndex * 0.1025) * rect.width;
       const proximity = Math.max(0, 1 - Math.abs(cursorX - photoX) / (rect.width * 0.24));
       const easedProximity = proximity * proximity * (3 - 2 * proximity);
-      photo.style.setProperty("--pile-dip", `${(easedProximity * 19).toFixed(2)}px`);
+      photo.style.setProperty("--pile-dip", `${(easedProximity * 9).toFixed(2)}px`);
     });
   }
 
@@ -209,6 +209,18 @@ function StoryVideo({ src, label }: { src: string; label: string }) {
   const [playing, setPlaying] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [hideUntilLeave, setHideUntilLeave] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.defaultMuted = true;
+    video.muted = true;
+    // Explicitly start playback when this story mounts during client navigation.
+    void video.play().catch(() => {
+      // Keep the play control available if the browser blocks autoplay.
+    });
+  }, [src]);
 
   async function togglePlayback() {
     const video = videoRef.current;

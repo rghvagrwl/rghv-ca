@@ -57,12 +57,12 @@
 
 .stackPhoto1 {
   z-index: 1;
-  transform: translateY(-5px) rotate(-12deg);
+  transform: translate(-4px, -5px) rotate(-12deg);
 }
 
 .stackPhoto2 {
   z-index: 2;
-  transform: translateY(-5px) rotate(12deg);
+  transform: translate(4px, -5px) rotate(12deg);
 }
 
 .stackPhoto3 {
