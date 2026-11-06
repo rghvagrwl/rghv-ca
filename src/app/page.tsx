@@ -148,7 +148,7 @@ const workProjects = [
   {
     id: "unordinary",
     title: "UNORDINARY",
-    year: "2024",
+    year: "2025",
     images: [
       "/unordinary/Unordinary 1.webp",
       "/unordinary/Unordinary 2.webp",
@@ -163,12 +163,12 @@ const workProjects = [
   {
     id: "minimum",
     title: "MINIMUM",
-    year: "2022",
+    year: "2024",
     images: [
       "/minimum/Minimum 1.webp",
       "/minimum/Minimum 2.webp",
-      "/minimum/Minimum 3.webp",
-      "/minimum/Minimum 4.webp",
+      "/minimum/service-cards.png",
+      "/minimum/build-interface-framed.png",
       "/minimum/Minimum 5.webp",
       "/minimum/Minimum 6.webp",
     ],

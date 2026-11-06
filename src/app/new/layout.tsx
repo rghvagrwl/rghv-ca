@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Shell from "./shell";
+import { socialMetadata } from "../../lib/social-metadata";
 
 // Lock the frame on phones: no pinch-zooming out of the layout, safe-area
 // aware, and the browser chrome matches the page colour.
@@ -13,11 +14,7 @@ export const viewport: Viewport = {
   themeColor: "#f0f0f0",
 };
 
-export const metadata: Metadata = {
-  title: "raghav agarwal",
-  description:
-    "Raghav Agarwal is a designer working across product, brand, and digital interfaces.",
-};
+export const metadata: Metadata = socialMetadata("home");
 
 export default function NewLayout({
   children,

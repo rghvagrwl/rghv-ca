@@ -6,7 +6,9 @@ import { createPortal } from "react-dom";
 import pageStyles from "./page.module.css";
 import styles from "./internship-photos.module.css";
 
-const photos = [
+type Photo = { src: string; width: number; height: number; alt: string; displayAspect?: string; objectPosition?: string };
+
+const internshipPhotos: Photo[] = [
   {
     "src": "/photo/vercel-internship/01.webp",
     "width": 1800,
@@ -75,7 +77,17 @@ const photos = [
   }
 ];
 
-export default function InternshipPhotos() {
+export default function InternshipPhotos({
+  photos = internshipPhotos,
+  title = "Photos from my internship",
+  backLabel = "Vercel",
+  galleryId = "internship-photo-gallery",
+}: {
+  photos?: Photo[];
+  title?: string;
+  backLabel?: string;
+  galleryId?: string;
+}) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [scrollLocked, setScrollLocked] = useState(false);
@@ -171,9 +183,9 @@ export default function InternshipPhotos() {
           className={`${styles.stackButton} ${open ? styles.stackButtonOpen : ""}`}
           type="button"
           ref={stackRef}
-          aria-label="Open photos from my internship"
+          aria-label={`Open ${title.toLowerCase()}`}
           aria-expanded={open}
-          aria-controls="internship-photo-gallery"
+          aria-controls={galleryId}
           onClick={openGallery}
           onPointerMove={trackPointer}
           onPointerLeave={resetTracking}
@@ -191,12 +203,12 @@ export default function InternshipPhotos() {
 
       {mounted && createPortal(
         <div
-          id="internship-photo-gallery"
+          id={galleryId}
           ref={overlayRef}
           className={`${styles.overlay} ${open ? styles.overlayOpen : ""}`}
           role="dialog"
           aria-modal={open ? true : undefined}
-          aria-label="Photos from my internship"
+          aria-label={title}
           aria-hidden={!open}
           inert={!open}
           onClick={close}
@@ -207,25 +219,26 @@ export default function InternshipPhotos() {
               type="button"
               ref={closeRef}
               onClick={close}
-              aria-label="Back to Vercel"
+              aria-label={`Back to ${backLabel}`}
             >
               <span className={pageStyles.arrowSlot} aria-hidden="true">
                 <svg className={pageStyles.arrowIcon} viewBox="0 0 24 24" fill="none">
                   <path d="M5 12H20M10.0001 17.6568L4.34326 12L10.0001 6.34314" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
-              <span className={pageStyles.arrowTitle}>Photos from my internship</span>
+              <span className={pageStyles.arrowTitle}>{title}</span>
             </button>
           </div>
           <div className={styles.galleryScroll}>
             <div className={`${pageStyles.gallery} ${pageStyles.captureGallery} ${styles.gallery}`} onClick={(event) => event.stopPropagation()}>
               {photos.map((photo, index) => (
                 <figure
-                  className={pageStyles.galleryFigure}
+                  className={`${pageStyles.galleryFigure} ${photo.displayAspect ? styles.portraitCrop : ""}`}
                   key={photo.src}
                   style={{
-                    "--capture-aspect": `${photo.width} / ${photo.height}`,
+                    "--capture-aspect": photo.displayAspect ?? `${photo.width} / ${photo.height}`,
                     "--capture-tilt": index % 2 === 0 ? "-0.5deg" : "0.5deg",
+                    "--photo-position": photo.objectPosition ?? "center",
                   } as CSSProperties}
                 >
                   <span className={pageStyles.detailImageFrame}>

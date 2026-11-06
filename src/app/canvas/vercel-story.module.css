@@ -22,6 +22,19 @@
   margin-top: 22px;
 }
 
+.prose h2 {
+  margin: 0 0 24px;
+  color: var(--secondary-ink);
+  font-size: 18px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6;
+}
+
+.storySection {
+  margin-top: 72px;
+}
+
 .story a {
   color: inherit;
   text-decoration-line: underline;
@@ -51,6 +64,31 @@
 
 .media {
   margin: 0;
+}
+
+.singleMedia {
+  margin-top: 56px;
+}
+
+.screenshotFrame {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 4%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: white;
+}
+
+.screenshotFrame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.afterMedia {
+  margin-top: 56px;
 }
 
 .videoFrame {
@@ -161,6 +199,18 @@
 
   .mediaGroup {
     margin-top: 40px;
+  }
+
+  .singleMedia {
+    margin-top: 40px;
+  }
+
+  .afterMedia {
+    margin-top: 40px;
+  }
+
+  .storySection {
+    margin-top: 56px;
   }
 
   .divider {

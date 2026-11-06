@@ -17,8 +17,17 @@ const work = workProjects.map((project) => ({
   year: project.year,
   images: project.images,
 }));
+const otherWorkIds = new Set([
+  "ando", "tembo", "socratica", "context", "prism-collective", "instafleet", "merge-club",
+  "on-deck-founders", "crisped", "zero-email", "faktor", "para",
+]);
+const mainWork = work.map((project, index) => ({ project, index })).filter(({ project }) => !otherWorkIds.has(project.id) && project.id !== "no-category");
+const otherWork = work.map((project, index) => ({ project, index })).filter(({ project }) => otherWorkIds.has(project.id));
+const allWork = [...mainWork, ...otherWork];
 
+const writing: { id: string; title: string; date: string }[] = [];
 const homeItemLimit = 3;
+const homeWorkLimit = 4;
 const writingPlaceholders = [1, 2, 3];
 const transitionOutMs = 520;
 const transitionPauseMs = 130;
@@ -80,19 +89,24 @@ function captureImageAspect(capture: typeof captures[number], imageIndex: number
 
 const pileTilts = [-8, 5, -4, 7, -6, 4, -7, 6, -3];
 const pilePeeks = [9, 14, 19, 23, 27, 23, 19, 14, 9];
+const otherWorkPeeks = [9, 13, 17, 21, 24, 27, 27, 24, 21, 17, 13, 9];
 
 type Selection =
   | { kind: "work"; index: number }
+  | { kind: "writing"; index: number }
   | { kind: "capture"; index: number }
   | { kind: "workAll" }
+  | { kind: "otherWorkAll" }
   | { kind: "captureAll" }
   | { kind: "writingAll" };
 
 function getTitle(selection: Selection) {
   switch (selection.kind) {
     case "work": return work[selection.index].name;
+    case "writing": return writing[selection.index].title;
     case "capture": return captures[selection.index].title;
     case "workAll": return "Work";
+    case "otherWorkAll": return "Other work";
     case "captureAll": return "Captures";
     case "writingAll": return "Writing";
   }
@@ -122,8 +136,11 @@ function NewLabel() {
   return <span className={styles.newNote}>new</span>;
 }
 
-function CaptureRow({ capture, index, onClick }: { capture: typeof captures[number]; index: number; onClick: () => void }) {
-  const pile = [...capture.images, ...capture.images].slice(0, 9);
+function PileRow({ title, date, images, index, onClick }: { title: string; date?: string; images: readonly string[]; index: number; onClick: () => void }) {
+  const pile = images.length >= 9 ? images.slice(0, 12) : [...images, ...images].slice(0, 9);
+  const isOtherWorkPile = pile.length === 12;
+  const firstLeft = isOtherWorkPile ? 6 : 9;
+  const leftStep = isOtherWorkPile ? 8 : 10.25;
 
   function updateCursorDip(event: React.PointerEvent<HTMLButtonElement>) {
     if (event.pointerType === "touch") return;
@@ -133,7 +150,7 @@ function CaptureRow({ capture, index, onClick }: { capture: typeof captures[numb
     const photos = row.querySelectorAll<HTMLElement>("[data-pile-photo]");
 
     photos.forEach((photo, photoIndex) => {
-      const photoX = (0.09 + photoIndex * 0.1025) * rect.width;
+      const photoX = ((firstLeft + photoIndex * leftStep) / 100) * rect.width;
       const proximity = Math.max(0, 1 - Math.abs(cursorX - photoX) / (rect.width * 0.24));
       const easedProximity = proximity * proximity * (3 - 2 * proximity);
       photo.style.setProperty("--pile-dip", `${(easedProximity * 9).toFixed(2)}px`);
@@ -150,14 +167,14 @@ function CaptureRow({ capture, index, onClick }: { capture: typeof captures[numb
     <button
       className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.captureItem}`}
       type="button"
-      aria-label={`Open ${capture.title}`}
+      aria-label={`Open ${title}`}
       onClick={onClick}
       onPointerMove={updateCursorDip}
       onPointerLeave={resetCursorDip}
     >
       <Arrow />
-      <span className={styles.captureTitle}>{capture.title}</span>
-      <span className={styles.date}>{capture.listDate}</span>
+      <span className={styles.captureTitle}>{title}</span>
+      {date ? <span className={styles.date}>{date}</span> : null}
       <span className={styles.capturePile} aria-hidden="true">
         {pile.map((src, photoIndex) => (
           <span
@@ -165,12 +182,12 @@ function CaptureRow({ capture, index, onClick }: { capture: typeof captures[numb
             data-pile-photo
             key={`${src}-${photoIndex}`}
             style={{
-              "--pile-left": `${9 + photoIndex * 10.25}%`,
+              "--pile-left": `${firstLeft + photoIndex * leftStep}%`,
               "--pile-tilt": `${pileTilts[(photoIndex + index) % pileTilts.length]}deg`,
               "--pile-shift": `${photoIndex % 2 === 0 ? -8 : 8}px`,
               "--pile-delay": `${photoIndex * 14}ms`,
-              "--pile-peek": `${pilePeeks[photoIndex]}px`,
-              "--pile-layer": 5 - Math.abs(photoIndex - 4),
+              "--pile-peek": `${isOtherWorkPile ? otherWorkPeeks[photoIndex] : pilePeeks[photoIndex]}px`,
+              "--pile-layer": 7 - Math.abs(photoIndex - (pile.length - 1) / 2),
             } as CSSProperties}
           >
             <span className={styles.pilePhotoInner}>
@@ -181,6 +198,10 @@ function CaptureRow({ capture, index, onClick }: { capture: typeof captures[numb
       </span>
     </button>
   );
+}
+
+function CaptureRow({ capture, index, onClick }: { capture: typeof captures[number]; index: number; onClick: () => void }) {
+  return <PileRow title={capture.title} date={capture.listDate} images={capture.images.slice(0, 9)} index={index} onClick={onClick} />;
 }
 
 function GalleryImage({ src, alt, first, smooth, naturalSize = false }: { src: string; alt: string; first: boolean; smooth: boolean; naturalSize?: boolean }) {
@@ -356,12 +377,217 @@ function VercelStory() {
   );
 }
 
+const chronoPhotos = [
+  { src: "/photo/chrono/DSCF4146.jpg", width: 1800, height: 1200, alt: "A teammate adding stickers during FigBuild" },
+  { src: "/photo/chrono/DSCF4157.jpg", width: 1800, height: 1200, alt: "Teammates working together at a laptop" },
+  { src: "/photo/chrono/DSCF4189.jpg", width: 1800, height: 1200, alt: "Two teammates beside sketches on a whiteboard" },
+  { src: "/photo/chrono/DSCF4175.jpg", width: 1800, height: 1200, displayAspect: "2 / 3", objectPosition: "55% center", alt: "Teammates preparing to film the demo" },
+];
+
+function ChronoStory() {
+  const images = work.find((project) => project.id === "chrono")!.images;
+
+  return (
+    <article className={storyStyles.story}>
+      <div className={storyStyles.prose}>
+        <p>Chrono is a time-journaling concept we designed over 48 hours for <a href="https://figbuild2026.devpost.com/" target="_blank" rel="noopener noreferrer">FigBuild 2026</a>, a weekend-long design hackathon where we ended up placing 2nd.</p>
+        <p>We started by exploring how strangely we experience time. Some days feel like they last forever, while entire weeks seem to disappear. We became interested in chronosensation, the idea of how we subjectively perceive time, and how we could design something that helps people become more conscious of that relationship.</p>
+      </div>
+
+      <div className={storyStyles.mediaGroup}>
+        {images.map((src, index) => (
+          <figure className={storyStyles.media} key={src}>
+            <GalleryImage src={src} alt={`Chrono design image ${index + 1}`} first={index === 0} smooth />
+          </figure>
+        ))}
+      </div>
+
+      <div className={`${storyStyles.prose} ${storyStyles.afterMedia}`}>
+        <p>The result was Chrono, a journaling experience built around reflecting on how time is spent and how it feels. We spent the weekend researching, designing, and putting together a presentation to communicate the idea.</p>
+        <p>You can also <a href="https://youtu.be/RY0h6cki00c?si=pNRiZzswBXBAWtp9" target="_blank" rel="noopener noreferrer">watch the demo video we submitted</a> for a closer look at the concept and how it works.</p>
+        <p>It was a really fun weekend getting to build something from scratch with friends, especially without overthinking it too much. I&apos;m happy with what we managed to make in just 48 hours.</p>
+      </div>
+
+      <hr className={`${storyStyles.divider} ${storyStyles.endDivider}`} />
+      <InternshipPhotos photos={chronoPhotos} title="Photos from FigBuild" backLabel="Chrono" galleryId="chrono-photo-gallery" />
+      <div className={storyStyles.closingNote}>
+        <p>Huge thanks to my teammates Mateo Tannahill, Michael Yen, and Sparsh Shah for making this such a fun project to work on.</p>
+      </div>
+    </article>
+  );
+}
+
+function MinimumStory() {
+  const images = work.find((project) => project.id === "minimum")!.images;
+  const brandingImages = images.slice(0, 2);
+  const interfaceImages = images.slice(2);
+
+  return (
+    <article className={storyStyles.story}>
+      <div className={storyStyles.prose}>
+        <p>Minimum was a cloud infrastructure startup I worked on with three friends throughout high school. We wanted to make deploying and managing cloud infrastructure simpler, with the longer-term ambition of making infrastructure increasingly autonomous.</p>
+        <p>I joined as the sole designer, knowing almost nothing about cloud infrastructure. I didn&apos;t really understand how deployments worked, what went into running an application, or why developers needed half the tools we were trying to build. I was learning everything as I went, often asking my teammates to explain technical concepts before I could even begin thinking about how to design for them.</p>
+        <p>Looking back, I think that was one of the best things about working on Minimum. I had to develop an understanding of the technology rather than just designing interfaces around things I already knew. It forced me to think about how complicated systems could be made approachable without taking away the control and flexibility that developers needed.</p>
+      </div>
+
+      <div className={storyStyles.mediaGroup}>
+        {brandingImages.map((src, index) => (
+          <figure className={storyStyles.media} key={src}>
+            <GalleryImage src={src} alt={`Minimum branding image ${index + 1}`} first={index === 0} smooth />
+          </figure>
+        ))}
+      </div>
+
+      <div className={`${storyStyles.prose} ${storyStyles.storySection}`}>
+        <h2>Experimenting with the interface</h2>
+        <p>Minimum was probably one of the most important projects in shaping how I design today. We were ambitious, and because we were so young, I don&apos;t think we felt particularly constrained by how things were supposed to look or work.</p>
+        <p>We pushed the interface in all sorts of directions, sometimes to an extreme. I spent countless hours experimenting with navigation, layouts, interactions, and different ways of representing infrastructure. We weren&apos;t particularly interested in making another conventional cloud dashboard. We wanted to question whether the conventions of existing developer tools were even the right ones to follow.</p>
+        <p>Not every experiment was good. Some were probably unnecessarily complicated, and others prioritized looking interesting over being useful. But I think having that freedom to break conventions, make mistakes, and figure out why something did or didn&apos;t work was incredibly valuable.</p>
+      </div>
+
+      <div className={storyStyles.mediaGroup}>
+        {interfaceImages.map((src, index) => (
+          <figure className={storyStyles.media} key={src}>
+            <GalleryImage src={src} alt={src === "/minimum/build-interface-framed.png" ? "Minimum frontend build interface with deployment logs" : `Minimum interface exploration ${index + 1}`} first={false} smooth />
+          </figure>
+        ))}
+      </div>
+
+      <div className={`${storyStyles.prose} ${storyStyles.afterMedia}`}>
+        <p>Below, you can see my first dashboard design alongside one of my last iterations. The difference is pretty dramatic, and you can see just how much I evolved over the course of the project. It&apos;s a fun reminder of how much you can learn by simply making things over and over again.</p>
+      </div>
+
+      <div className={storyStyles.mediaGroup}>
+        <figure className={storyStyles.media}>
+          <span className={storyStyles.screenshotFrame}>
+            <Image src="/minimum/first-dashboard-design-detail.png" alt="Early Minimum dashboard and service card explorations on a Figma canvas" width={3024} height={1822} sizes="(max-width: 700px) 100vw, 70vw" />
+          </span>
+        </figure>
+        <figure className={storyStyles.media}>
+          <span className={storyStyles.screenshotFrame}>
+            <Image src="/minimum/later-dashboard-design.png" alt="A later Minimum dashboard showing projects and filters" width={3456} height={2234} sizes="(max-width: 700px) 100vw, 70vw" />
+          </span>
+        </figure>
+      </div>
+
+      <div className={`${storyStyles.prose} ${storyStyles.storySection}`}>
+        <h2>A little ahead of ourselves</h2>
+        <p>One of our bigger ambitions with Minimum was the idea of autonomous infrastructure. We imagined a world where developers wouldn&apos;t have to spend so much time configuring, monitoring, and maintaining their infrastructure. Instead, software could increasingly handle those responsibilities on its own, identifying problems, making adjustments, and keeping things running.</p>
+        <p>This was before everyone started describing software as agentic, which makes it funny to look back on now. A lot of what we were imagining feels closely related to the direction that companies like Vercel are exploring today, especially around making infrastructure something developers have to think about less and less.</p>
+        <p>Obviously, we never got close to realizing the full vision, but I still think it&apos;s pretty cool that we were thinking about these problems so early.</p>
+      </div>
+
+      <div className={`${storyStyles.prose} ${storyStyles.storySection}`}>
+        <h2>Building with friends on the internet</h2>
+        <p>One of my favourite things about Minimum was how we worked together. We all met through Discord, and despite spending so much time building together, we barely ever got on calls.</p>
+        <p>I remember spending hours in Figma with <a href="https://x.com/dhrtzg" target="_blank" rel="noopener noreferrer">Dylan Hartzog</a>, moving things around, sharing ideas, and trying completely different directions, all without ever having spoken to each other. Almost everything happened through Discord messages. It was a pretty unconventional way of working, but somehow it worked for us.</p>
+      </div>
+
+      <figure className={`${storyStyles.media} ${storyStyles.singleMedia}`}>
+        <span className={storyStyles.screenshotFrame}>
+          <Image src="/minimum/discord-march-2024.png" alt="March 2024 Discord conversation about Minimum's future" width={3024} height={1834} sizes="(max-width: 700px) 100vw, 70vw" />
+        </span>
+      </figure>
+
+      <div className={`${storyStyles.prose} ${storyStyles.afterMedia}`}>
+        <p>Looking back at these conversations, it&apos;s kind of crazy how ambitious we were for a bunch of kids in high school. We were talking about building a company that could be worth billions, working on it full-time, and spending years turning it into something real. Meanwhile, I was still going to school every morning and spending my afternoons and evenings on Discord.</p>
+        <p>I think those hours after school shaped a lot of who I am today, both as a designer and as a person. I got to surround myself with people who were just as excited about building things as I was, despite us living completely different lives in different places. We took our ideas seriously, even when they were probably a little ridiculous, and I think there&apos;s something really valuable about that kind of ambition at such a young age.</p>
+        <p>Eventually, Minimum came to an end. We were all getting busier with school and our own lives, and the reality of graduating and figuring out our futures started to set in. It became harder to give the project the time and attention it deserved, and we slowly moved on to other things.</p>
+      </div>
+
+      <figure className={`${storyStyles.media} ${storyStyles.singleMedia}`}>
+        <span className={storyStyles.screenshotFrame}>
+          <Image src="/minimum/discord-october-2025.png" alt="October 2025 Discord message saying rip minimum" width={3024} height={1832} sizes="(max-width: 700px) 100vw, 70vw" />
+        </span>
+      </figure>
+
+      <div className={`${storyStyles.prose} ${storyStyles.afterMedia}`}>
+        <p>Although Minimum never became the company we imagined, I&apos;m incredibly glad we worked on it. It gave me a place to experiment without worrying too much about getting everything right, develop my taste, and learn how to think through complicated product problems.</p>
+        <p>I don&apos;t think I&apos;d be the designer I am today without this project.</p>
+      </div>
+    </article>
+  );
+}
+
+function UnordinaryStory() {
+  const images = work.find((project) => project.id === "unordinary")!.images;
+  const identityImages = images.slice(0, 2);
+  const discoveryImages = [images[7], images[2]];
+  const detailImages = [images[5], images[6], images[3], images[4]];
+
+  return (
+    <article className={storyStyles.story}>
+      <div className={storyStyles.prose}>
+        <p>After <a href="/work/minimum">our last project</a> came to an end, <a href="https://x.com/dhrtzg" target="_blank" rel="noopener noreferrer">Dylan</a> and I found ourselves looking for something new to work on. Around the same time, <a href="https://x.com/read_cv" target="_blank" rel="noopener noreferrer">Read.cv</a>, a platform we both really admired, had announced it was shutting down after being acquired by Perplexity.</p>
+        <p>For those unfamiliar, Read.cv was a professional network for creatives. It gave designers, engineers, and other interesting people a place to share their work, discover others, and find opportunities. Unlike traditional professional networks like LinkedIn, it felt much more personal and thoughtful. It celebrated the work people made rather than just their job titles.</p>
+        <p>We loved what Read.cv represented, and seeing it disappear felt like a real loss for the creative community. So we decided to try building something that could carry some of those values forward.</p>
+      </div>
+
+      <div className={storyStyles.mediaGroup}>
+        {identityImages.map((src, index) => (
+          <figure className={storyStyles.media} key={src}>
+            <GalleryImage src={src} alt={index === 0 ? "Unordinary wordmark on a colorful background" : "Unordinary identity with colorful geometric symbols"} first={index === 0} smooth />
+          </figure>
+        ))}
+      </div>
+
+      <hr className={storyStyles.divider} />
+
+      <div className={storyStyles.prose}>
+        <h2>Making something of our own</h2>
+        <p>That&apos;s how Unordinary started. We wanted to build a place where people could showcase their work, discover interesting people, and find opportunities, but we also wanted to put our own spin on the experience.</p>
+        <p>While Read.cv was a big inspiration, we weren&apos;t interested in simply recreating it. We wanted to push the design further, rethink how profiles and work could be presented, and make the whole experience feel a little more expressive and enjoyable to use.</p>
+      </div>
+
+      <div className={storyStyles.mediaGroup}>
+        {discoveryImages.map((src, index) => (
+          <figure className={storyStyles.media} key={src}>
+            <GalleryImage src={src} alt={index === 0 ? "Unordinary landing page inviting people to create a profile" : "Unordinary discovery page showing creative work and profiles"} first={false} smooth />
+          </figure>
+        ))}
+      </div>
+
+      <div className={`${storyStyles.prose} ${storyStyles.afterMedia}`}>
+        <p>A lot of my time went into experimenting with the interface, from profiles and navigation to the smaller interactions that made the product feel more considered. I wanted Unordinary to feel like something people would genuinely enjoy spending time on, rather than another professional platform they felt obligated to use.</p>
+      </div>
+
+      <div className={storyStyles.mediaGroup}>
+        {detailImages.map((src, index) => (
+          <figure className={storyStyles.media} key={src}>
+            <GalleryImage src={src} alt={["Unordinary experience editor", "Unordinary account settings", "Unordinary jobs page", "Unordinary job listing form"][index]} first={false} smooth />
+          </figure>
+        ))}
+      </div>
+
+      <hr className={storyStyles.divider} />
+
+      <div className={storyStyles.prose}>
+        <h2>A month of building</h2>
+        <p>Most of Unordinary came together in roughly a month-long sprint. We spent a lot of time designing, building, changing our minds, and trying to get as much of the product working as we could.</p>
+        <p>It was a really fun project to work on, especially coming out of something as long-running as Minimum. There was something refreshing about starting with a relatively clear idea and seeing how far we could take it in such a short period of time.</p>
+        <p>You can actually visit <a href="https://www.unordinary.app/" target="_blank" rel="noopener noreferrer">Unordinary</a> today, although we never really launched it publicly. There are probably plenty of gaps in the product, unfinished ideas, and things I&apos;d approach differently now.</p>
+        <p>Still, I&apos;m really happy with what we made. I think there&apos;s something special about building a product simply because you wish it existed. We weren&apos;t trying to reinvent professional networking or build the next big company. We just missed something we loved and wanted to see what our own version of it could look like.</p>
+      </div>
+    </article>
+  );
+}
+
 function DetailContent({ selection }: { selection: Selection }) {
+  if (selection.kind === "writing") return null;
   if (selection.kind === "work" && work[selection.index].id === "vercel-2026") {
     return <VercelStory />;
   }
+  if (selection.kind === "work" && work[selection.index].id === "chrono") {
+    return <ChronoStory />;
+  }
+  if (selection.kind === "work" && work[selection.index].id === "minimum") {
+    return <MinimumStory />;
+  }
+  if (selection.kind === "work" && work[selection.index].id === "unordinary") {
+    return <UnordinaryStory />;
+  }
 
-  if (selection.kind === "workAll" || selection.kind === "captureAll" || selection.kind === "writingAll") return null;
+  if (selection.kind === "workAll" || selection.kind === "otherWorkAll" || selection.kind === "captureAll" || selection.kind === "writingAll") return null;
 
   const images: readonly string[] = selection.kind === "work"
     ? work[selection.index].images
@@ -388,9 +614,14 @@ function DetailContent({ selection }: { selection: Selection }) {
 function selectionFromPath(pathname: string): Selection | null {
   if (/^\/writing\/?$/.test(pathname)) return { kind: "writingAll" };
   if (/^\/work\/?$/.test(pathname)) return { kind: "workAll" };
+  if (/^\/work\/other-work\/?$/.test(pathname)) return { kind: "otherWorkAll" };
   if (/^\/captures\/?$/.test(pathname)) return { kind: "captureAll" };
-  const match = pathname.match(/^\/(work|captures)\/([^/]+)\/?$/);
+  const match = pathname.match(/^\/(writing|work|captures)\/([^/]+)\/?$/);
   if (!match) return null;
+  if (match[1] === "writing") {
+    const index = writing.findIndex((article) => article.id === match[2]);
+    return index < 0 ? null : { kind: "writing", index };
+  }
   if (match[1] === "work") {
     const index = work.findIndex((project) => project.slug === match[2] || project.id === match[2]);
     return index < 0 ? null : { kind: "work", index };
@@ -402,9 +633,11 @@ function selectionFromPath(pathname: string): Selection | null {
 function pathFor(selection: Selection | null) {
   if (!selection) return "/";
   switch (selection.kind) {
+    case "writing": return `/writing/${writing[selection.index].id}`;
     case "work": return `/work/${work[selection.index].slug}`;
     case "capture": return `/captures/${captures[selection.index].slug}`;
     case "workAll": return "/work";
+    case "otherWorkAll": return "/work/other-work";
     case "captureAll": return "/captures";
     case "writingAll": return "/writing";
   }
@@ -420,7 +653,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   useEffect(() => {
     function parentFromHistory() {
       const parent = selectionFromPath(window.history.state?.canvasParent ?? "/");
-      return parent?.kind === "workAll" || parent?.kind === "captureAll" || parent?.kind === "writingAll" ? parent : null;
+      return parent?.kind === "workAll" || parent?.kind === "otherWorkAll" || parent?.kind === "captureAll" || parent?.kind === "writingAll" ? parent : null;
     }
     function syncFromHistory() {
       if (transitionTimer.current) clearTimeout(transitionTimer.current);
@@ -442,7 +675,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
 
   function openDetail(next: Selection) {
     if (phase !== "home" && phase !== "detail") return;
-    const fromList = phase === "detail" && (selection?.kind === "workAll" || selection?.kind === "captureAll" || selection?.kind === "writingAll");
+    const fromList = phase === "detail" && (selection?.kind === "workAll" || selection?.kind === "otherWorkAll" || selection?.kind === "captureAll" || selection?.kind === "writingAll");
     const parent = fromList ? selection : null;
     setParentSelection(parent);
     window.history.pushState({ ...window.history.state, canvasParent: pathFor(parent) }, "", pathFor(next));
@@ -457,11 +690,11 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   const goBack = useCallback(() => {
     if (phase !== "detail") return;
     const next = parentSelection;
-    window.history.pushState({ ...window.history.state, canvasParent: "/" }, "", pathFor(next));
+    window.history.pushState({ ...window.history.state, canvasParent: next?.kind === "otherWorkAll" ? "/work" : "/" }, "", pathFor(next));
     setPhase("leavingDetail");
     transitionTimer.current = setTimeout(() => {
       setSelection(next);
-      setParentSelection(null);
+      setParentSelection(next?.kind === "otherWorkAll" ? { kind: "workAll" } : null);
       setPhase(next ? "detail" : "home");
       window.scrollTo({ top: 0, behavior: "instant" });
     }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : transitionOutMs + transitionPauseMs);
@@ -477,7 +710,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   }, [phase, goBack]);
 
   const navigationLabel = selection ? getTitle(selection) : "Raghav Agarwal";
-  const navigationDate = selection?.kind === "capture" ? captures[selection.index].date
+  const navigationDate = selection?.kind === "writing" ? writing[selection.index].date : selection?.kind === "capture" ? captures[selection.index].date
     : selection?.kind === "work" ? work[selection.index].year : null;
   const isVercelWork = selection?.kind === "work" && work[selection.index].id === "vercel-2026";
 
@@ -506,14 +739,14 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
         <div className={styles.navigation}>
           <div className={styles.group}>
             <div className={styles.section}>Work</div>
-            {work.slice(0, homeItemLimit).map((project, index) => (
+            {mainWork.slice(0, homeWorkLimit).map(({ project, index }) => (
               <button className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={project.name} type="button" onClick={() => openDetail({ kind: "work", index })}>
                 <Arrow />
                 <span className={styles.arrowTitle}>{project.name}</span>
                 {project.id === "vercel-2026" ? <NewLabel /> : project.year ? <span className={styles.date}>{project.year}</span> : null}
               </button>
             ))}
-            {work.length > homeItemLimit && (
+            {allWork.length > homeWorkLimit && (
             <button className={`${styles.viewAll} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} type="button" onClick={() => openDetail({ kind: "workAll" })}>
               <Arrow />
               <span className={styles.arrowTitle}>View all</span>
@@ -523,12 +756,17 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
 
           <div className={styles.group}>
             <div className={styles.section}>Writing</div>
-            {writingPlaceholders.slice(0, homeItemLimit).map((placeholder) => (
+            {writing.slice(0, homeItemLimit).map((article, index) => (
+              <button className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={article.id} type="button" onClick={() => openDetail({ kind: "writing", index })}>
+                <Arrow /><span className={styles.arrowTitle}>{article.title}</span><span className={styles.date}>{article.date}</span>
+              </button>
+            ))}
+            {writingPlaceholders.slice(0, Math.max(0, homeItemLimit - writing.length)).map((placeholder) => (
               <div className={`${styles.item} ${styles.listItem} ${styles.placeholderItem}`} key={placeholder}>
                 <span>Placeholder</span>
               </div>
             ))}
-            {writingPlaceholders.length > homeItemLimit && (
+            {writing.length > homeItemLimit && (
             <button className={`${styles.viewAll} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} type="button" onClick={() => openDetail({ kind: "writingAll" })}>
               <Arrow /><span className={styles.arrowTitle}>View all</span>
             </button>
@@ -555,7 +793,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
       <div className={`${styles.detail} ${phase === "detail" ? styles.detailActive : ""}`} inert={phase !== "detail"}>
         {selection && (
           <>
-            <div className={styles.detailSidebar}>
+            <div className={`${styles.detailSidebar} ${selection.kind === "writing" ? styles.writingSidebar : ""}`}>
               <h1 className={styles.detailHeading} aria-label={navigationLabel}>
                 <button className={`${styles.detailBackRow} ${styles.arrowItem}`} type="button" onClick={goBack} aria-label={parentSelection ? `Back to ${getTitle(parentSelection)}` : "Back to home"}>
                   <BackArrow />
@@ -563,24 +801,31 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
                   {isVercelWork ? <NewLabel /> : navigationDate ? <span className={styles.detailDate}>{navigationDate}</span> : null}
                 </button>
               </h1>
-              {selection.kind === "workAll" || selection.kind === "captureAll" || selection.kind === "writingAll" ? (
+              {selection.kind === "workAll" || selection.kind === "otherWorkAll" || selection.kind === "captureAll" || selection.kind === "writingAll" ? (
                   <div className={`${styles.detailList} ${styles.navigation}`}>
-                    {selection.kind === "workAll" ? work.map((project, index) => (
+                    {selection.kind === "workAll" ? allWork.map(({ project, index }) => (
                       <button className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={project.id} type="button" onClick={() => openDetail({ kind: "work", index })}>
                         <Arrow />
                         <span className={styles.arrowTitle}>{project.name}</span>
                         {project.id === "vercel-2026" ? <NewLabel /> : project.year ? <span className={styles.date}>{project.year}</span> : null}
                       </button>
-                    )) : selection.kind === "writingAll" ? writingPlaceholders.map((placeholder) => (
-                      <div className={`${styles.item} ${styles.listItem} ${styles.placeholderItem}`} key={placeholder}><span>Placeholder</span></div>
+                    ))
+                    : selection.kind === "otherWorkAll" ? otherWork.map(({ project, index }) => (
+                      <button className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={project.id} type="button" onClick={() => openDetail({ kind: "work", index })}>
+                        <Arrow />
+                        <span className={styles.arrowTitle}>{project.name}</span>
+                        {project.year ? <span className={styles.date}>{project.year}</span> : null}
+                      </button>
+                    )) : selection.kind === "writingAll" ? writing.map((article, index) => (
+                      <button className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={article.id} type="button" onClick={() => openDetail({ kind: "writing", index })}><Arrow /><span className={styles.arrowTitle}>{article.title}</span><span className={styles.date}>{article.date}</span></button>
                     )) : captures.map((capture, index) => (
                       <CaptureRow capture={capture} index={index} key={capture.title} onClick={() => openDetail({ kind: "capture", index })} />
                     ))}
                   </div>
               ) : null}
             </div>
-            {selection.kind !== "workAll" && selection.kind !== "captureAll" && selection.kind !== "writingAll" && (
-              <div className={`${styles.detailContent} ${selection.kind === "capture" ? styles.captureContent : ""} ${selection.kind === "work" && work[selection.index].id === "vercel-2026" ? styles.storyContent : ""}`}>
+            {selection.kind !== "workAll" && selection.kind !== "otherWorkAll" && selection.kind !== "captureAll" && selection.kind !== "writingAll" && (
+              <div className={`${styles.detailContent} ${selection.kind === "writing" ? styles.writingContent : ""} ${selection.kind === "capture" ? styles.captureContent : ""} ${selection.kind === "work" && ["vercel-2026", "chrono", "minimum", "unordinary"].includes(work[selection.index].id) ? styles.storyContent : ""}`}>
                 <DetailContent selection={selection} />
               </div>
             )}
