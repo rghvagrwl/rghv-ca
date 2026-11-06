@@ -454,13 +454,13 @@ function MinimumStory() {
       </div>
 
       <div className={`${storyStyles.prose} ${storyStyles.afterMedia}`}>
-        <p>Below, you can see my first dashboard design alongside one of my last iterations. The difference is pretty dramatic, and you can see just how much I evolved over the course of the project. It&apos;s a fun reminder of how much you can learn by simply making things over and over again.</p>
+        <p>Below, you can see my first dashboard design alongside early iterations from 2022. The difference from that to the final work is pretty dramatic, and you can see just how much I evolved over the course of the project. It&apos;s a fun reminder of how much you can learn by simply making things over and over again.</p>
       </div>
 
       <div className={storyStyles.mediaGroup}>
         <figure className={storyStyles.media}>
           <span className={storyStyles.screenshotFrame}>
-            <Image src="/minimum/first-dashboard-design-detail.png" alt="Early Minimum dashboard and service card explorations on a Figma canvas" width={3024} height={1822} sizes="(max-width: 700px) 100vw, 70vw" />
+            <Image src="/minimum/first-dashboard-design-detail.png" alt="Early Minimum dashboard iterations and feedback on a Figma canvas" width={3024} height={1822} sizes="(max-width: 700px) 100vw, 70vw" />
           </span>
         </figure>
         <figure className={storyStyles.media}>
@@ -495,11 +495,18 @@ function MinimumStory() {
         <p>Eventually, Minimum came to an end. We were all getting busier with school and our own lives, and the reality of graduating and figuring out our futures started to set in. It became harder to give the project the time and attention it deserved, and we slowly moved on to other things.</p>
       </div>
 
-      <figure className={`${storyStyles.media} ${storyStyles.singleMedia}`}>
-        <span className={storyStyles.screenshotFrame}>
-          <Image src="/minimum/discord-october-2025.png" alt="October 2025 Discord message saying rip minimum" width={3024} height={1832} sizes="(max-width: 700px) 100vw, 70vw" />
-        </span>
-      </figure>
+      <div className={storyStyles.mediaGroup}>
+        <figure className={storyStyles.media}>
+          <span className={storyStyles.screenshotFrame}>
+            <Image src="/minimum/minimum-final-website.png" alt="Minimum website with the cloud platform introduction and build logs" width={2880} height={1620} sizes="(max-width: 700px) 100vw, 70vw" />
+          </span>
+        </figure>
+        <figure className={storyStyles.media}>
+          <span className={storyStyles.screenshotFrame}>
+            <Image src="/minimum/discord-october-2025.png" alt="October 2025 Discord message saying rip minimum" width={3024} height={1832} sizes="(max-width: 700px) 100vw, 70vw" />
+          </span>
+        </figure>
+      </div>
 
       <div className={`${storyStyles.prose} ${storyStyles.afterMedia}`}>
         <p>Although Minimum never became the company we imagined, I&apos;m incredibly glad we worked on it. It gave me a place to experiment without worrying too much about getting everything right, develop my taste, and learn how to think through complicated product problems.</p>
