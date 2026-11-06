@@ -6,7 +6,7 @@
   },
   "work": {
     "title": "Selected work",
-    "description": "Product, brand, and digital interfaces.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work.png"
   },
   "captures": {
@@ -14,89 +14,94 @@
     "description": "Places, people, and moments along the way.",
     "image": "/og/captures.png"
   },
+  "writing": {
+    "title": "Writing",
+    "description": "By Raghav Agarwal",
+    "image": "/og/writing.png"
+  },
   "work-vercel": {
     "title": "Vercel",
-    "description": "Vercel, 2026. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-vercel.png"
   },
   "work-ando": {
     "title": "Ando",
-    "description": "Ando, 2026. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-ando.png"
   },
   "work-chrono": {
     "title": "Chrono",
-    "description": "Chrono, 2026. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-chrono.png"
   },
   "work-socratica": {
     "title": "Socratica",
-    "description": "Socratica, 2025. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-socratica.png"
   },
   "work-tembo": {
     "title": "Tembo",
-    "description": "Tembo, 2026. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-tembo.png"
   },
   "work-context": {
     "title": "Context",
-    "description": "Context, 2025. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-context.png"
   },
   "work-instafleet": {
     "title": "Instafleet",
-    "description": "Instafleet, 2025. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-instafleet.png"
   },
   "work-merge-club": {
     "title": "Merge",
-    "description": "Merge, 2025. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-merge-club.png"
   },
   "work-on-deck-founders": {
     "title": "ODF",
-    "description": "ODF, 2025. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-on-deck-founders.png"
   },
   "work-prism-collective": {
     "title": "Prism Collective",
-    "description": "Prism Collective, 2025. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-prism-collective.png"
   },
   "work-unordinary": {
     "title": "Unordinary",
-    "description": "Unordinary, 2024. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-unordinary.png"
   },
   "work-crisped": {
     "title": "Crisped",
-    "description": "Crisped, 2024. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-crisped.png"
   },
   "work-zero-email": {
     "title": "Zero",
-    "description": "Zero, 2024. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-zero-email.png"
   },
   "work-minimum": {
     "title": "Minimum",
-    "description": "Minimum, 2022. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-minimum.png"
   },
   "work-faktor": {
     "title": "Faktor",
-    "description": "Faktor, 2022. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-faktor.png"
   },
   "work-para": {
     "title": "Para",
-    "description": "Para, 2022. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-para.png"
   },
   "work-no-category": {
     "title": "Miscellaneous",
-    "description": "Miscellaneous, selected work. A design project by Raghav Agarwal.",
+    "description": "By Raghav Agarwal",
     "image": "/og/work-no-category.png"
   },
   "capture-tonys-pizza-in-sf": {
