@@ -197,29 +197,44 @@ export default function VisitorLogPage() {
         </span>{"\n"}
         {"\n\n"}
         {groups.length === 0 ? <span className={styles.muted}>no visits yet</span> : null}
-        <span className={styles.list}>
-          {groups.map((group, groupIndex) => <span key={group.id}>
-            {groupIndex > 0 ? "\n" : null}
-            {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <><span className={styles.day}>{group.day}</span>{"\n\n"}</> : null}
-            {liveSessions.includes(group.session) ? <><span className={styles.live}>Live</span>{"  "}</> : LIVE_COLUMN_SPACES}
-            <time className={styles.sessionTime}>{timeColumn(group.latest)}</time>{"  "}
-            {mapsUrl(group) ?
-              <a className={styles.location} href={mapsUrl(group) ?? undefined} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
-                {locationLabel(group)}
-              </a> : <span className={styles.location}>{locationLabel(group)}</span>}{"  "}
-            <SessionAge at={group.latest} asOf={asOf} live={liveSessions.includes(group.session)} />
-            {"\n"}{DETAIL_INDENT}<span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
-            {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
-            {"\n"}
-            {group.events.filter((item) => item.kind !== "duration").map((item, index) =>
-              <span key={`${item.at}-${index}`}>
-                {LIVE_COLUMN_SPACES}
-                <time className={styles.eventTime}>{timeColumn(item.at)}</time>{"  "}
-                <span className={styles.action}>{item.kind === "page" ? "visited" : "opened"}</span>{"  "}
-                <span className={styles.path}>{item.path}</span>{"\n"}
-              </span>) }
-          </span>)}
-        </span>
+        <div className={styles.list}>
+          {groups.map((group, groupIndex) => {
+            const live = liveSessions.includes(group.session);
+            const map = mapsUrl(group);
+            return <section className={styles.group} key={group.id}>
+              {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <div className={styles.day}>{group.day}</div> : null}
+              <div className={styles.sessionLine}>
+                <span className={styles.timeBlock}>
+                  <span className={live ? styles.livePrefixActive : styles.livePrefix}>
+                    {live ? <><span className={styles.live}>Live</span>{"  "}</> : LIVE_COLUMN_SPACES}
+                  </span>
+                  <time className={styles.sessionTime}>{timeColumn(group.latest)}</time>
+                </span>
+                <span className={styles.separator}>{"  "}</span>
+                {map ?
+                  <a className={styles.location} href={map} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
+                    {locationLabel(group)}
+                  </a> : <span className={styles.location}>{locationLabel(group)}</span>}
+                <span className={styles.separator}>{"  "}</span>
+                <SessionAge at={group.latest} asOf={asOf} live={live} />
+              </div>
+              <div className={styles.details}>
+                <span className={styles.detailIndent}>{DETAIL_INDENT}</span>
+                <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
+                {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
+              </div>
+              {group.events.filter((item) => item.kind !== "duration").map((item, index) =>
+                <div className={styles.eventLine} key={`${item.at}-${index}`}>
+                  <span className={styles.eventClock}><span className={styles.eventPrefix}>{LIVE_COLUMN_SPACES}</span><time className={styles.eventTime}>{timeColumn(item.at)}</time></span>
+                  <span className={styles.separator}>{"  "}</span>
+                  <span className={styles.eventDescription}>
+                    <span className={styles.action}>{item.kind === "page" ? "visited" : "opened"}</span>{"  "}
+                    <span className={styles.path}>{item.path}</span>
+                  </span>
+                </div>) }
+            </section>;
+          })}
+        </div>
         {events.length < total && events.length < 5000 ?
           <>{"\n"}<button className={styles.more} type="button" disabled={busy} onClick={() => void load(events.length)}>
             {busy ? "loading..." : `[load ${Math.min(PAGE_SIZE, total - events.length)} more]`}

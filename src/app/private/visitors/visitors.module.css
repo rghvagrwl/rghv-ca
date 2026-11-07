@@ -21,7 +21,9 @@
 .page button:disabled { color: rgba(255, 255, 255, .5); cursor: default; }
 .summary { color: rgba(255, 255, 255, .75); }
 .now { color: #00bfff; }
-.day { color: #fff; }
+.group + .group { margin-top: 1lh; }
+.day { margin-bottom: 1lh; color: #fff; }
+.sessionLine, .details, .eventLine { white-space: pre-wrap; }
 .sessionTime, .eventTime { color: rgba(255, 255, 255, .5); }
 .sessionId { color: rgba(255, 255, 255, .75); }
 .age { color: rgba(255, 255, 255, .75); }
@@ -43,4 +45,28 @@
 
 @media (max-width: 600px) {
   .page { padding: 20px 16px 60px; font-size: 11px; }
+  .list { white-space: normal; }
+  .group + .group { margin-top: 2.2em; }
+  .day { margin-bottom: 1.4em; }
+  .sessionLine {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 1ch;
+    row-gap: 2px;
+    white-space: normal;
+  }
+  .sessionLine .location { grid-column: 1; grid-row: 1; min-width: 0; overflow-wrap: anywhere; }
+  .sessionLine .age { grid-column: 2; grid-row: 1; white-space: nowrap; }
+  .timeBlock { grid-column: 1 / -1; grid-row: 2; }
+  .livePrefix { display: none; }
+  .separator, .detailIndent, .eventPrefix { display: none; }
+  .details { margin: 2px 0 5px; white-space: normal; }
+  .eventLine {
+    display: grid;
+    grid-template-columns: 15ch minmax(0, 1fr);
+    column-gap: 2ch;
+    white-space: normal;
+  }
+  .eventClock { white-space: nowrap; }
+  .eventDescription { min-width: 0; overflow-wrap: anywhere; }
 }
