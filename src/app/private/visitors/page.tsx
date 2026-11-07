@@ -27,7 +27,7 @@ function duration(ms: number) {
   return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 }
 
-type Group = { id: string; visitor: string; city: string; country: string; start: number; latest: number; events: VisitorEvent[]; activeMs: number };
+type Group = { id: string; visitor: string; city: string; country: string; postalCode?: string; start: number; latest: number; events: VisitorEvent[]; activeMs: number };
 
 function eventKey(event: VisitorEvent) {
   return `${event.at}:${event.session}:${event.kind}:${event.path}:${event.durationMs ?? ""}`;
@@ -37,6 +37,7 @@ export default function VisitorLogPage() {
   const [events, setEvents] = useState<VisitorEvent[]>([]);
   const [total, setTotal] = useState(0);
   const [liveSessions, setLiveSessions] = useState<string[]>([]);
+  const [locationMode, setLocationMode] = useState<"location" | "city">("location");
   const [status, setStatus] = useState<"loading" | "locked" | "ready" | "error" | "unconfigured">("loading");
   const [key, setKey] = useState("");
   const [message, setMessage] = useState("");
@@ -106,12 +107,13 @@ export default function VisitorLogPage() {
     for (const event of events) {
       let group = byId.get(event.session);
       if (!group) {
-        group = { id: event.session, visitor: event.visitor, city: event.city, country: event.country,
+        group = { id: event.session, visitor: event.visitor, city: event.city, country: event.country, postalCode: event.postalCode,
           start: event.at, latest: event.at, events: [], activeMs: 0 };
         byId.set(event.session, group);
       }
       group.start = Math.min(group.start, event.at);
       group.latest = Math.max(group.latest, event.at);
+      group.postalCode ??= event.postalCode;
       group.events.push(event);
       if (event.kind === "duration") group.activeMs += event.durationMs ?? 0;
     }
@@ -147,12 +149,17 @@ export default function VisitorLogPage() {
         {"\n\n"}<span className={liveSessions.length ? styles.now : styles.muted}>
           {liveSessions.length ? `${liveSessions.length} visitor${liveSessions.length === 1 ? "" : "s"} now` : "No visitors now"}
         </span>{"\n"}
-        <span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}</span>{"\n\n"}
+        <span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}</span>{"\n"}
+        <span className={styles.switcher} role="group" aria-label="Location display">
+          <button type="button" className={locationMode === "location" ? styles.selected : undefined} aria-pressed={locationMode === "location"} onClick={() => setLocationMode("location")}>location</button>
+          {" / "}
+          <button type="button" className={locationMode === "city" ? styles.selected : undefined} aria-pressed={locationMode === "city"} onClick={() => setLocationMode("city")}>city</button>
+        </span>{"\n\n"}
         {groups.length === 0 ? <span className={styles.muted}>no visits yet</span> : null}
         <span className={styles.list}>
           {groups.map((group, groupIndex) => <span key={group.id}>
             {groupIndex > 0 ? "\n" : null}
-            <span className={styles.location}>{group.city}, {group.country}</span>{"  "}
+            <span className={styles.location}>{locationMode === "location" && group.postalCode ? `~ ${group.postalCode}, ` : ""}{group.city}, {group.country}</span>{"  "}
             <time className={styles.sessionTime}>{clock(group.start)}</time>{"  "}
             <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
             {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}

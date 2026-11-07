@@ -18,6 +18,7 @@ export type VisitorEvent = {
   at: number;
   city: string;
   country: string;
+  postalCode?: string;
   durationMs?: number;
 };
 

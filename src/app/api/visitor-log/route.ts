@@ -83,6 +83,8 @@ export async function POST(request: NextRequest) {
   try { city = decodeURIComponent(rawCity); } catch { /* Keep undecoded city. */ }
   city = city.trim().slice(0, 80) || "Unknown";
   const country = (request.headers.get("x-vercel-ip-country") ?? "").trim().slice(0, 2) || "Unknown";
+  const rawPostalCode = (request.headers.get("x-vercel-ip-postal-code") ?? "").trim().slice(0, 16);
+  const postalCode = /^[A-Za-z0-9][A-Za-z0-9 -]*$/.test(rawPostalCode) ? rawPostalCode : undefined;
   if (city.toUpperCase() === "MADIUN" && country.toUpperCase() === "ID") {
     return new Response(null, { status: 204 });
   }
@@ -99,6 +101,7 @@ export async function POST(request: NextRequest) {
     at: Date.now(),
     city,
     country,
+    ...(postalCode ? { postalCode } : {}),
     ...(kind === "duration" ? { durationMs: Math.min(Math.max(durationMs as number, 0), 60 * 60 * 1000) } : {}),
   };
   try {
