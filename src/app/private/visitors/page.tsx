@@ -138,10 +138,10 @@ export default function VisitorLogPage() {
     <main className={styles.page}>
       <header className={styles.header}>
         <span className={styles.prompt}>rghv@site:~$</span>{" tail visitor.log"}
-        {status === "ready" ? <span>{"    "}
-          <button type="button" onClick={() => void load()} disabled={busy}>[refresh]</button>{"  "}
+        {status === "ready" ? <>{"\n"}
+          <button type="button" onClick={() => void load()} disabled={busy}>[refresh]</button>{"\n"}
           <button type="button" onClick={() => void lock()}>[sign out]</button>
-        </span> : null}
+        </> : null}
       </header>
 
       {status === "loading" ? <p className={styles.muted}>loading...</p> : null}
@@ -184,7 +184,7 @@ export default function VisitorLogPage() {
             {"\n"}
             {[...group.events].reverse().filter((item) => item.kind !== "duration").map((item, index) =>
               <span key={`${item.at}-${index}`}>
-                {"  > "}<time className={styles.eventTime}>{time(item.at)}</time>{"  "}
+                {"> "}<time className={styles.eventTime}>{time(item.at)}</time>{"  "}
                 <span className={styles.action}>{item.kind === "page" ? "visited" : "opened "}</span>{"  "}
                 <span className={styles.path}>{item.path}</span>{"\n"}
               </span>) }
