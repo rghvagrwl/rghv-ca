@@ -25,9 +25,14 @@ function duration(ms: number) {
 
 type Group = { id: string; visitor: string; city: string; country: string; start: number; latest: number; events: VisitorEvent[]; activeMs: number };
 
+function eventKey(event: VisitorEvent) {
+  return `${event.at}:${event.session}:${event.kind}:${event.path}:${event.durationMs ?? ""}`;
+}
+
 export default function VisitorLogPage() {
   const [events, setEvents] = useState<VisitorEvent[]>([]);
   const [total, setTotal] = useState(0);
+  const [liveSessions, setLiveSessions] = useState<string[]>([]);
   const [status, setStatus] = useState<"loading" | "locked" | "ready" | "error" | "unconfigured">("loading");
   const [key, setKey] = useState("");
   const [message, setMessage] = useState("");
@@ -40,9 +45,15 @@ export default function VisitorLogPage() {
       if (response.status === 401) { setStatus("locked"); return; }
       if (response.status === 503) { setStatus("unconfigured"); return; }
       if (!response.ok) throw new Error();
-      const data = (await response.json()) as { events: VisitorEvent[]; total: number };
-      setEvents((old) => offset ? [...old, ...data.events] : data.events);
+      const data = (await response.json()) as { events: VisitorEvent[]; total: number; liveSessions: string[] };
+      setEvents((old) => {
+        if (offset) return [...old, ...data.events];
+        if (old.length <= PAGE_SIZE) return data.events;
+        const latest = new Set(data.events.map(eventKey));
+        return [...data.events, ...old.filter((event) => !latest.has(eventKey(event)))].slice(0, 5000);
+      });
       setTotal(data.total);
+      setLiveSessions(data.liveSessions ?? []);
       setStatus("ready");
       setMessage("");
     } catch {
@@ -54,6 +65,13 @@ export default function VisitorLogPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    if (status !== "ready") return;
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === "visible") void load();
+    }, 30_000);
+    return () => window.clearInterval(interval);
+  }, [load, status]);
 
   async function unlock(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,6 +93,7 @@ export default function VisitorLogPage() {
   async function lock() {
     await fetch("/api/visitor-log/auth", { method: "DELETE" });
     setEvents([]);
+    setLiveSessions([]);
     setStatus("locked");
   }
 
@@ -101,7 +120,7 @@ export default function VisitorLogPage() {
         <span className={styles.prompt}>rghv@site:~$</span>{" tail visitor.log"}
         {status === "ready" ? <span>{"    "}
           <button type="button" onClick={() => void load()} disabled={busy}>[refresh]</button>{"  "}
-          <button type="button" onClick={() => void lock()}>[lock]</button>
+          <button type="button" onClick={() => void lock()}>[sign out]</button>
         </span> : null}
       </header>
 
@@ -121,7 +140,7 @@ export default function VisitorLogPage() {
       {status === "error" ? <div><p className={styles.error}>{message}</p><button type="button" onClick={() => void load()}>[retry]</button></div> : null}
 
       {status === "ready" ? <>
-        {"\n\n"}<span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}{"  "}<span>/ Toronto time</span></span>{"\n\n"}
+        {"\n\n"}<span className={styles.summary}>{liveSessions.length} live now{"  /  "}{events.length === total ? `${total} events` : `${events.length} of ${total} events`}{"  "}<span>/ Toronto time</span></span>{"\n\n"}
         {groups.length === 0 ? <span className={styles.muted}>no visits yet</span> : null}
         <span className={styles.list}>
           {groups.map((group, groupIndex) => <span key={group.id}>
@@ -130,6 +149,7 @@ export default function VisitorLogPage() {
             <time className={styles.sessionTime}>{clock(group.start)}</time>{"  "}
             <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
             {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
+            {liveSessions.includes(group.id) ? <>{"  "}<span className={styles.live}>live</span></> : null}
             {"\n"}
             {[...group.events].reverse().filter((item) => item.kind !== "duration").map((item, index) =>
               <span key={`${item.at}-${index}`}>

@@ -3,6 +3,8 @@ import {
   appendVisitorEvent,
   hasVisitorLogAccess,
   IGNORE_COOKIE,
+  markVisitorPresent,
+  readLiveSessions,
   readVisitorEvents,
   VISITOR_COOKIE,
   visitorLogRateLimited,
@@ -28,7 +30,8 @@ export async function GET(request: NextRequest) {
   const rawOffset = Number(request.nextUrl.searchParams.get("offset") ?? "0");
   const offset = Number.isInteger(rawOffset) && rawOffset >= 0 ? Math.min(rawOffset, 5000) : 0;
   try {
-    return privateResponse(await readVisitorEvents(offset));
+    const [log, liveSessions] = await Promise.all([readVisitorEvents(offset), readLiveSessions()]);
+    return privateResponse({ ...log, liveSessions });
   } catch {
     return privateResponse({ error: "Could not read visitor log" }, 503);
   }
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
     return new Response(null, { status: 400 });
   }
   const { kind, path, session, durationMs } = input;
-  if ((kind !== "page" && kind !== "open" && kind !== "duration") ||
+  if ((kind !== "page" && kind !== "open" && kind !== "duration" && kind !== "heartbeat") ||
       typeof path !== "string" || path.length < 1 || path.length > 200 ||
       typeof session !== "string" || !/^[a-f0-9-]{36}$/.test(session) ||
       (kind === "duration" && (typeof durationMs !== "number" || !Number.isFinite(durationMs)))) {
@@ -83,6 +86,11 @@ export async function POST(request: NextRequest) {
   if (city.toUpperCase() === "MADIUN" && country.toUpperCase() === "ID") {
     return new Response(null, { status: 204 });
   }
+  if (kind === "heartbeat") {
+    try { await markVisitorPresent(session); }
+    catch { return new Response(null, { status: 503 }); }
+    return new Response(null, { status: 204 });
+  }
   const event: VisitorEvent = {
     session,
     visitor,
@@ -95,6 +103,7 @@ export async function POST(request: NextRequest) {
   };
   try {
     await appendVisitorEvent(event);
+    if (kind === "page") await markVisitorPresent(session);
   } catch {
     return new Response(null, { status: 503 });
   }

@@ -19,7 +19,7 @@ function getSession() {
   }
 }
 
-function send(event: { kind: "page" | "open" | "duration"; path: string; session: string; durationMs?: number }, beacon = false) {
+function send(event: { kind: "page" | "open" | "duration" | "heartbeat"; path: string; session: string; durationMs?: number }, beacon = false) {
   const body = JSON.stringify(event);
   if (beacon && navigator.sendBeacon) {
     navigator.sendBeacon(ENDPOINT, new Blob([body], { type: "application/json" }));
@@ -62,10 +62,14 @@ export default function VisitorTracker() {
       } catch { /* Ignore invalid links. */ }
     };
     send({ kind: "page", path: pathname, session });
+    const heartbeat = window.setInterval(() => {
+      if (document.visibilityState === "visible") send({ kind: "heartbeat", path: pathname, session });
+    }, 60_000);
     document.addEventListener("visibilitychange", onVisibility);
     document.addEventListener("click", onClick, { capture: true });
     window.addEventListener("pagehide", duration);
     return () => {
+      window.clearInterval(heartbeat);
       duration();
       document.removeEventListener("visibilitychange", onVisibility);
       document.removeEventListener("click", onClick, { capture: true });

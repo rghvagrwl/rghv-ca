@@ -23,6 +23,7 @@
 .sessionTime, .sessionId { color: rgba(228, 232, 225, .56); }
 .location { color: #e4e8e1; }
 .active { color: rgba(228, 232, 225, .65); }
+.live { color: #e4e8e1; }
 .eventTime { color: rgba(228, 232, 225, .56); }
 .action { color: rgba(228, 232, 225, .7); }
 .path { color: #e4e8e1; }

@@ -5,6 +5,8 @@ export const VISITOR_COOKIE = "rghv_vid";
 export const IGNORE_COOKIE = "rghv_ignore_visitor";
 export const ACCESS_COOKIE = "rghv_visitor_log_access";
 const LOG_KEY = "visitor-log:v1";
+const PRESENCE_KEY = "visitor-log:presence:v1";
+const PRESENCE_WINDOW_MS = 2 * 60 * 1000;
 const MAX_EVENTS = 5000;
 const RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
 
@@ -26,6 +28,7 @@ type RedisClient = {
   zRemRangeByRank: (key: string, start: number, stop: number) => Promise<unknown>;
   zRange: (key: string, start: number, stop: number, options: { REV: true }) => Promise<string[]>;
   zCard: (key: string) => Promise<number>;
+  zRangeByScore: (key: string, min: number, max: number) => Promise<string[]>;
   incr: (key: string) => Promise<number>;
   expire: (key: string, seconds: number) => Promise<number>;
 };
@@ -106,6 +109,28 @@ export async function appendVisitorEvent(event: VisitorEvent) {
   if (typeof count?.result === "number" && count.result > MAX_EVENTS) {
     await kvCommand(["ZREMRANGEBYRANK", LOG_KEY, 0, count.result - MAX_EVENTS - 1]);
   }
+}
+
+export async function markVisitorPresent(session: string) {
+  const now = Date.now();
+  const client = await redisClient();
+  if (client) {
+    await client.zAdd(PRESENCE_KEY, { score: now, value: session });
+    await client.zRemRangeByScore(PRESENCE_KEY, 0, now - PRESENCE_WINDOW_MS);
+    await client.expire(PRESENCE_KEY, 5 * 60);
+    return;
+  }
+  await kvCommand(["ZADD", PRESENCE_KEY, now, session]);
+  await kvCommand(["ZREMRANGEBYSCORE", PRESENCE_KEY, 0, now - PRESENCE_WINDOW_MS]);
+  await kvCommand(["EXPIRE", PRESENCE_KEY, 5 * 60]);
+}
+
+export async function readLiveSessions() {
+  const since = Date.now() - PRESENCE_WINDOW_MS;
+  const client = await redisClient();
+  if (client) return client.zRangeByScore(PRESENCE_KEY, since, Date.now());
+  const result = await kvCommand(["ZRANGEBYSCORE", PRESENCE_KEY, since, Date.now()]);
+  return Array.isArray(result?.result) ? result.result as string[] : [];
 }
 
 export async function readVisitorEvents(offset: number, limit = 200) {
