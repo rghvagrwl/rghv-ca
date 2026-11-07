@@ -210,6 +210,7 @@ export default function EntriesPage() {
             <li key={entry.id}>
               <button
                 className="nv-entry-head"
+                data-visitor-event={`entry: ${entry.title}`}
                 data-cursor-pad="7"
                 data-cursor-target
                 onClick={(event) => handleOpen(entry, event)}

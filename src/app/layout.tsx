@@ -3,6 +3,8 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import localFont from "next/font/local";
+import VisitorTracker from "./visitor-tracker";
+import { visitorLogReady } from "../lib/visitor-log";
 import "./globals.css";
 
 const switzer = localFont({
@@ -56,6 +58,7 @@ export default function RootLayout({
     <html lang="en" className={`${switzer.variable} h-full scroll-smooth antialiased`}>
       <body className="min-h-full">
         {children}
+        {isProduction && visitorLogReady() ? <VisitorTracker /> : null}
         {isProduction ? <Analytics /> : null}
         {isProduction ? <SpeedInsights /> : null}
         {isProduction ? (
