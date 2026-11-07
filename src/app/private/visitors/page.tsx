@@ -17,7 +17,7 @@ const timeFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 function time(at: number) {
-  return timeFormatter.format(at).replace(/\b(AM|PM)\b/g, (period) => period.toLowerCase());
+  return timeFormatter.format(at);
 }
 
 function timeColumn(at: number) {
