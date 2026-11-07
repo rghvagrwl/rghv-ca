@@ -24,6 +24,8 @@
 .now { color: #e4e8e1; }
 .sessionTime, .sessionId { color: rgba(228, 232, 225, .56); }
 .location { color: #e4e8e1; }
+.page a.location { color: #e4e8e1; text-decoration: none; cursor: pointer; }
+.page a.location:hover, .page a.location:focus-visible { text-decoration: underline; text-underline-offset: 2px; outline: none; }
 .active { color: rgba(228, 232, 225, .65); }
 .live { color: #e4e8e1; }
 .eventTime { color: rgba(228, 232, 225, .56); }

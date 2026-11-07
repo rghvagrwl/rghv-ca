@@ -29,6 +29,20 @@ function duration(ms: number) {
 
 type Group = { id: string; visitor: string; city: string; country: string; postalCode?: string; start: number; latest: number; events: VisitorEvent[]; activeMs: number };
 
+function locationLabel(group: Group, mode: "location" | "city") {
+  const city = `${group.city}, ${group.country}`;
+  return mode === "location" && group.postalCode ? `~ ${group.postalCode}, ${city}` : city;
+}
+
+function mapsUrl(group: Group, mode: "location" | "city") {
+  const query = [
+    mode === "location" ? group.postalCode : undefined,
+    group.city !== "Unknown" ? group.city : undefined,
+    group.country !== "Unknown" ? group.country : undefined,
+  ].filter(Boolean).join(", ");
+  return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : null;
+}
+
 function eventKey(event: VisitorEvent) {
   return `${event.at}:${event.session}:${event.kind}:${event.path}:${event.durationMs ?? ""}`;
 }
@@ -159,7 +173,10 @@ export default function VisitorLogPage() {
         <span className={styles.list}>
           {groups.map((group, groupIndex) => <span key={group.id}>
             {groupIndex > 0 ? "\n" : null}
-            <span className={styles.location}>{locationMode === "location" && group.postalCode ? `~ ${group.postalCode}, ` : ""}{group.city}, {group.country}</span>{"  "}
+            {mapsUrl(group, locationMode) ?
+              <a className={styles.location} href={mapsUrl(group, locationMode) ?? undefined} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
+                {locationLabel(group, locationMode)}
+              </a> : <span className={styles.location}>{locationLabel(group, locationMode)}</span>}{"  "}
             <time className={styles.sessionTime}>{clock(group.start)}</time>{"  "}
             <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
             {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
