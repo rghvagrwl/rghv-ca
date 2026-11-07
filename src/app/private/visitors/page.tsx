@@ -59,6 +59,7 @@ export default function VisitorLogPage() {
         method: "POST", credentials: "same-origin",
         headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key }),
       });
+      if (response.status === 429) { setMessage("Too many attempts. Try again in a minute."); return; }
       if (!response.ok) { setMessage("That access key did not work."); return; }
       setKey("");
       await load();

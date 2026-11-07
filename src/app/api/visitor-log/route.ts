@@ -5,6 +5,7 @@ import {
   IGNORE_COOKIE,
   readVisitorEvents,
   VISITOR_COOKIE,
+  visitorLogRateLimited,
   visitorLogReady,
   type VisitorEvent,
 } from "../../../lib/visitor-log";
@@ -41,6 +42,14 @@ export async function POST(request: NextRequest) {
       request.cookies.has("rghv_visitor_log_access") ||
       botPattern.test(request.headers.get("user-agent") ?? "")) {
     return new Response(null, { status: 204 });
+  }
+
+  try {
+    if (await visitorLogRateLimited(request, "events")) {
+      return new Response(null, { status: 429 });
+    }
+  } catch {
+    return new Response(null, { status: 503 });
   }
 
   let input: Record<string, unknown>;

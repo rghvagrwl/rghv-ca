@@ -26,6 +26,8 @@ type RedisClient = {
   zRemRangeByRank: (key: string, start: number, stop: number) => Promise<unknown>;
   zRange: (key: string, start: number, stop: number, options: { REV: true }) => Promise<string[]>;
   zCard: (key: string) => Promise<number>;
+  incr: (key: string) => Promise<number>;
+  expire: (key: string, seconds: number) => Promise<number>;
 };
 
 declare global {
@@ -65,6 +67,27 @@ export function visitorLogReady() {
       (process.env.REDIS_URL ||
         (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)),
   );
+}
+
+// Keep only a short-lived digest of the client IP; never store the raw IP.
+export async function visitorLogRateLimited(request: Request, kind: "events" | "auth") {
+  const ip = (request.headers.get("x-vercel-forwarded-for") ??
+    request.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
+  const window = Math.floor(Date.now() / 60_000);
+  const digest = createHmac("sha256", process.env.VISITOR_LOG_ACCESS_KEY!)
+    .update(`${kind}:${ip}:${window}`).digest("hex").slice(0, 24);
+  const key = `visitor-log:rate:${kind}:${digest}`;
+  const client = await redisClient();
+  let count: number;
+  if (client) {
+    count = await client.incr(key);
+    if (count === 1) await client.expire(key, 120);
+  } else {
+    const result = await kvCommand(["INCR", key]);
+    count = typeof result?.result === "number" ? result.result : 0;
+    if (count === 1) await kvCommand(["EXPIRE", key, 120]);
+  }
+  return count > (kind === "auth" ? 10 : 60);
 }
 
 export async function appendVisitorEvent(event: VisitorEvent) {

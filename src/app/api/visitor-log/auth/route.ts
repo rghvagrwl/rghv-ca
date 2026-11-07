@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ACCESS_COOKIE, accessToken, matchesAccessKey } from "../../../../lib/visitor-log";
+import { ACCESS_COOKIE, accessToken, matchesAccessKey, visitorLogRateLimited, visitorLogReady } from "../../../../lib/visitor-log";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  if (!visitorLogReady()) return NextResponse.json({ error: "Unavailable" }, { status: 503 });
   const origin = request.headers.get("origin");
   if (origin && origin !== request.nextUrl.origin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  try {
+    if (await visitorLogRateLimited(request, "auth")) {
+      return NextResponse.json({ error: "Too many attempts. Try again shortly." }, { status: 429, headers: { "Cache-Control": "no-store" } });
+    }
+  } catch {
+    return NextResponse.json({ error: "Unavailable" }, { status: 503 });
+  }
   let input: { key?: string };
   try {
     input = (await request.json()) as { key?: string };
