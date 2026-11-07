@@ -685,7 +685,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
     const fromList = phase === "detail" && (selection?.kind === "workAll" || selection?.kind === "otherWorkAll" || selection?.kind === "captureAll" || selection?.kind === "writingAll");
     const parent = fromList ? selection : null;
     setParentSelection(parent);
-    window.history.pushState({ ...window.history.state, canvasParent: pathFor(parent) }, "", pathFor(next));
+    window.history.pushState({ canvasParent: pathFor(parent) }, "", pathFor(next));
     setPhase(phase === "home" ? "leavingHome" : "leavingDetail");
     transitionTimer.current = setTimeout(() => {
       setSelection(next);
@@ -697,7 +697,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   const goBack = useCallback(() => {
     if (phase !== "detail") return;
     const next = parentSelection;
-    window.history.pushState({ ...window.history.state, canvasParent: next?.kind === "otherWorkAll" ? "/work" : "/" }, "", pathFor(next));
+    window.history.pushState({ canvasParent: next?.kind === "otherWorkAll" ? "/work" : "/" }, "", pathFor(next));
     setPhase("leavingDetail");
     transitionTimer.current = setTimeout(() => {
       setSelection(next);
