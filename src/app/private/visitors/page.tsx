@@ -14,7 +14,7 @@ const timeFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 function clock(at: number) {
-  return `${dateFormatter.format(at)} ${time(at)}`;
+  return `${time(at)} ${dateFormatter.format(at)}`;
 }
 
 function time(at: number) {
