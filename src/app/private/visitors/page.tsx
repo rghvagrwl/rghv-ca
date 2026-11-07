@@ -69,6 +69,11 @@ function eventKey(event: VisitorEvent) {
   return `${event.at}:${event.session}:${event.kind}:${event.path}:${event.durationMs ?? ""}`;
 }
 
+function eventLabel(event: VisitorEvent) {
+  if (event.kind !== "page") return event.path;
+  return event.path === "/" ? "rghv.ca" : event.path.slice(1);
+}
+
 function SessionAge({ at, asOf }: { at: number; asOf: number }) {
   return <span className={styles.age}>{timeAgo(at, asOf)}</span>;
 }
@@ -238,7 +243,7 @@ export default function VisitorLogPage() {
                   <span className={styles.separator}>{"  "}</span>
                   <span className={styles.eventDescription}>
                     <span className={styles.action}>{item.kind === "page" ? "visited" : "opened"}</span>{"  "}
-                    <span className={styles.path}>{item.path}</span>
+                    <span className={styles.path}>{eventLabel(item)}</span>
                   </span>
                 </div>) }
             </section>;
