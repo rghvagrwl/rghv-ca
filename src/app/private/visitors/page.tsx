@@ -5,11 +5,12 @@ import type { VisitorEvent } from "../../../lib/visitor-log";
 import styles from "./visitors.module.css";
 
 const PAGE_SIZE = 200;
-const LIVE_COLUMN_SPACES = " ".repeat(6);
 const TIME_COLUMN_WIDTH = 15;
-const DETAIL_INDENT = " ".repeat(LIVE_COLUMN_SPACES.length + TIME_COLUMN_WIDTH + 2);
 const dateFormatter = new Intl.DateTimeFormat("sv-SE", {
   timeZone: "America/Toronto", year: "numeric", month: "2-digit", day: "2-digit",
+});
+const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Toronto", year: "numeric", month: "long", day: "numeric",
 });
 const timeFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Toronto", hour: "2-digit", minute: "2-digit", second: "2-digit",
@@ -22,6 +23,16 @@ function time(at: number) {
 
 function timeColumn(at: number) {
   return time(at).padEnd(TIME_COLUMN_WIDTH, " ");
+}
+
+function dateLabel(at: number) {
+  const parts = dateLabelFormatter.formatToParts(at);
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = Number(parts.find((part) => part.type === "day")?.value);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const suffix = day % 100 >= 11 && day % 100 <= 13 ? "th"
+    : day % 10 === 1 ? "st" : day % 10 === 2 ? "nd" : day % 10 === 3 ? "rd" : "th";
+  return `${month} ${day}${suffix}, ${year}`;
 }
 
 function duration(ms: number) {
@@ -168,8 +179,10 @@ export default function VisitorLogPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <span className={styles.prompt}>rghv@site:~$</span>{" tail visitor.log"}
-        {status === "ready" ? <>{"    "}<span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}</span></> : null}
+        <span className={styles.headerTop}>
+          <span><span className={styles.prompt}>rghv@site:~$</span>{" tail visitor.log"}</span>
+          {status === "ready" ? <span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}</span> : null}
+        </span>
         {status === "ready" ? <>{"\n"}
           <button type="button" onClick={() => void load()} disabled={busy}>[refresh]</button>{"\n"}
           <button type="button" onClick={() => void lock()}>[sign out]</button>
@@ -202,30 +215,22 @@ export default function VisitorLogPage() {
             const live = liveSessions.includes(group.session);
             const map = mapsUrl(group);
             return <section className={styles.group} key={group.id}>
-              {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <div className={styles.day}>{group.day}</div> : null}
+              {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <div className={styles.day}>{dateLabel(group.latest)}</div> : null}
               <div className={styles.sessionLine}>
-                <span className={styles.timeBlock}>
-                  <span className={live ? styles.livePrefixActive : styles.livePrefix}>
-                    {live ? <><span className={styles.live}>Live</span>{"  "}</> : LIVE_COLUMN_SPACES}
-                  </span>
-                  <time className={styles.sessionTime}>{timeColumn(group.latest)}</time>
+                <span className={styles.sessionIdentity}>
+                  {live ? <><span className={styles.live}>Live</span>{"  "}</> : null}
+                  {map ?
+                    <a className={styles.location} href={map} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
+                      {locationLabel(group)}
+                    </a> : <span className={styles.location}>{locationLabel(group)}</span>}
+                  {"  "}<span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
                 </span>
-                <span className={styles.separator}>{"  "}</span>
-                {map ?
-                  <a className={styles.location} href={map} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
-                    {locationLabel(group)}
-                  </a> : <span className={styles.location}>{locationLabel(group)}</span>}
-                <span className={styles.separator}>{"  "}</span>
                 <SessionAge at={group.latest} asOf={asOf} live={live} />
               </div>
-              <div className={styles.details}>
-                <span className={styles.detailIndent}>{DETAIL_INDENT}</span>
-                <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
-                {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
-              </div>
-              {group.events.filter((item) => item.kind !== "duration").map((item, index) =>
+              {group.activeMs ? <div className={styles.details}><span className={styles.active}>{duration(group.activeMs)} active</span></div> : null}
+              {group.events.filter((item) => item.kind !== "duration").reverse().map((item, index) =>
                 <div className={styles.eventLine} key={`${item.at}-${index}`}>
-                  <span className={styles.eventClock}><span className={styles.eventPrefix}>{LIVE_COLUMN_SPACES}</span><time className={styles.eventTime}>{timeColumn(item.at)}</time></span>
+                  <span className={styles.eventClock}><time className={styles.eventTime}>{timeColumn(item.at)}</time></span>
                   <span className={styles.separator}>{"  "}</span>
                   <span className={styles.eventDescription}>
                     <span className={styles.action}>{item.kind === "page" ? "visited" : "opened"}</span>{"  "}
