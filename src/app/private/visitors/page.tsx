@@ -98,11 +98,11 @@ export default function VisitorLogPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <span><span className={styles.prompt}>rghv@site:~$</span> tail visitor.log</span>
-        {status === "ready" ? <div className={styles.actions}>
-          <button type="button" onClick={() => void load()} disabled={busy}>[refresh]</button>
+        <span className={styles.prompt}>rghv@site:~$</span>{" tail visitor.log"}
+        {status === "ready" ? <span>{"    "}
+          <button type="button" onClick={() => void load()} disabled={busy}>[refresh]</button>{"  "}
           <button type="button" onClick={() => void lock()}>[lock]</button>
-        </div> : null}
+        </span> : null}
       </header>
 
       {status === "loading" ? <p className={styles.muted}>loading...</p> : null}
@@ -121,31 +121,28 @@ export default function VisitorLogPage() {
       {status === "error" ? <div><p className={styles.error}>{message}</p><button type="button" onClick={() => void load()}>[retry]</button></div> : null}
 
       {status === "ready" ? <>
-        <p className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`} <span>/ Toronto time</span></p>
-        {groups.length === 0 ? <p className={styles.muted}>no visits yet</p> : null}
-        <div className={styles.list}>
-          {groups.map((group) => <section className={styles.session} key={group.id}>
-            <div className={styles.sessionTop}>
-              <time className={styles.sessionTime}>{clock(group.start)}</time>
-              <span className={styles.location}>{group.city}, {group.country}</span>
-              <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
-              {group.activeMs ? <span className={styles.active}>{duration(group.activeMs)} active</span> : null}
-            </div>
-            <ul>
-              {[...group.events].reverse().filter((item) => item.kind !== "duration").map((item, index) =>
-                <li key={`${item.at}-${index}`}>
-                  <span className={styles.marker} aria-hidden="true">›</span>
-                  <time>{timeFormatter.format(item.at)}</time>
-                  <span className={styles.action}>{item.kind === "page" ? "visited" : "opened"}</span>
-                  <span className={styles.path}>{item.path}</span>
-                </li>) }
-            </ul>
-          </section>)}
-        </div>
+        {"\n\n"}<span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}{"  "}<span>/ Toronto time</span></span>{"\n\n"}
+        {groups.length === 0 ? <span className={styles.muted}>no visits yet</span> : null}
+        <span className={styles.list}>
+          {groups.map((group, groupIndex) => <span key={group.id}>
+            {groupIndex > 0 ? "\n" : null}
+            <span className={styles.location}>{group.city}, {group.country}</span>{"  "}
+            <time className={styles.sessionTime}>{clock(group.start)}</time>{"  "}
+            <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
+            {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
+            {"\n"}
+            {[...group.events].reverse().filter((item) => item.kind !== "duration").map((item, index) =>
+              <span key={`${item.at}-${index}`}>
+                {"  > "}<time className={styles.eventTime}>{timeFormatter.format(item.at)}</time>{"  "}
+                <span className={styles.action}>{item.kind === "page" ? "visited" : "opened "}</span>{"  "}
+                <span className={styles.path}>{item.path}</span>{"\n"}
+              </span>) }
+          </span>)}
+        </span>
         {events.length < total && events.length < 5000 ?
-          <button className={styles.more} type="button" disabled={busy} onClick={() => void load(events.length)}>
+          <>{"\n"}<button className={styles.more} type="button" disabled={busy} onClick={() => void load(events.length)}>
             {busy ? "loading..." : `[load ${Math.min(PAGE_SIZE, total - events.length)} more]`}
-          </button> : null}
+          </button></> : null}
       </> : null}
     </main>
   );
