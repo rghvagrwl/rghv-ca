@@ -69,16 +69,8 @@ function eventKey(event: VisitorEvent) {
   return `${event.at}:${event.session}:${event.kind}:${event.path}:${event.durationMs ?? ""}`;
 }
 
-function SessionAge({ at, asOf, live }: { at: number; asOf: number; live: boolean }) {
-  const [clock, setClock] = useState(asOf);
-  useEffect(() => {
-    if (!live) return;
-    const interval = window.setInterval(() => {
-      if (document.visibilityState === "visible") setClock(Date.now());
-    }, 1_000);
-    return () => window.clearInterval(interval);
-  }, [live]);
-  return <span className={styles.age}>{timeAgo(at, live ? Math.max(clock, asOf) : asOf)}</span>;
+function SessionAge({ at, asOf }: { at: number; asOf: number }) {
+  return <span className={styles.age}>{timeAgo(at, asOf)}</span>;
 }
 
 export default function VisitorLogPage() {
@@ -126,6 +118,18 @@ export default function VisitorLogPage() {
     }, 30_000);
     return () => window.clearInterval(interval);
   }, [load, status]);
+  useEffect(() => {
+    if (status !== "ready") return;
+    const updateClock = () => {
+      if (document.visibilityState === "visible") setAsOf(Date.now());
+    };
+    const interval = window.setInterval(updateClock, 1_000);
+    document.addEventListener("visibilitychange", updateClock);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", updateClock);
+    };
+  }, [status]);
 
   async function unlock(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -225,7 +229,7 @@ export default function VisitorLogPage() {
                     </a> : <span className={styles.location}>{locationLabel(group)}</span>}
                   {"  "}<span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
                 </span>
-                <SessionAge at={group.latest} asOf={asOf} live={live} />
+                <SessionAge at={group.latest} asOf={asOf} />
               </div>
               {group.activeMs ? <div className={styles.details}><span className={styles.active}>{duration(group.activeMs)} active</span></div> : null}
               {group.events.filter((item) => item.kind !== "duration").reverse().map((item, index) =>
