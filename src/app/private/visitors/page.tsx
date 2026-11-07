@@ -27,6 +27,14 @@ function duration(ms: number) {
   return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 }
 
+function timeAgo(at: number, now: number) {
+  const seconds = Math.max(0, Math.floor((now - at) / 1000));
+  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 60 * 60) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 24 * 60 * 60) return `${Math.floor(seconds / (60 * 60))}h ago`;
+  return `${Math.floor(seconds / (24 * 60 * 60))}d ago`;
+}
+
 type Group = { id: string; visitor: string; city: string; country: string; postalCode?: string; start: number; latest: number; events: VisitorEvent[]; activeMs: number };
 
 function locationLabel(group: Group, mode: "location" | "city") {
@@ -50,6 +58,7 @@ function eventKey(event: VisitorEvent) {
 export default function VisitorLogPage() {
   const [events, setEvents] = useState<VisitorEvent[]>([]);
   const [total, setTotal] = useState(0);
+  const [asOf, setAsOf] = useState(0);
   const [liveSessions, setLiveSessions] = useState<string[]>([]);
   const [locationMode, setLocationMode] = useState<"location" | "city">("location");
   const [status, setStatus] = useState<"loading" | "locked" | "ready" | "error" | "unconfigured">("loading");
@@ -72,6 +81,7 @@ export default function VisitorLogPage() {
         return [...data.events, ...old.filter((event) => !latest.has(eventKey(event)))].slice(0, 5000);
       });
       setTotal(data.total);
+      setAsOf(Date.now());
       setLiveSessions(data.liveSessions ?? []);
       setStatus("ready");
       setMessage("");
@@ -173,12 +183,13 @@ export default function VisitorLogPage() {
         <span className={styles.list}>
           {groups.map((group, groupIndex) => <span key={group.id}>
             {groupIndex > 0 ? "\n" : null}
+            <time className={styles.sessionTime}>{clock(group.start)}</time>{"  "}
+            <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>{"\n"}
             {mapsUrl(group, locationMode) ?
               <a className={styles.location} href={mapsUrl(group, locationMode) ?? undefined} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
                 {locationLabel(group, locationMode)}
               </a> : <span className={styles.location}>{locationLabel(group, locationMode)}</span>}{"  "}
-            <time className={styles.sessionTime}>{clock(group.start)}</time>{"  "}
-            <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
+            <span className={styles.age}>{timeAgo(group.latest, asOf)}</span>
             {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
             {liveSessions.includes(group.id) ? <>{"  "}<span className={styles.live}>live</span></> : null}
             {"\n"}
