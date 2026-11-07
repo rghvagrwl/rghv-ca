@@ -19,7 +19,7 @@
 .page button:hover, .page button:focus-visible { color: #e4e8e1; outline: none; }
 .page button:disabled { opacity: .35; cursor: default; }
 .summary { color: rgba(228, 232, 225, .62); }
-.summary span { color: rgba(228, 232, 225, .55); }
+.now { color: #e4e8e1; }
 .sessionTime, .sessionId { color: rgba(228, 232, 225, .56); }
 .location { color: #e4e8e1; }
 .active { color: rgba(228, 232, 225, .65); }

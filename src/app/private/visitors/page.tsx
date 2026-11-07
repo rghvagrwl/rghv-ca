@@ -5,16 +5,20 @@ import type { VisitorEvent } from "../../../lib/visitor-log";
 import styles from "./visitors.module.css";
 
 const PAGE_SIZE = 200;
-const dateTimeFormatter = new Intl.DateTimeFormat("sv-SE", {
+const dateFormatter = new Intl.DateTimeFormat("sv-SE", {
   timeZone: "America/Toronto", year: "numeric", month: "2-digit", day: "2-digit",
-  hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
 });
-const timeFormatter = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "America/Toronto", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
+const timeFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Toronto", hour: "numeric", minute: "2-digit", second: "2-digit",
+  hour12: true, timeZoneName: "short",
 });
 
 function clock(at: number) {
-  return dateTimeFormatter.format(at);
+  return `${dateFormatter.format(at)} ${time(at)}`;
+}
+
+function time(at: number) {
+  return timeFormatter.format(at).replace(/\b(AM|PM)\b/g, (period) => period.toLowerCase());
 }
 
 function duration(ms: number) {
@@ -140,7 +144,10 @@ export default function VisitorLogPage() {
       {status === "error" ? <div><p className={styles.error}>{message}</p><button type="button" onClick={() => void load()}>[retry]</button></div> : null}
 
       {status === "ready" ? <>
-        {"\n\n"}<span className={styles.summary}>{liveSessions.length} live now{"  /  "}{events.length === total ? `${total} events` : `${events.length} of ${total} events`}{"  "}<span>/ Toronto time</span></span>{"\n\n"}
+        {"\n\n"}<span className={liveSessions.length ? styles.now : styles.muted}>
+          {liveSessions.length ? `${liveSessions.length} visitor${liveSessions.length === 1 ? "" : "s"} now` : "No visitors now"}
+        </span>{"\n"}
+        <span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}</span>{"\n\n"}
         {groups.length === 0 ? <span className={styles.muted}>no visits yet</span> : null}
         <span className={styles.list}>
           {groups.map((group, groupIndex) => <span key={group.id}>
@@ -153,7 +160,7 @@ export default function VisitorLogPage() {
             {"\n"}
             {[...group.events].reverse().filter((item) => item.kind !== "duration").map((item, index) =>
               <span key={`${item.at}-${index}`}>
-                {"  > "}<time className={styles.eventTime}>{timeFormatter.format(item.at)}</time>{"  "}
+                {"  > "}<time className={styles.eventTime}>{time(item.at)}</time>{"  "}
                 <span className={styles.action}>{item.kind === "page" ? "visited" : "opened "}</span>{"  "}
                 <span className={styles.path}>{item.path}</span>{"\n"}
               </span>) }
