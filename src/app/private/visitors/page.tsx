@@ -5,11 +5,16 @@ import type { VisitorEvent } from "../../../lib/visitor-log";
 import styles from "./visitors.module.css";
 
 const PAGE_SIZE = 200;
+const dateTimeFormatter = new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "America/Toronto", year: "numeric", month: "2-digit", day: "2-digit",
+  hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
+});
+const timeFormatter = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "America/Toronto", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
+});
 
 function clock(at: number) {
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit",
-  }).format(at);
+  return dateTimeFormatter.format(at);
 }
 
 function duration(ms: number) {
@@ -93,52 +98,54 @@ export default function VisitorLogPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <span>RGHV / VISITOR LOG</span>
+        <span><span className={styles.prompt}>rghv@site:~$</span> tail visitor.log</span>
         {status === "ready" ? <div className={styles.actions}>
-          <button type="button" onClick={() => void load()} disabled={busy}>REFRESH</button>
-          <button type="button" onClick={() => void lock()}>LOCK</button>
+          <button type="button" onClick={() => void load()} disabled={busy}>[refresh]</button>
+          <button type="button" onClick={() => void lock()}>[lock]</button>
         </div> : null}
       </header>
 
-      {status === "loading" ? <p className={styles.muted}>Loading…</p> : null}
+      {status === "loading" ? <p className={styles.muted}>loading...</p> : null}
       {status === "locked" ? <section className={styles.gate}>
-        <p>PRIVATE ACCESS</p>
+        <p className={styles.muted}>private access</p>
         <form onSubmit={unlock}>
-          <label htmlFor="access-key">Access key</label>
+          <label htmlFor="access-key">access key:</label>
           <div className={styles.formRow}>
             <input id="access-key" type="password" value={key} onChange={(event) => setKey(event.target.value)} autoComplete="current-password" autoFocus />
-            <button type="submit" disabled={busy || !key}>ENTER ↗</button>
+            <button type="submit" disabled={busy || !key}>[enter]</button>
           </div>
         </form>
         {message ? <p role="alert" className={styles.error}>{message}</p> : null}
       </section> : null}
       {status === "unconfigured" ? <p className={styles.error}>Set VISITOR_LOG_ACCESS_KEY and connect the existing Redis database to enable this log.</p> : null}
-      {status === "error" ? <div><p className={styles.error}>{message}</p><button type="button" onClick={() => void load()}>RETRY</button></div> : null}
+      {status === "error" ? <div><p className={styles.error}>{message}</p><button type="button" onClick={() => void load()}>[retry]</button></div> : null}
 
       {status === "ready" ? <>
-        <p className={styles.summary}>{total} EVENTS · {groups.length} SESSIONS SHOWN · MOST RECENT FIRST</p>
-        {groups.length === 0 ? <p className={styles.muted}>No visits recorded yet.</p> : null}
+        <p className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`} <span>/ Toronto time</span></p>
+        {groups.length === 0 ? <p className={styles.muted}>no visits yet</p> : null}
         <div className={styles.list}>
           {groups.map((group) => <section className={styles.session} key={group.id}>
             <div className={styles.sessionTop}>
+              <time className={styles.sessionTime}>{clock(group.start)}</time>
               <span className={styles.location}>{group.city}, {group.country}</span>
-              <span>{clock(group.start)}</span>
+              <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
+              {group.activeMs ? <span className={styles.active}>{duration(group.activeMs)} active</span> : null}
             </div>
-            <p className={styles.meta}>VISITOR {group.visitor.slice(0, 8)} · ACTIVE {group.activeMs ? duration(group.activeMs) : "—"}</p>
             <ul>
               {[...group.events].reverse().filter((item) => item.kind !== "duration").map((item, index) =>
                 <li key={`${item.at}-${index}`}>
-                  <time>{new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(item.at)}</time>
-                  <span>{item.kind === "page" ? "visited" : "opened"} <strong>{item.path}</strong></span>
+                  <span className={styles.marker} aria-hidden="true">›</span>
+                  <time>{timeFormatter.format(item.at)}</time>
+                  <span className={styles.action}>{item.kind === "page" ? "visited" : "opened"}</span>
+                  <span className={styles.path}>{item.path}</span>
                 </li>) }
             </ul>
           </section>)}
         </div>
         {events.length < total && events.length < 5000 ?
           <button className={styles.more} type="button" disabled={busy} onClick={() => void load(events.length)}>
-            {busy ? "LOADING…" : `LOAD ${Math.min(PAGE_SIZE, total - events.length)} MORE ↓`}
+            {busy ? "loading..." : `[load ${Math.min(PAGE_SIZE, total - events.length)} more]`}
           </button> : null}
-        <p className={styles.foot}>Approximate city · active time counts visible tab time · stored for up to 90 days / 5,000 events</p>
       </> : null}
     </main>
   );
