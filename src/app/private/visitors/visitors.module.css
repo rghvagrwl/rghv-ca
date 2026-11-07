@@ -20,7 +20,7 @@
 .page button:hover, .page button:focus-visible { color: #fff; outline: none; }
 .page button:disabled { color: rgba(255, 255, 255, .5); cursor: default; }
 .summary { color: rgba(255, 255, 255, .75); }
-.now { color: #fff; }
+.now { color: #00bfff; }
 .day { color: #fff; }
 .sessionTime, .eventTime { color: rgba(255, 255, 255, .5); }
 .sessionId { color: rgba(255, 255, 255, .75); }
@@ -29,7 +29,7 @@
 .page a.location { color: #fff; text-decoration: none; cursor: pointer; }
 .page a.location:hover, .page a.location:focus-visible { text-decoration: underline; text-underline-offset: 2px; outline: none; }
 .active { color: rgba(255, 255, 255, .75); }
-.live { color: #fff; }
+.live { color: #00bfff; }
 .action { color: rgba(255, 255, 255, .75); }
 .path { color: #fff; }
 .muted { color: rgba(255, 255, 255, .5); }

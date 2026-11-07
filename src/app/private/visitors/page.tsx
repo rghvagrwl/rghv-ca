@@ -5,8 +5,9 @@ import type { VisitorEvent } from "../../../lib/visitor-log";
 import styles from "./visitors.module.css";
 
 const PAGE_SIZE = 200;
+const LIVE_COLUMN_SPACES = " ".repeat(6);
 const TIME_COLUMN_WIDTH = 15;
-const DETAIL_INDENT = " ".repeat(TIME_COLUMN_WIDTH + 2);
+const DETAIL_INDENT = " ".repeat(LIVE_COLUMN_SPACES.length + TIME_COLUMN_WIDTH + 2);
 const dateFormatter = new Intl.DateTimeFormat("sv-SE", {
   timeZone: "America/Toronto", year: "numeric", month: "2-digit", day: "2-digit",
 });
@@ -200,18 +201,19 @@ export default function VisitorLogPage() {
           {groups.map((group, groupIndex) => <span key={group.id}>
             {groupIndex > 0 ? "\n" : null}
             {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <><span className={styles.day}>{group.day}</span>{"\n\n"}</> : null}
+            {liveSessions.includes(group.session) ? <><span className={styles.live}>Live</span>{"  "}</> : LIVE_COLUMN_SPACES}
             <time className={styles.sessionTime}>{timeColumn(group.latest)}</time>{"  "}
             {mapsUrl(group) ?
               <a className={styles.location} href={mapsUrl(group) ?? undefined} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
                 {locationLabel(group)}
               </a> : <span className={styles.location}>{locationLabel(group)}</span>}{"  "}
             <SessionAge at={group.latest} asOf={asOf} live={liveSessions.includes(group.session)} />
-            {liveSessions.includes(group.session) ? <>{"  "}<span className={styles.live}>Live</span></> : null}
             {"\n"}{DETAIL_INDENT}<span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
             {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
             {"\n"}
             {group.events.filter((item) => item.kind !== "duration").map((item, index) =>
               <span key={`${item.at}-${index}`}>
+                {LIVE_COLUMN_SPACES}
                 <time className={styles.eventTime}>{timeColumn(item.at)}</time>{"  "}
                 <span className={styles.action}>{item.kind === "page" ? "visited" : "opened"}</span>{"  "}
                 <span className={styles.path}>{item.path}</span>{"\n"}
