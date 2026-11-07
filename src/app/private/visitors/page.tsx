@@ -32,21 +32,21 @@ function duration(ms: number) {
 function timeAgo(at: number, now: number) {
   const seconds = Math.max(0, Math.floor((now - at) / 1000));
   if (seconds < 60) return `${seconds}s ago`;
-  if (seconds < 60 * 60) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 60 * 60) return `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, "0")}s ago`;
   if (seconds < 24 * 60 * 60) return `${Math.floor(seconds / (60 * 60))}h ago`;
   return `${Math.floor(seconds / (24 * 60 * 60))}d ago`;
 }
 
 type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; latest: number; events: VisitorEvent[]; activeMs: number };
 
-function locationLabel(group: Group, mode: "location" | "city") {
+function locationLabel(group: Group) {
   const city = `${group.city}, ${group.country}`;
-  return mode === "location" && group.postalCode ? `${group.postalCode}, ${city}` : city;
+  return group.postalCode ? `${group.postalCode}, ${city}` : city;
 }
 
-function mapsUrl(group: Group, mode: "location" | "city") {
+function mapsUrl(group: Group) {
   const query = [
-    mode === "location" ? group.postalCode : undefined,
+    group.postalCode,
     group.city !== "Unknown" ? group.city : undefined,
     group.country !== "Unknown" ? group.country : undefined,
   ].filter(Boolean).join(", ");
@@ -57,12 +57,23 @@ function eventKey(event: VisitorEvent) {
   return `${event.at}:${event.session}:${event.kind}:${event.path}:${event.durationMs ?? ""}`;
 }
 
+function SessionAge({ at, asOf, live }: { at: number; asOf: number; live: boolean }) {
+  const [clock, setClock] = useState(asOf);
+  useEffect(() => {
+    if (!live) return;
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === "visible") setClock(Date.now());
+    }, 1_000);
+    return () => window.clearInterval(interval);
+  }, [live]);
+  return <span className={styles.age}>{timeAgo(at, live ? Math.max(clock, asOf) : asOf)}</span>;
+}
+
 export default function VisitorLogPage() {
   const [events, setEvents] = useState<VisitorEvent[]>([]);
   const [total, setTotal] = useState(0);
-  const [asOf, setAsOf] = useState(0);
   const [liveSessions, setLiveSessions] = useState<string[]>([]);
-  const [locationMode, setLocationMode] = useState<"location" | "city">("location");
+  const [asOf, setAsOf] = useState(0);
   const [status, setStatus] = useState<"loading" | "locked" | "ready" | "error" | "unconfigured">("loading");
   const [key, setKey] = useState("");
   const [message, setMessage] = useState("");
@@ -157,6 +168,7 @@ export default function VisitorLogPage() {
     <main className={styles.page}>
       <header className={styles.header}>
         <span className={styles.prompt}>rghv@site:~$</span>{" tail visitor.log"}
+        {status === "ready" ? <>{"    "}<span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}</span></> : null}
         {status === "ready" ? <>{"\n"}
           <button type="button" onClick={() => void load()} disabled={busy}>[refresh]</button>{"\n"}
           <button type="button" onClick={() => void lock()}>[sign out]</button>
@@ -182,23 +194,18 @@ export default function VisitorLogPage() {
         {"\n\n"}<span className={liveSessions.length ? styles.now : styles.muted}>
           {liveSessions.length ? `${liveSessions.length} visitor${liveSessions.length === 1 ? "" : "s"} now` : "No visitors now"}
         </span>{"\n"}
-        <span className={styles.summary}>{events.length === total ? `${total} events` : `${events.length} of ${total} events`}</span>{"\n"}
-        <span className={styles.switcher} role="group" aria-label="Location display">
-          <button type="button" className={locationMode === "location" ? styles.selected : undefined} aria-pressed={locationMode === "location"} onClick={() => setLocationMode("location")}>location</button>
-          {" / "}
-          <button type="button" className={locationMode === "city" ? styles.selected : undefined} aria-pressed={locationMode === "city"} onClick={() => setLocationMode("city")}>city</button>
-        </span>{"\n\n"}
+        {"\n\n"}
         {groups.length === 0 ? <span className={styles.muted}>no visits yet</span> : null}
         <span className={styles.list}>
           {groups.map((group, groupIndex) => <span key={group.id}>
             {groupIndex > 0 ? "\n" : null}
-            {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <><span className={styles.day}>{group.day}</span>{"\n"}</> : null}
+            {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <><span className={styles.day}>{group.day}</span>{"\n\n"}</> : null}
             <time className={styles.sessionTime}>{timeColumn(group.latest)}</time>{"  "}
-            {mapsUrl(group, locationMode) ?
-              <a className={styles.location} href={mapsUrl(group, locationMode) ?? undefined} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
-                {locationLabel(group, locationMode)}
-              </a> : <span className={styles.location}>{locationLabel(group, locationMode)}</span>}{"  "}
-            <span className={styles.age}>{timeAgo(group.latest, asOf)}</span>
+            {mapsUrl(group) ?
+              <a className={styles.location} href={mapsUrl(group) ?? undefined} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
+                {locationLabel(group)}
+              </a> : <span className={styles.location}>{locationLabel(group)}</span>}{"  "}
+            <SessionAge at={group.latest} asOf={asOf} live={liveSessions.includes(group.session)} />
             {liveSessions.includes(group.session) ? <>{"  "}<span className={styles.live}>Live</span></> : null}
             {"\n"}{DETAIL_INDENT}<span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
             {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}

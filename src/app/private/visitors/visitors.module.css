@@ -2,7 +2,7 @@
   min-height: 100vh;
   padding: 26px 30px 72px;
   background: #0a0a0a;
-  color: #e4e8e1;
+  color: #fff;
   font: 400 12px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-variant-numeric: tabular-nums;
   white-space: pre-wrap;
@@ -13,35 +13,33 @@
 }
 
 .page * { box-sizing: border-box; font-weight: 400; -webkit-user-select: text; user-select: text; }
-.page ::selection { background: rgba(228, 232, 225, .28); color: #fff; }
+.page ::selection { background: rgba(255, 255, 255, .25); color: #fff; }
 .header { display: inline; }
-.prompt { color: rgba(228, 232, 225, .58); }
-.page button { padding: 0; border: 0; background: none; color: rgba(228, 232, 225, .65); cursor: pointer; font: inherit; }
-.page button:hover, .page button:focus-visible { color: #e4e8e1; outline: none; }
-.page button:disabled { opacity: .35; cursor: default; }
-.summary { color: rgba(228, 232, 225, .62); }
-.switcher { color: rgba(228, 232, 225, .45); }
-.page button.selected { color: #e4e8e1; }
-.now { color: #00bfff; }
-.day { color: rgba(228, 232, 225, .56); }
-.sessionTime, .eventTime { color: rgba(228, 232, 225, .56); }
-.sessionId { color: rgba(228, 232, 225, .45); }
-.age { color: rgba(228, 232, 225, .75); }
-.location { color: #e4e8e1; }
-.page a.location { color: #e4e8e1; text-decoration: none; cursor: pointer; }
+.prompt { color: rgba(255, 255, 255, .75); }
+.page button { padding: 0; border: 0; background: none; color: rgba(255, 255, 255, .75); cursor: pointer; font: inherit; }
+.page button:hover, .page button:focus-visible { color: #fff; outline: none; }
+.page button:disabled { color: rgba(255, 255, 255, .5); cursor: default; }
+.summary { color: rgba(255, 255, 255, .75); }
+.now { color: #fff; }
+.day { color: #fff; }
+.sessionTime, .eventTime { color: rgba(255, 255, 255, .5); }
+.sessionId { color: rgba(255, 255, 255, .75); }
+.age { color: rgba(255, 255, 255, .75); }
+.location { color: #fff; }
+.page a.location { color: #fff; text-decoration: none; cursor: pointer; }
 .page a.location:hover, .page a.location:focus-visible { text-decoration: underline; text-underline-offset: 2px; outline: none; }
-.active { color: rgba(228, 232, 225, .65); }
-.live { color: #00bfff; }
-.action { color: rgba(228, 232, 225, .7); }
-.path { color: #e4e8e1; }
-.muted { color: rgba(228, 232, 225, .56); }
-.error { color: rgba(228, 232, 225, .82); }
+.active { color: rgba(255, 255, 255, .75); }
+.live { color: #fff; }
+.action { color: rgba(255, 255, 255, .75); }
+.path { color: #fff; }
+.muted { color: rgba(255, 255, 255, .5); }
+.error { color: #fff; }
 .gate { margin-top: 34px; width: min(100%, 450px); }
 .gate > p { margin: 0 0 24px; }
-.gate label { display: block; margin-bottom: 5px; color: rgba(228, 232, 225, .65); }
+.gate label { display: block; margin-bottom: 5px; color: rgba(255, 255, 255, .75); }
 .formRow { display: flex; align-items: baseline; gap: 20px; }
-.formRow input { flex: 1; min-width: 0; padding: 0; outline: none; border: none; border-bottom: 1px solid rgba(228, 232, 225, .3); border-radius: 0; background: none; color: inherit; font: inherit; }
-.formRow input:focus { border-color: #e4e8e1; }
+.formRow input { flex: 1; min-width: 0; padding: 0; outline: none; border: none; border-bottom: 1px solid rgba(255, 255, 255, .5); border-radius: 0; background: none; color: inherit; font: inherit; }
+.formRow input:focus { border-color: #fff; }
 
 @media (max-width: 600px) {
   .page { padding: 20px 16px 60px; font-size: 11px; }
