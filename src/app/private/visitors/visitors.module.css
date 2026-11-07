@@ -4,6 +4,7 @@
   background: #0a0a0a;
   color: #e4e8e1;
   font: 400 12px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   -webkit-user-select: text;
@@ -21,15 +22,16 @@
 .summary { color: rgba(228, 232, 225, .62); }
 .switcher { color: rgba(228, 232, 225, .45); }
 .page button.selected { color: #e4e8e1; }
-.now { color: #e4e8e1; }
+.now { color: #00bfff; }
+.day { color: rgba(228, 232, 225, .56); }
 .sessionTime, .eventTime { color: rgba(228, 232, 225, .56); }
-.sessionDate, .sessionId { color: rgba(228, 232, 225, .45); }
+.sessionId { color: rgba(228, 232, 225, .45); }
 .age { color: rgba(228, 232, 225, .75); }
 .location { color: #e4e8e1; }
 .page a.location { color: #e4e8e1; text-decoration: none; cursor: pointer; }
 .page a.location:hover, .page a.location:focus-visible { text-decoration: underline; text-underline-offset: 2px; outline: none; }
 .active { color: rgba(228, 232, 225, .65); }
-.live { color: #e4e8e1; }
+.live { color: #00bfff; }
 .action { color: rgba(228, 232, 225, .7); }
 .path { color: #e4e8e1; }
 .muted { color: rgba(228, 232, 225, .56); }

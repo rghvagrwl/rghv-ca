@@ -11,7 +11,7 @@ const dateFormatter = new Intl.DateTimeFormat("sv-SE", {
   timeZone: "America/Toronto", year: "numeric", month: "2-digit", day: "2-digit",
 });
 const timeFormatter = new Intl.DateTimeFormat("en-US", {
-  timeZone: "America/Toronto", hour: "numeric", minute: "2-digit", second: "2-digit",
+  timeZone: "America/Toronto", hour: "2-digit", minute: "2-digit", second: "2-digit",
   hour12: true, timeZoneName: "short",
 });
 
@@ -37,7 +37,7 @@ function timeAgo(at: number, now: number) {
   return `${Math.floor(seconds / (24 * 60 * 60))}d ago`;
 }
 
-type Group = { id: string; visitor: string; city: string; country: string; postalCode?: string; start: number; latest: number; events: VisitorEvent[]; activeMs: number };
+type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; latest: number; events: VisitorEvent[]; activeMs: number };
 
 function locationLabel(group: Group, mode: "location" | "city") {
   const city = `${group.city}, ${group.country}`;
@@ -130,20 +130,27 @@ export default function VisitorLogPage() {
 
   const groups = useMemo(() => {
     const byId = new Map<string, Group>();
-    for (const event of events) {
-      let group = byId.get(event.session);
+    const currentSession = new Map<string, Group>();
+    for (const event of [...events].reverse()) {
+      const day = dateFormatter.format(event.at);
+      const id = `${day}:${event.session}`;
+      let group = event.kind === "duration" ? currentSession.get(event.session) : byId.get(id);
       if (!group) {
-        group = { id: event.session, visitor: event.visitor, city: event.city, country: event.country, postalCode: event.postalCode,
-          start: event.at, latest: event.at, events: [], activeMs: 0 };
-        byId.set(event.session, group);
+        group = { id, session: event.session, day, visitor: event.visitor, city: event.city, country: event.country,
+          postalCode: event.postalCode, latest: event.at, events: [], activeMs: 0 };
+        byId.set(id, group);
       }
-      group.start = Math.min(group.start, event.at);
-      group.latest = Math.max(group.latest, event.at);
+      if (event.kind !== "duration") {
+        group.latest = Math.max(group.latest, event.at);
+        currentSession.set(event.session, group);
+      }
       group.postalCode ??= event.postalCode;
       group.events.push(event);
       if (event.kind === "duration") group.activeMs += event.durationMs ?? 0;
     }
-    return [...byId.values()].sort((a, b) => b.latest - a.latest);
+    return [...byId.values()]
+      .filter((group) => group.events.some((event) => event.kind !== "duration"))
+      .sort((a, b) => b.latest - a.latest);
   }, [events]);
 
   return (
@@ -185,21 +192,21 @@ export default function VisitorLogPage() {
         <span className={styles.list}>
           {groups.map((group, groupIndex) => <span key={group.id}>
             {groupIndex > 0 ? "\n" : null}
-            <time className={styles.sessionTime}>{timeColumn(group.latest)}</time>{"  ~ "}
+            {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <><span className={styles.day}>{group.day}</span>{"\n"}</> : null}
+            <time className={styles.sessionTime}>{timeColumn(group.latest)}</time>{"  "}
             {mapsUrl(group, locationMode) ?
               <a className={styles.location} href={mapsUrl(group, locationMode) ?? undefined} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
                 {locationLabel(group, locationMode)}
-              </a> : <span className={styles.location}>{locationLabel(group, locationMode)}</span>}{"\n"}
-            {DETAIL_INDENT}<span className={styles.age}>{timeAgo(group.latest, asOf)}</span>
+              </a> : <span className={styles.location}>{locationLabel(group, locationMode)}</span>}{"  "}
+            <span className={styles.age}>{timeAgo(group.latest, asOf)}</span>
+            {liveSessions.includes(group.session) ? <>{"  "}<span className={styles.live}>Live</span></> : null}
+            {"\n"}{DETAIL_INDENT}<span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
             {group.activeMs ? <>{"  "}<span className={styles.active}>{duration(group.activeMs)} active</span></> : null}
-            {"  "}<span className={styles.sessionDate}>{dateFormatter.format(group.latest)}</span>{"  "}
-            <span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
-            {liveSessions.includes(group.id) ? <>{"  "}<span className={styles.live}>live</span></> : null}
             {"\n"}
-            {[...group.events].reverse().filter((item) => item.kind !== "duration").map((item, index) =>
+            {group.events.filter((item) => item.kind !== "duration").map((item, index) =>
               <span key={`${item.at}-${index}`}>
-                <time className={styles.eventTime}>{timeColumn(item.at)}</time>{"  > "}
-                <span className={styles.action}>{item.kind === "page" ? "visited" : "opened "}</span>{"  "}
+                <time className={styles.eventTime}>{timeColumn(item.at)}</time>{"  "}
+                <span className={styles.action}>{item.kind === "page" ? "visited" : "opened"}</span>{"  "}
                 <span className={styles.path}>{item.path}</span>{"\n"}
               </span>) }
           </span>)}
