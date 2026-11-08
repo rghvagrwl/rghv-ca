@@ -411,7 +411,7 @@ function ChronoStory() {
       <hr className={`${storyStyles.divider} ${storyStyles.endDivider}`} />
       <InternshipPhotos photos={chronoPhotos} title="Photos from FigBuild" backLabel="Chrono" galleryId="chrono-photo-gallery" />
       <div className={storyStyles.closingNote}>
-        <p>Huge thanks to my teammates Mateo Tannahill, Michael Yen, and Sparsh Shah for making this such a fun project to work on.</p>
+        <p>Huge thanks to my teammates <a href="https://www.mateotannahill.com/" target="_blank" rel="noopener noreferrer">Mateo</a>, <a href="https://www.linkedin.com/in/michaelyen2323/" target="_blank" rel="noopener noreferrer">Michael</a>, and <a href="https://www.linkedin.com/in/sprsh/" target="_blank" rel="noopener noreferrer">Sparsh</a> for making this such a fun project to work on.</p>
       </div>
     </article>
   );
