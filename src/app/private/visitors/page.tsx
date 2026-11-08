@@ -12,6 +12,7 @@ const dateFormatter = new Intl.DateTimeFormat("sv-SE", {
 const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Toronto", year: "numeric", month: "long", day: "numeric",
 });
+const countryFormatter = new Intl.DisplayNames(["en"], { type: "region" });
 const timeFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Toronto", hour: "2-digit", minute: "2-digit", second: "2-digit",
   hour12: true, timeZoneName: "short",
@@ -52,7 +53,10 @@ function timeAgo(at: number, now: number) {
 type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; latest: number; lastEventAt: number; live: boolean; events: VisitorEvent[]; activeMs: number; activeSince?: number; activePath?: string };
 
 function locationLabel(group: Group) {
-  const city = `${group.city}, ${group.country}`;
+  const country = /^[A-Za-z]{2}$/.test(group.country)
+    ? countryFormatter.of(group.country.toUpperCase()) ?? group.country
+    : group.country;
+  const city = `${group.city}, ${country}`;
   return group.postalCode ? `${group.postalCode}, ${city}` : city;
 }
 
