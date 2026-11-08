@@ -28,7 +28,7 @@
 }
 
 .page ::selection {
-  background: var(--faint-ink);
+  background: rgb(0 0 0 / 10%);
   color: inherit;
 }
 
