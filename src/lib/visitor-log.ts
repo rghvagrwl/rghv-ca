@@ -13,7 +13,7 @@ const RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
 export type VisitorEvent = {
   session: string;
   visitor: string;
-  kind: "page" | "open" | "duration";
+  kind: "page" | "open" | "duration" | "resume";
   path: string;
   at: number;
   city: string;

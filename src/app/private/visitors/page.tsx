@@ -49,7 +49,7 @@ function timeAgo(at: number, now: number) {
   return `${Math.floor(seconds / (24 * 60 * 60))}d ago`;
 }
 
-type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; latest: number; events: VisitorEvent[]; activeMs: number };
+type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; latest: number; events: VisitorEvent[]; activeMs: number; activeSince?: number; activePath?: string };
 
 function locationLabel(group: Group) {
   const city = `${group.city}, ${group.country}`;
@@ -178,7 +178,16 @@ export default function VisitorLogPage() {
       }
       group.postalCode ??= event.postalCode;
       group.events.push(event);
-      if (event.kind === "duration") group.activeMs += event.durationMs ?? 0;
+      if (event.kind === "page" || event.kind === "resume") {
+        group.activeSince = event.at;
+        group.activePath = event.path;
+      } else if (event.kind === "duration") {
+        group.activeMs += event.durationMs ?? 0;
+        if (group.activePath === event.path) {
+          group.activeSince = undefined;
+          group.activePath = undefined;
+        }
+      }
     }
     return [...byId.values()]
       .filter((group) => group.events.some((event) => event.kind !== "duration"))
@@ -222,6 +231,7 @@ export default function VisitorLogPage() {
         <div className={styles.list}>
           {groups.map((group, groupIndex) => {
             const live = liveSessions.includes(group.session);
+            const activeMs = group.activeMs + (live && group.activeSince !== undefined ? Math.max(0, asOf - group.activeSince) : 0);
             const map = mapsUrl(group);
             return <section className={styles.group} key={group.id}>
               {groupIndex === 0 || groups[groupIndex - 1].day !== group.day ? <div className={styles.day}>{dateLabel(group.latest)}</div> : null}
@@ -236,8 +246,8 @@ export default function VisitorLogPage() {
                 </span>
                 <SessionAge at={group.latest} asOf={asOf} />
               </div>
-              {group.activeMs ? <div className={styles.details}><span className={styles.active}>{duration(group.activeMs)} active</span></div> : null}
-              {group.events.filter((item) => item.kind !== "duration").reverse().map((item, index) =>
+              {activeMs > 0 ? <div className={styles.details}><span className={styles.active}>{duration(activeMs)} active</span></div> : null}
+              {group.events.filter((item) => item.kind === "page" || item.kind === "open").reverse().map((item, index) =>
                 <div className={styles.eventLine} key={`${item.at}-${index}`}>
                   <span className={styles.eventClock}><time className={styles.eventTime}>{timeColumn(item.at)}</time></span>
                   <span className={styles.separator}>{"  "}</span>

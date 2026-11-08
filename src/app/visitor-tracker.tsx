@@ -19,7 +19,7 @@ function getSession() {
   }
 }
 
-function send(event: { kind: "page" | "open" | "duration" | "heartbeat"; path: string; session: string; durationMs?: number }, beacon = false) {
+function send(event: { kind: "page" | "open" | "duration" | "heartbeat" | "resume"; path: string; session: string; durationMs?: number }, beacon = false) {
   const body = JSON.stringify(event);
   if (beacon && navigator.sendBeacon) {
     navigator.sendBeacon(ENDPOINT, new Blob([body], { type: "application/json" }));
@@ -46,7 +46,10 @@ export default function VisitorTracker() {
     };
     const onVisibility = () => {
       if (document.visibilityState === "hidden") duration();
-      else visibleSince = performance.now();
+      else if (!visibleSince) {
+        visibleSince = performance.now();
+        send({ kind: "resume", path: pathname, session });
+      }
     };
     const onClick = (event: MouseEvent) => {
       const marked = (event.target as Element | null)?.closest("[data-visitor-event]");

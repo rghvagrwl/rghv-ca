@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     return new Response(null, { status: 400 });
   }
   const { kind, path, session, durationMs } = input;
-  if ((kind !== "page" && kind !== "open" && kind !== "duration" && kind !== "heartbeat") ||
+  if ((kind !== "page" && kind !== "open" && kind !== "duration" && kind !== "heartbeat" && kind !== "resume") ||
       typeof path !== "string" || path.length < 1 || path.length > 200 ||
       typeof session !== "string" || !/^[a-f0-9-]{36}$/.test(session) ||
       (kind === "duration" && (typeof durationMs !== "number" || !Number.isFinite(durationMs)))) {
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
   };
   try {
     await appendVisitorEvent(event);
-    if (kind === "page") await markVisitorPresent(session);
+    if (kind === "page" || kind === "resume") await markVisitorPresent(session);
   } catch {
     return new Response(null, { status: 503 });
   }
