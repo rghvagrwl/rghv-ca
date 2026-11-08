@@ -49,7 +49,7 @@ function timeAgo(at: number, now: number) {
   return `${Math.floor(seconds / (24 * 60 * 60))}d ago`;
 }
 
-type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; latest: number; events: VisitorEvent[]; activeMs: number; activeSince?: number; activePath?: string };
+type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; latest: number; lastEventAt: number; live: boolean; events: VisitorEvent[]; activeMs: number; activeSince?: number; activePath?: string };
 
 function locationLabel(group: Group) {
   const city = `${group.city}, ${group.country}`;
@@ -169,9 +169,10 @@ export default function VisitorLogPage() {
       let group = event.kind === "duration" ? currentSession.get(event.session) : byId.get(id);
       if (!group) {
         group = { id, session: event.session, day, visitor: event.visitor, city: event.city, country: event.country,
-          postalCode: event.postalCode, latest: event.at, events: [], activeMs: 0 };
+          postalCode: event.postalCode, latest: event.at, lastEventAt: event.at, live: false, events: [], activeMs: 0 };
         byId.set(id, group);
       }
+      group.lastEventAt = Math.max(group.lastEventAt, event.at);
       if (event.kind !== "duration") {
         group.latest = Math.max(group.latest, event.at);
         currentSession.set(event.session, group);
@@ -189,10 +190,14 @@ export default function VisitorLogPage() {
         }
       }
     }
+    const liveSet = new Set(liveSessions);
+    for (const group of byId.values()) {
+      group.live = liveSet.has(group.session) && currentSession.get(group.session) === group;
+    }
     return [...byId.values()]
       .filter((group) => group.events.some((event) => event.kind !== "duration"))
-      .sort((a, b) => b.latest - a.latest);
-  }, [events]);
+      .sort((a, b) => Number(b.live) - Number(a.live) || b.lastEventAt - a.lastEventAt);
+  }, [events, liveSessions]);
 
   return (
     <main className={styles.page}>
@@ -230,7 +235,7 @@ export default function VisitorLogPage() {
         {groups.length === 0 ? <span className={styles.muted}>no visits yet</span> : null}
         <div className={styles.list}>
           {groups.map((group, groupIndex) => {
-            const live = liveSessions.includes(group.session);
+            const live = group.live;
             const activeMs = group.activeMs + (live && group.activeSince !== undefined ? Math.max(0, asOf - group.activeSince) : 0);
             const map = mapsUrl(group);
             return <section className={styles.group} key={group.id}>
@@ -244,7 +249,7 @@ export default function VisitorLogPage() {
                     </a> : <span className={styles.location}>{locationLabel(group)}</span>}
                   {"  "}<span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
                 </span>
-                <SessionAge at={group.latest} asOf={asOf} />
+                <SessionAge at={live ? group.latest : group.lastEventAt} asOf={asOf} />
               </div>
               {activeMs > 0 ? <div className={styles.details}><span className={styles.active}>{duration(activeMs)} active</span></div> : null}
               {group.events.filter((item) => item.kind === "page" || item.kind === "open").reverse().map((item, index) =>
