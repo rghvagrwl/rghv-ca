@@ -426,7 +426,7 @@ function MinimumStory() {
     <article className={storyStyles.story}>
       <div className={storyStyles.prose}>
         <p>Minimum was a cloud infrastructure startup I worked on with three friends throughout high school. We wanted to make deploying and managing cloud infrastructure simpler, with the longer-term ambition of making infrastructure increasingly autonomous.</p>
-        <p>I joined as the sole designer, knowing almost nothing about cloud infrastructure. I didn&apos;t really understand how deployments worked, what went into running an application, or why developers needed half the tools we were trying to build. I was learning everything as I went, often asking my teammates to explain technical concepts before I could even begin thinking about how to design for them.</p>
+        <p>I was the sole designer, knowing almost nothing about cloud infrastructure. I didn&apos;t really understand how deployments worked, what went into running an application, or why developers needed half the tools we were trying to build. I was learning everything as I went, often asking my teammates to explain technical concepts before I could even begin thinking about how to design for them.</p>
         <p>Looking back, I think that was one of the best things about working on Minimum. I had to develop an understanding of the technology rather than just designing interfaces around things I already knew. It forced me to think about how complicated systems could be made approachable without taking away the control and flexibility that developers needed.</p>
       </div>
 
@@ -440,8 +440,8 @@ function MinimumStory() {
 
       <div className={`${storyStyles.prose} ${storyStyles.storySection}`}>
         <h2>Experimenting with the interface</h2>
-        <p>Minimum was probably one of the most important projects in shaping how I design today. We were ambitious, and because we were so young, I don&apos;t think we felt particularly constrained by how things were supposed to look or work.</p>
-        <p>We pushed the interface in all sorts of directions, sometimes to an extreme. I spent countless hours experimenting with navigation, layouts, interactions, and different ways of representing infrastructure. We weren&apos;t particularly interested in making another conventional cloud dashboard. We wanted to question whether the conventions of existing developer tools were even the right ones to follow.</p>
+        <p>Minimum was probably one of the most important projects in shaping how I design today. We were ambitious, and I was young enough that I didn&apos;t feel particularly constrained by how things were supposed to look or work.</p>
+        <p>I pushed the interface in all sorts of directions, sometimes to an extreme. I spent countless hours experimenting with navigation, layouts, interactions, and different ways of representing infrastructure. I wasn&apos;t particularly interested in making another conventional cloud dashboard. I wanted to question whether the conventions of existing developer tools were even the right ones to follow.</p>
         <p>Not every experiment was good. Some were probably unnecessarily complicated, and others prioritized looking interesting over being useful. But I think having that freedom to break conventions, make mistakes, and figure out why something did or didn&apos;t work was incredibly valuable.</p>
       </div>
 
