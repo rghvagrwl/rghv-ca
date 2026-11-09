@@ -61,10 +61,12 @@ export async function POST(request: NextRequest) {
   } catch {
     return new Response(null, { status: 400 });
   }
-  const { kind, path, session, durationMs } = input;
+  const { kind, path, session, durationMs, referrer } = input;
   if ((kind !== "page" && kind !== "open" && kind !== "duration" && kind !== "heartbeat" && kind !== "resume") ||
       typeof path !== "string" || path.length < 1 || path.length > 200 ||
       typeof session !== "string" || !/^[a-f0-9-]{36}$/.test(session) ||
+      (referrer !== undefined && (kind !== "page" || typeof referrer !== "string" ||
+        referrer.length > 253 || !/^[a-z0-9.-]+$/i.test(referrer))) ||
       (kind === "duration" && (typeof durationMs !== "number" || !Number.isFinite(durationMs)))) {
     return new Response(null, { status: 400 });
   }
@@ -102,6 +104,8 @@ export async function POST(request: NextRequest) {
     city,
     country,
     ...(postalCode ? { postalCode } : {}),
+    ...(typeof referrer === "string" && referrer.toLowerCase() !== request.nextUrl.hostname.toLowerCase()
+      ? { referrer: referrer.toLowerCase() } : {}),
     ...(kind === "duration" ? { durationMs: Math.min(Math.max(durationMs as number, 0), 60 * 60 * 1000) } : {}),
   };
   try {

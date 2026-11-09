@@ -20,6 +20,7 @@ export type VisitorEvent = {
   country: string;
   postalCode?: string;
   durationMs?: number;
+  referrer?: string;
 };
 
 type RedisClient = {

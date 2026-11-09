@@ -50,7 +50,7 @@ function timeAgo(at: number, now: number) {
   return `${Math.floor(seconds / (24 * 60 * 60))}d ago`;
 }
 
-type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; latest: number; lastEventAt: number; live: boolean; events: VisitorEvent[]; activeMs: number; activeSince?: number; activePath?: string };
+type Group = { id: string; session: string; day: string; visitor: string; city: string; country: string; postalCode?: string; referrer?: string; latest: number; lastEventAt: number; live: boolean; events: VisitorEvent[]; activeMs: number; activeSince?: number; activePath?: string };
 
 function locationLabel(group: Group) {
   const country = /^[A-Za-z]{2}$/.test(group.country)
@@ -58,6 +58,17 @@ function locationLabel(group: Group) {
     : group.country;
   const city = `${group.city}, ${country}`;
   return group.postalCode ? `${group.postalCode}, ${city}` : city;
+}
+
+function sourceLabel(hostname: string) {
+  const matches = (domain: string) => hostname === domain || hostname.endsWith(`.${domain}`);
+  if (matches("linkedin.com") || matches("lnkd.in")) return "LinkedIn";
+  if (matches("x.com") || matches("twitter.com") || matches("t.co")) return "X";
+  if (matches("discord.com") || matches("discord.gg") || matches("discordapp.com")) return "Discord";
+  if (matches("google.com")) return "Google";
+  if (matches("instagram.com")) return "Instagram";
+  if (matches("facebook.com") || matches("fb.com")) return "Facebook";
+  return hostname;
 }
 
 function mapsUrl(group: Group) {
@@ -182,6 +193,7 @@ export default function VisitorLogPage() {
         currentSession.set(event.session, group);
       }
       group.postalCode ??= event.postalCode;
+      group.referrer ??= event.referrer;
       group.events.push(event);
       if (event.kind === "page" || event.kind === "resume") {
         group.activeSince = event.at;
@@ -251,6 +263,7 @@ export default function VisitorLogPage() {
                     <a className={styles.location} href={map} target="_blank" rel="noopener noreferrer" title="Search this approximate location in Google Maps">
                       {locationLabel(group)}
                     </a> : <span className={styles.location}>{locationLabel(group)}</span>}
+                  {group.referrer ? <>{"  "}<span className={styles.source}>from {sourceLabel(group.referrer)}</span></> : null}
                   {"  "}<span className={styles.sessionId}>#{group.visitor.slice(0, 8)}</span>
                 </span>
                 <SessionAge at={live ? group.latest : group.lastEventAt} asOf={asOf} />

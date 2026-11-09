@@ -29,6 +29,7 @@
 .sessionIdentity { min-width: 0; }
 .eventTime { color: rgba(255, 255, 255, .5); }
 .sessionId { color: rgba(255, 255, 255, .25); }
+.source { color: rgba(255, 255, 255, .5); }
 .age { color: rgba(255, 255, 255, .75); white-space: nowrap; }
 .location { color: #fff; }
 .page a.location { color: #fff; text-decoration: none; cursor: pointer; }

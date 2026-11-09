@@ -19,7 +19,7 @@ function getSession() {
   }
 }
 
-function send(event: { kind: "page" | "open" | "duration" | "heartbeat" | "resume"; path: string; session: string; durationMs?: number }, beacon = false) {
+function send(event: { kind: "page" | "open" | "duration" | "heartbeat" | "resume"; path: string; session: string; durationMs?: number; referrer?: string }, beacon = false) {
   const body = JSON.stringify(event);
   if (beacon && navigator.sendBeacon) {
     navigator.sendBeacon(ENDPOINT, new Blob([body], { type: "application/json" }));
@@ -29,6 +29,17 @@ function send(event: { kind: "page" | "open" | "duration" | "heartbeat" | "resum
     method: "POST", body, credentials: "same-origin", keepalive: beacon,
     headers: { "Content-Type": "application/json" },
   }).catch(() => {});
+}
+
+function externalReferrer() {
+  if (!document.referrer) return undefined;
+  try {
+    const hostname = new URL(document.referrer).hostname.toLowerCase();
+    if (hostname === window.location.hostname || hostname === "rghv.ca" || hostname.endsWith(".rghv.ca")) return undefined;
+    return hostname;
+  } catch {
+    return undefined;
+  }
 }
 
 export default function VisitorTracker() {
@@ -64,7 +75,7 @@ export default function VisitorTracker() {
         }
       } catch { /* Ignore invalid links. */ }
     };
-    send({ kind: "page", path: pathname, session });
+    send({ kind: "page", path: pathname, session, referrer: externalReferrer() });
     const heartbeat = window.setInterval(() => {
       if (document.visibilityState === "visible") send({ kind: "heartbeat", path: pathname, session });
     }, 60_000);
