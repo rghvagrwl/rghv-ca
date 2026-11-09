@@ -1,5 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { ACCESS_COOKIE } from "../../../lib/visitor-log";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -236,8 +237,9 @@ export async function GET() {
 
   const cookieStore = await cookies();
   const isIgnoredVisitor = cookieStore.get(IGNORE_VISITOR_COOKIE_NAME)?.value === "1";
+  const hasPrivateLogAccess = cookieStore.has(ACCESS_COOKIE);
   const isBlockedLocation = isBlockedVisitorLocation(city, country);
-  const shouldTrackVisitor = !isIgnoredVisitor && !isLikelyBot && !isLikelyPrefetch;
+  const shouldTrackVisitor = !isIgnoredVisitor && !hasPrivateLogAccess && !isLikelyBot && !isLikelyPrefetch;
   let visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
   let shouldSetCookie = false;
   if (!visitorId) {
