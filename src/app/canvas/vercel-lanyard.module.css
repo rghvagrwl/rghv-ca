@@ -12,14 +12,13 @@
   position: absolute;
   z-index: 3;
   top: -1px;
-  left: 50%;
-  width: 186px;
-  height: 35px;
+  left: 0;
+  width: 100%;
+  height: 40px;
   padding: 0;
   border: 0;
   background: none;
   overflow: hidden;
-  transform: translateX(-50%);
   cursor: pointer;
 }
 
@@ -27,11 +26,12 @@
 .peekButton:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 .canvas {
-  width: 100%;
+  --peek-lift: 8px;
+  width: 140%;
   height: auto;
   aspect-ratio: 512 / 590;
   position: absolute;
-  inset: 0 auto auto 0;
+  inset: 0 auto auto -20%;
   pointer-events: none;
   clip-path: inset(0 -200vw -200vh -200vw);
   opacity: 0;
@@ -52,8 +52,24 @@
   width: 100%;
   height: 100%;
   touch-action: none;
-  transform: translateY(-24px);
+  transform: translateY(calc(-24px - var(--peek-lift)));
   transition: transform 480ms cubic-bezier(.2, .8, .2, 1);
 }
 
-.ready canvas { transform: translateY(0); }
+.ready canvas { transform: translateY(calc(-1 * var(--peek-lift))); }
+
+@media (max-width: 700px) {
+  .canvas {
+    --peek-lift: clamp(5px, 1.8vw, 9px);
+    width: 155%;
+    left: -27.5%;
+  }
+}
+
+@media (max-width: 480px) {
+  .canvas {
+    --peek-lift: clamp(10px, 3.6vw, 18px);
+    width: 210%;
+    left: -55%;
+  }
+}

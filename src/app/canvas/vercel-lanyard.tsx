@@ -32,7 +32,6 @@ const BAND_PROFILE = [
 ] as const;
 const STRAP_REACH = 2.6;
 const HORIZONTAL_LIMIT = 1.55;
-const PEEK_AXIS = new THREE.Vector3(0, 0, 1);
 const CARD_JOINT_OFFSET = new THREE.Vector3(0, 1.45, 0);
 let badgeFontReady: Promise<FontFace> | null = null;
 type Model = { nodes: Record<"clip" | "clamp", THREE.Mesh> };
@@ -227,11 +226,28 @@ function BadgeName() {
   </mesh>;
 }
 
-function Badge() {
+function Badge({ peekVisible }: { peekVisible: boolean }) {
   const { nodes } = useGLTF(MODEL) as unknown as Model;
   const card = useMemo(() => cardSurface(), []);
   const shine = useMemo(() => new THREE.ShapeGeometry(cardShape(), 8), []);
   const inset = useMemo(() => new THREE.ShapeGeometry(triangleShape()), []);
+  const shineMaterial = useRef<THREE.ShaderMaterial>(null);
+  const peekStart = useRef<number | null>(null);
+  const reduceMotion = useRef(false);
+  useEffect(() => {
+    reduceMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+  useFrame(() => {
+    if (!shineMaterial.current || reduceMotion.current) return;
+    if (!peekVisible) {
+      shineMaterial.current.uniforms.uPeekSweep.value = -1;
+      return;
+    }
+    const now = performance.now();
+    if (peekStart.current === null) peekStart.current = now;
+    const progress = THREE.MathUtils.clamp((now - peekStart.current - 120) / 650, 0, 1);
+    shineMaterial.current.uniforms.uPeekSweep.value = progress;
+  });
   useEffect(() => () => { card.dispose(); shine.dispose(); inset.dispose(); }, [card, shine, inset]);
   return <group scale={2.25} position={[0, -1.2, -0.05]}>
     <mesh geometry={card} position={[0, 0, -0.014]} castShadow receiveShadow>
@@ -245,17 +261,22 @@ function Badge() {
         envMapIntensity={0.45} side={THREE.DoubleSide} />
     </mesh>
     <mesh geometry={shine} position={[0, 0, 0.008]} renderOrder={1}>
-      <shaderMaterial
+      <shaderMaterial ref={shineMaterial}
         transparent depthWrite={false} blending={THREE.NormalBlending}
         side={THREE.FrontSide}
-        vertexShader={`varying vec3 vWorldPosition;
+        uniforms={{ uPeekSweep: { value: -1 } }}
+        vertexShader={`varying vec2 vCardPosition;
+          varying vec3 vWorldPosition;
           varying vec3 vWorldNormal;
           void main() {
+            vCardPosition = position.xy;
             vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
             vWorldNormal = normalize(mat3(modelMatrix) * vec3(0.0, 0.0, 1.0));
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }`}
-        fragmentShader={`varying vec3 vWorldPosition;
+        fragmentShader={`uniform float uPeekSweep;
+          varying vec2 vCardPosition;
+          varying vec3 vWorldPosition;
           varying vec3 vWorldNormal;
           void main() {
             vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
@@ -273,6 +294,14 @@ function Badge() {
             float sidewaysTilt = smoothstep(0.08, 0.3, abs(normal.x));
             float light = (0.12 * broad + 0.055 * glint + 0.045 * sideFill)
               * verticalFade * facing * sidewaysTilt * (0.75 + 1.6 * grazing);
+            float cardX = (vCardPosition.x + 0.358) / 0.716;
+            float cardY = vCardPosition.y - 0.023;
+            float diagonal = (cardX + 1.0 - cardY) * 0.5;
+            float sweepCenter = mix(-0.25, 1.25, uPeekSweep);
+            float sweep = exp(-pow((diagonal - sweepCenter) / 0.13, 2.0))
+              * sin(clamp(uPeekSweep, 0.0, 1.0) * 3.141593)
+              * step(0.0, uPeekSweep);
+            light += sweep * 0.28 * facing;
             vec3 reflectionColor = vec3(0.92, 0.95, 1.0);
             gl_FragColor = vec4(reflectionColor, light);
           }`} />
@@ -324,7 +353,7 @@ function Badge() {
   </group>;
 }
 
-function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { interactive: boolean; peekHovered: boolean; maxSpeed?: number; minSpeed?: number }) {
+function Lanyard({ interactive, peekHovered, peekVisible, hoverX, maxSpeed = 50, minSpeed = 10 }: { interactive: boolean; peekHovered: boolean; peekVisible: boolean; hoverX: { current: number }; maxSpeed?: number; minSpeed?: number }) {
   const fixed = useRef<RapierRigidBody>(null!);
   const j1 = useRef<RapierRigidBody>(null!);
   const j2 = useRef<RapierRigidBody>(null!);
@@ -333,6 +362,8 @@ function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { i
   const [dragged, setDragged] = useState<THREE.Vector3 | null>(null);
   const [hovered, setHovered] = useState(false);
   const camera = useThree((state) => state.camera);
+  const canvasHeight = useThree((state) => state.size.height);
+  const horizontalLimit = useRef(HORIZONTAL_LIMIT);
   const band = useMemo(() => createBandGeometry(), []);
   const loop = useMemo(() => createBandGeometry(LOOP_SEGMENTS, -1), []);
   const stitches = useMemo(() => createStitchGeometry(), []);
@@ -358,6 +389,7 @@ function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { i
   const clearDragGuard = useRef<(() => void) | null>(null);
   const peekRest = useRef<{ card: THREE.Vector3; joint: THREE.Vector3 } | null>(null);
   const peekMotion = useRef(0);
+  const peekLean = useRef(0);
   const lastBand = useRef(new Float32Array(15).fill(Infinity));
   const lastBandRotation = useRef(new THREE.Quaternion());
   const geometryReady = useRef(false);
@@ -378,6 +410,18 @@ function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { i
     return () => { document.body.style.cursor = ""; };
   }, [hovered, dragged]);
   useEffect(() => () => { clearDragGuard.current?.(); }, []);
+  useEffect(() => {
+    const updateHorizontalLimit = () => {
+      if (!(camera instanceof THREE.PerspectiveCamera) || !canvasHeight) return;
+      const worldHeight = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const worldPerPixel = worldHeight / canvasHeight;
+      horizontalLimit.current = Math.min(HORIZONTAL_LIMIT,
+        Math.max(0.35, (window.innerWidth / 2 - 8) * worldPerPixel - 0.86));
+    };
+    updateHorizontalLimit();
+    window.addEventListener("resize", updateHorizontalLimit);
+    return () => window.removeEventListener("resize", updateHorizontalLimit);
+  }, [camera, canvasHeight]);
   useEffect(() => {
     geometryReady.current = false;
     return () => {
@@ -404,11 +448,18 @@ function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { i
         };
       }
       peekMotion.current = THREE.MathUtils.damp(peekMotion.current, peekHovered ? 1 : 0, 12, Math.min(delta, 0.05));
-      const offset = peekMotion.current * 0.07;
+      peekLean.current = THREE.MathUtils.damp(peekLean.current, peekHovered ? hoverX.current : 0, 10, Math.min(delta, 0.05));
+      const offset = peekMotion.current * 0.02;
       const rest = peekRest.current;
       card.current.setTranslation({ x: rest.card.x, y: rest.card.y - offset, z: rest.card.z }, true);
       j3.current.setTranslation({ x: rest.joint.x, y: rest.joint.y - offset, z: rest.joint.z }, true);
-      quaternion.setFromAxisAngle(PEEK_AXIS, -0.02618 * (1 - peekMotion.current));
+      tilt.set(
+        -0.035 * peekMotion.current,
+        0.14 * peekLean.current,
+        -0.02618 + 0.06 * peekLean.current,
+        "XYZ",
+      );
+      quaternion.setFromEuler(tilt);
       card.current.setRotation(quaternion, true);
     }
     if (dragged) {
@@ -417,7 +468,7 @@ function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { i
       vec.add(dir.multiplyScalar(camera.position.length()));
       [card, j1, j2, j3, fixed].forEach((body) => body.current?.wakeUp());
       target.copy(vec).sub(dragged);
-      target.x = THREE.MathUtils.clamp(target.x, -HORIZONTAL_LIMIT, HORIZONTAL_LIMIT);
+      target.x = THREE.MathUtils.clamp(target.x, -horizontalLimit.current, horizontalLimit.current);
       target.z = Math.max(0.08, target.z);
       const rotation = card.current.rotation();
       quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
@@ -560,8 +611,8 @@ function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { i
       geometryReady.current = true;
     }
     const position = card.current.translation();
-    if (!dragged && Math.abs(position.x) > HORIZONTAL_LIMIT) {
-      card.current.setTranslation({ x: Math.sign(position.x) * HORIZONTAL_LIMIT, y: position.y, z: position.z }, true);
+    if (!dragged && Math.abs(position.x) > horizontalLimit.current) {
+      card.current.setTranslation({ x: Math.sign(position.x) * horizontalLimit.current, y: position.y, z: position.z }, true);
       const velocity = card.current.linvel();
       card.current.setLinvel({ x: 0, y: velocity.y, z: velocity.z }, true);
     }
@@ -633,7 +684,7 @@ function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { i
             if ((event.target as Element).hasPointerCapture(event.pointerId)) (event.target as Element).releasePointerCapture(event.pointerId);
             finishDrag.current?.();
           }}>
-          <Badge />
+          <Badge peekVisible={peekVisible && !interactive} />
         </group>
       </RigidBody>
     </group>
@@ -652,7 +703,7 @@ function Lanyard({ interactive, peekHovered, maxSpeed = 50, minSpeed = 10 }: { i
   </>;
 }
 
-function Scene({ released, peekHovered, onReady }: { released: boolean; peekHovered: boolean; onReady: () => void }) {
+function Scene({ released, peekHovered, peekVisible, hoverX, onReady }: { released: boolean; peekHovered: boolean; peekVisible: boolean; hoverX: { current: number }; onReady: () => void }) {
   useEffect(() => {
     onReady();
   }, [onReady]);
@@ -669,7 +720,7 @@ function Scene({ released, peekHovered, onReady }: { released: boolean; peekHove
       <Lightformer intensity={10} color="white" position={[-10, 0, 14]} rotation={[0, Math.PI / 2, Math.PI / 3]} scale={[100, 10, 1]} />
     </Environment>
     <Physics gravity={released ? [0, -40, 0] : [0, 0, 0]} timeStep={1 / 60} numSolverIterations={8}
-      numInternalPgsIterations={2} interpolate><Lanyard interactive={released} peekHovered={peekHovered} /></Physics>
+      numInternalPgsIterations={2} interpolate><Lanyard interactive={released} peekHovered={peekHovered} peekVisible={peekVisible} hoverX={hoverX} /></Physics>
   </>;
 }
 
@@ -678,8 +729,21 @@ export default function VercelLanyard() {
   const [peekVisible, setPeekVisible] = useState(false);
   const [peekHovered, setPeekHovered] = useState(false);
   const [released, setReleased] = useState(false);
+  const [mobileCanvas, setMobileCanvas] = useState(false);
   const container = useRef<HTMLDivElement>(null);
+  const hoverX = useRef(0);
   const markReady = useCallback(() => setSceneReady(true), []);
+  const updatePeekHover = useCallback((clientX: number, element: HTMLElement) => {
+    const bounds = element.getBoundingClientRect();
+    hoverX.current = THREE.MathUtils.clamp((clientX - bounds.left) / bounds.width * 2 - 1, -1, 1);
+  }, []);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 700px)");
+    const sync = () => setMobileCanvas(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
   useEffect(() => {
     if (!sceneReady) return;
     const timer = window.setTimeout(() => setPeekVisible(true), 500);
@@ -687,11 +751,13 @@ export default function VercelLanyard() {
   }, [sceneReady]);
   return <div className={styles.scene} aria-label="Interactive Vercel badge">
     {!released && <button className={styles.peekButton} type="button" aria-label="Drop the Vercel badge"
-      onPointerEnter={() => setPeekHovered(true)} onPointerLeave={() => setPeekHovered(false)}
+      onPointerEnter={(event) => { updatePeekHover(event.clientX, event.currentTarget); setPeekHovered(true); }}
+      onPointerMove={(event) => updatePeekHover(event.clientX, event.currentTarget)}
+      onPointerLeave={() => { hoverX.current = 0; setPeekHovered(false); }}
       onFocus={() => setPeekHovered(true)} onBlur={() => setPeekHovered(false)}
       onClick={() => setReleased(true)} disabled={!peekVisible} />}
     <div ref={container} className={`${styles.canvas} ${peekVisible ? styles.ready : ""}`}>
-      <Canvas camera={{ position: [0, 0, 13], fov: 25 }} dpr={3.75}
+      <Canvas camera={{ position: [0, 0, 13], fov: 25 }} dpr={mobileCanvas ? 2.75 : 3.75}
         eventSource={document.body}
         events={(state) => ({
           ...events(state),
@@ -707,7 +773,7 @@ export default function VercelLanyard() {
         })}
         gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => { gl.setClearColor(0x000000, 0); gl.toneMapping = THREE.ACESFilmicToneMapping; gl.toneMappingExposure = 1.2; }}>
-        <Suspense fallback={null}><Scene released={released} peekHovered={peekHovered} onReady={markReady} /></Suspense>
+        <Suspense fallback={null}><Scene released={released} peekHovered={peekHovered} peekVisible={peekVisible} hoverX={hoverX} onReady={markReady} /></Suspense>
       </Canvas>
     </div>
   </div>;
