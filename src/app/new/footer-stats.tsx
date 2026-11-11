@@ -256,10 +256,10 @@ export default function SiteFooter({ omitFinalPeriod = false, listStyle = false 
   const [whenText, setWhenText] = useState("a little while ago");
 
   if (!stats) {
-    return null;
+    return <footer className="nv-footer" data-ready="false" />;
   }
 
-  if (listStyle) return <footer className="nv-footer"><VisitorRow stats={stats} /></footer>;
+  if (listStyle) return <footer className="nv-footer" data-ready="true"><VisitorRow stats={stats} /></footer>;
 
   const place =
     stats.lastVisitorLabel && !stats.lastVisitorLabel.startsWith("UNKNOWN")

@@ -60,6 +60,15 @@
   padding: 0;
   font: inherit;
   font-size: 16px;
+  min-height: 32px;
+  opacity: 1;
+  transition: opacity 200ms ease;
+}
+
+.area :global(.nv-footer[data-ready="false"]) { opacity: 0; }
+
+:global(.themeChanging) .area :global(.nv-footer) {
+  transition: opacity 200ms ease, color 200ms ease, background-color 200ms ease, border-color 200ms ease !important;
 }
 
 .area :global(.nv-footer-stat) {
