@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { workProjects } from "../new/content";
 import SiteFooter from "../new/footer-stats";
@@ -8,7 +9,13 @@ import InternshipPhotos from "./internship-photos";
 import Portrait from "./portrait";
 import styles from "./page.module.css";
 import storyStyles from "./vercel-story.module.css";
+import lanyardStyles from "./vercel-lanyard.module.css";
 import visitorFooterStyles from "./visitor-footer.module.css";
+
+const VercelLanyard = dynamic(() => import("./vercel-lanyard"), {
+  ssr: false,
+  loading: () => <div className={lanyardStyles.scene} aria-hidden="true"><div className={lanyardStyles.canvas} /></div>,
+});
 
 const work = workProjects.map((project) => ({
   id: project.id,
@@ -31,6 +38,21 @@ const homeWorkLimit = 4;
 const writingPlaceholders = [1, 2, 3];
 const transitionOutMs = 520;
 const transitionPauseMs = 130;
+const themeStorageKey = "canvas-theme";
+type Theme = "light" | "dark";
+
+function savedTheme(): Theme | null {
+  try {
+    const value = window.localStorage.getItem(themeStorageKey);
+    return value === "light" || value === "dark" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function deviceTheme(): Theme {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 const captures = [
   {
@@ -131,8 +153,11 @@ function BackArrow() {
   );
 }
 
-function NewLabel() {
-  return <span className={styles.newNote}>new</span>;
+function NewLabel({ detail = false }: { detail?: boolean }) {
+  return <span className={styles.newNoteSwap}>
+    <span className={styles.newNote} aria-hidden="true">new</span>
+    <span className={`${detail ? styles.detailDate : styles.date} ${styles.newYear}`}>2026</span>
+  </span>;
 }
 
 function PileRow({ title, date, images, index, onClick }: { title: string; date?: string; images: readonly string[]; index: number; onClick: () => void }) {
@@ -654,7 +679,48 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   const [selection, setSelection] = useState<Selection | null>(initialSelection);
   const [phase, setPhase] = useState<"home" | "leavingHome" | "detail" | "leavingDetail">(initialSelection ? "detail" : "home");
   const [parentSelection, setParentSelection] = useState<Selection | null>(null);
+  const [theme, setTheme] = useState<Theme | null>(null);
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pageRef = useRef<HTMLElement>(null);
+  const themeRef = useRef<Theme | null>(null);
+  const themeTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const syncTheme = () => {
+      const preference = savedTheme();
+      const next = preference ?? deviceTheme();
+      themeRef.current = next;
+      setTheme(next);
+      if (preference) document.documentElement.dataset.canvasTheme = preference;
+      else delete document.documentElement.dataset.canvasTheme;
+    };
+    syncTheme();
+    media.addEventListener("change", syncTheme);
+    window.addEventListener("storage", syncTheme);
+    return () => {
+      media.removeEventListener("change", syncTheme);
+      window.removeEventListener("storage", syncTheme);
+      if (themeTimer.current) window.clearTimeout(themeTimer.current);
+    };
+  }, []);
+
+  function toggleTheme() {
+    const next: Theme = (themeRef.current ?? deviceTheme()) === "dark" ? "light" : "dark";
+    themeRef.current = next;
+    const page = pageRef.current;
+    if (page && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      page.classList.add(styles.themeChanging);
+      if (themeTimer.current) window.clearTimeout(themeTimer.current);
+      themeTimer.current = window.setTimeout(() => {
+        page.classList.remove(styles.themeChanging);
+        themeTimer.current = null;
+      }, 200);
+    }
+    document.documentElement.dataset.canvasTheme = next;
+    setTheme(next);
+    try { window.localStorage.setItem(themeStorageKey, next); } catch { /* Keep the in-page choice. */ }
+  }
 
   useEffect(() => {
     function parentFromHistory() {
@@ -721,7 +787,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   const isVercelWork = selection?.kind === "work" && work[selection.index].id === "vercel-2026";
 
   return (
-    <main className={styles.page} data-canvas-site data-home={phase === "home" || phase === "leavingHome" ? "" : undefined}>
+    <main ref={pageRef} className={styles.page} data-canvas-site data-theme={theme ?? undefined} data-home={phase === "home" || phase === "leavingHome" ? "" : undefined}>
       <div className={styles.stage}>
       <div className={`${styles.home} ${phase !== "home" ? styles.homeInactive : ""}`} inert={phase !== "home"}>
       <div className={styles.column}>
@@ -791,7 +857,17 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
             )}
           </div>
         </div>
-        <div className={visitorFooterStyles.area}>
+        <div className={`${visitorFooterStyles.area} ${visitorFooterStyles.controls}`}>
+          <button className={visitorFooterStyles.themeButton} type="button"
+            onClick={toggleTheme} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-pressed={theme === "dark"}>
+            <span className={`${visitorFooterStyles.themeIcon} ${theme === "dark" ? visitorFooterStyles.themeIconVisible : ""}`} aria-hidden="true">
+              <svg viewBox="0 -960 960 960" fill="currentColor"><path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM80-440q-17 0-28.5-11.5T40-480q0-17 11.5-28.5T80-520h80q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440H80Zm720 0q-17 0-28.5-11.5T760-480q0-17 11.5-28.5T800-520h80q17 0 28.5 11.5T920-480q0 17-11.5 28.5T880-440h-80ZM480-760q-17 0-28.5-11.5T440-800v-80q0-17 11.5-28.5T480-920q17 0 28.5 11.5T520-880v80q0 17-11.5 28.5T480-760Zm0 720q-17 0-28.5-11.5T440-80v-80q0-17 11.5-28.5T480-200q17 0 28.5 11.5T520-160v80q0 17-11.5 28.5T480-40ZM226-678l-43-42q-12-11-11.5-28t11.5-29q12-12 29-12t28 12l42 43q11 12 11 28t-11 28q-11 12-27.5 11.5T226-678Zm494 495-42-43q-11-12-11-28.5t11-27.5q11-12 27.5-11.5T734-282l43 42q12 11 11.5 28T777-183q-12 12-29 12t-28-12Zm-42-495q-12-11-11.5-27.5T678-734l42-43q11-12 28-11.5t29 11.5q12 12 12 29t-12 28l-43 42q-12 11-28 11t-28-11ZM183-183q-12-12-12-29t12-28l43-42q12-11 28.5-11t27.5 11q12 11 11.5 27.5T282-226l-42 43q-11 12-28 11.5T183-183Zm297-297Z"/></svg>
+            </span>
+            <span className={`${visitorFooterStyles.themeIcon} ${theme === "light" ? visitorFooterStyles.themeIconVisible : ""}`} aria-hidden="true">
+              <svg viewBox="0 -960 960 960" fill="currentColor"><path d="M480-120q-151 0-255.5-104.5T120-480q0-138 90-239.5T440-838q13-2 23 3.5t16 14.5q6 9 6.5 21t-7.5 23q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q11-7 22.5-6.5T819-479q10 5 15.5 15t3.5 24q-14 138-117.5 229T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z"/></svg>
+            </span>
+          </button>
           <SiteFooter omitFinalPeriod listStyle />
         </div>
       </div>
@@ -804,9 +880,10 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
                 <button className={`${styles.detailBackRow} ${styles.arrowItem}`} type="button" onClick={goBack} aria-label={parentSelection ? `Back to ${getTitle(parentSelection)}` : "Back to home"}>
                   <BackArrow />
                   <span className={styles.arrowTitle}>{navigationLabel}</span>
-                  {isVercelWork ? <NewLabel /> : navigationDate ? <span className={styles.detailDate}>{navigationDate}</span> : null}
+                  {isVercelWork ? <NewLabel detail /> : navigationDate ? <span className={styles.detailDate}>{navigationDate}</span> : null}
                 </button>
               </h1>
+              {isVercelWork ? <VercelLanyard /> : null}
               {selection.kind === "workAll" || selection.kind === "otherWorkAll" || selection.kind === "captureAll" || selection.kind === "writingAll" ? (
                   <div className={`${styles.detailList} ${styles.navigation}`}>
                     {selection.kind === "workAll" ? allWork.map(({ project, index }) => (

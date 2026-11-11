@@ -7,11 +7,11 @@
 .hidden { visibility: hidden; }
 .dialog { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 32px; border: 0; background: transparent; overflow: hidden; }
 .dialog[open] { display: flex; align-items: center; justify-content: center; }
-.dialog::backdrop { background: #eeeeee80; backdrop-filter: blur(14px); animation: backdropIn 400ms both; }
+.dialog::backdrop { background: var(--polaroid-backdrop, #eeeeee80); backdrop-filter: blur(14px); animation: backdropIn 400ms both; }
 .dialog[data-closing="true"]::backdrop { animation: backdropOut 560ms both; }
 .enlarged { width: min(430px, 78vw, 49dvh); aspect-ratio: 1; cursor: zoom-out; }
-.close { position: absolute; right: 24px; top: 20px; border: none; background: none; color: #0008; font: 14px system-ui, sans-serif; cursor: pointer; padding: 10px; }
-.thumbnail:focus-visible, .enlarged:focus-visible, .close:focus-visible { outline: 2px solid #0006; outline-offset: 6px; }
+.close { position: absolute; right: 24px; top: 20px; border: none; background: none; color: var(--polaroid-close, #0008); font: 14px system-ui, sans-serif; cursor: pointer; padding: 10px; }
+.thumbnail:focus-visible, .enlarged:focus-visible, .close:focus-visible { outline: 2px solid var(--polaroid-focus, #0006); outline-offset: 6px; }
 @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes backdropOut { from { opacity: 1; } to { opacity: 0; } }
 @keyframes polaroidReveal {

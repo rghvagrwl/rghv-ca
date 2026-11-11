@@ -8,7 +8,15 @@
   --muted-ink: rgb(0 0 0 / 40%);
   --faint-ink: rgb(0 0 0 / 20%);
   --rule: rgb(0 0 0 / 10%);
+  --selection-bg: rgb(0 0 0 / 10%);
+  --capture-border: white;
   --image-surface: rgb(0 0 0 / 5%);
+  --polaroid-backdrop: #eeeeee80;
+  --polaroid-close: #0008;
+  --polaroid-focus: #0006;
+  --gallery-overlay: rgb(247 247 247 / 80%);
+  --gallery-ink: #000;
+  --gallery-rule: rgb(0 0 0 / 10%);
   min-height: 100dvh;
   padding: var(--site-top-space) 20px 20px;
   background: var(--paper);
@@ -28,8 +36,56 @@
 }
 
 .page ::selection {
-  background: rgb(0 0 0 / 10%);
+  background: var(--selection-bg);
   color: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(html:not([data-canvas-theme="light"])) .page:not([data-theme="light"]) {
+    --paper: #111111;
+    --ink: rgb(255 255 255 / 94%);
+    --body-ink: rgb(255 255 255 / 78%);
+    --secondary-ink: rgb(255 255 255 / 60%);
+    --muted-ink: rgb(255 255 255 / 42%);
+    --faint-ink: rgb(255 255 255 / 23%);
+    --rule: rgb(255 255 255 / 5%);
+    --selection-bg: rgb(255 255 255 / 20%);
+    --capture-border: rgb(255 255 255 / 5%);
+    --image-surface: rgb(255 255 255 / 6%);
+    --polaroid-backdrop: rgb(17 17 17 / 88%);
+    --polaroid-close: rgb(255 255 255 / 65%);
+    --polaroid-focus: rgb(255 255 255 / 40%);
+    --gallery-overlay: rgb(17 17 17 / 84%);
+    --gallery-ink: #f2f2f2;
+    --gallery-rule: rgb(255 255 255 / 5%);
+    color-scheme: dark;
+  }
+}
+
+:global(html[data-canvas-theme="dark"]) .page:not([data-theme="light"]),
+.page[data-theme="dark"] {
+  --paper: #111111;
+  --ink: rgb(255 255 255 / 94%);
+  --body-ink: rgb(255 255 255 / 78%);
+  --secondary-ink: rgb(255 255 255 / 60%);
+  --muted-ink: rgb(255 255 255 / 42%);
+  --faint-ink: rgb(255 255 255 / 23%);
+  --rule: rgb(255 255 255 / 5%);
+  --selection-bg: rgb(255 255 255 / 20%);
+  --capture-border: rgb(255 255 255 / 5%);
+  --image-surface: rgb(255 255 255 / 6%);
+  --polaroid-backdrop: rgb(17 17 17 / 88%);
+  --polaroid-close: rgb(255 255 255 / 65%);
+  --polaroid-focus: rgb(255 255 255 / 40%);
+  --gallery-overlay: rgb(17 17 17 / 84%);
+  --gallery-ink: #f2f2f2;
+  --gallery-rule: rgb(255 255 255 / 5%);
+  color-scheme: dark;
+}
+
+.page.themeChanging,
+.page.themeChanging * {
+  transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease !important;
 }
 
 .page :is(button, a[href], [role="button"]) {
@@ -92,7 +148,7 @@
   width: 100%;
   max-width: 512px;
   margin: 0 auto 100px;
-  overflow: clip;
+  overflow: visible;
 }
 
 .detailHeading {
@@ -103,7 +159,7 @@
 .detailBackRow {
   display: flex;
   width: 100%;
-  overflow: clip;
+  overflow: visible;
   min-height: 37.5px;
   align-items: center;
   margin: 0;
@@ -174,7 +230,7 @@
   width: min(100%, calc(100% * var(--capture-aspect, 16 / 9)));
   margin-inline: auto;
   aspect-ratio: var(--capture-aspect, 16 / 9);
-  border: 1px solid white;
+  border: 1px solid var(--capture-border, white);
 }
 
 .detailImageFrame {
@@ -259,7 +315,7 @@
 
 .navigation {
   --dimmed-text: var(--faint-ink);
-  overflow: clip;
+  overflow: visible;
   font-size: 16px;
 }
 
@@ -376,10 +432,21 @@
   flex: 1;
 }
 
+.newNoteSwap {
+  display: grid;
+  flex: none;
+  align-items: center;
+  justify-items: end;
+  margin-left: 12px;
+}
+
+.newNoteSwap > span {
+  grid-area: 1 / 1;
+}
+
 .newNote {
   display: inline-block;
   flex: none;
-  margin-left: 12px;
   padding-right: 0.2em;
   color: #13d95c;
   font-family: "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive;
@@ -391,8 +458,13 @@
   white-space: nowrap;
   vertical-align: middle;
   transform: translateY(-1px) rotate(-2deg);
-  animation: noteWrite 700ms ease-out 1100ms both;
+  animation: noteWrite 700ms ease-out 1100ms both, noteOut 220ms ease-in 3800ms forwards;
   transition: opacity 180ms ease;
+}
+
+.newYear {
+  margin-left: 0;
+  animation: yearIn 260ms ease-out 4060ms both;
 }
 
 @media (min-width: 701px) and (hover: hover) and (pointer: fine) {
@@ -410,11 +482,20 @@
   to { clip-path: inset(-0.2em -0.2em -0.2em -0.2em); }
 }
 
+@keyframes noteOut {
+  to { opacity: 0; filter: blur(6px); }
+}
+
+@keyframes yearIn {
+  from { opacity: 0; filter: blur(6px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .newNote {
-    animation: none;
-    clip-path: none;
+    display: none;
   }
+  .newYear { animation: none; }
 }
 
 .arrowSlot {

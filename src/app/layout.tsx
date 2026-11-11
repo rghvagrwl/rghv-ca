@@ -51,7 +51,10 @@ export default function RootLayout({
   const isProduction = process.env.NODE_ENV === "production";
 
   return (
-    <html lang="en" className={`${switzer.variable} h-full scroll-smooth antialiased`}>
+    <html lang="en" className={`${switzer.variable} h-full scroll-smooth antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: 'try { const theme = localStorage.getItem("canvas-theme"); if (theme === "light" || theme === "dark") document.documentElement.dataset.canvasTheme = theme; } catch {}' }} />
+      </head>
       <body className="min-h-full">
         {children}
         {isProduction ? <SiteTelemetry trackVisits={visitorLogReady()} /> : null}
