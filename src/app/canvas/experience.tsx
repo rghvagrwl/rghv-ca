@@ -42,7 +42,6 @@ const captures = [
     images: [
       "/photo/tonys-pizza-sf-june-2026/01.webp",
       "/photo/tonys-pizza-sf-june-2026/02.webp",
-      "/photo/tonys-pizza-sf-june-2026/03.webp",
       "/photo/tonys-pizza-sf-june-2026/04.webp",
       "/photo/tonys-pizza-sf-june-2026/05.webp",
     ],
