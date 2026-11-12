@@ -192,7 +192,7 @@ function BadgeName() {
   useEffect(() => {
     let active = true;
     let current: THREE.CanvasTexture | null = null;
-    badgeFontReady ??= new FontFace("Geist Mono Badge", "url(/fonts/geist-mono/GeistMono-Regular.ttf)")
+    badgeFontReady ??= new FontFace("Geist Mono Badge", "url(/fonts/geist-mono/GeistMono-Regular.ttf)", { weight: "400", style: "normal" })
       .load().then((loaded) => { document.fonts.add(loaded); return loaded; });
     badgeFontReady.then(() => {
       if (!active) return;
@@ -201,11 +201,22 @@ function BadgeName() {
       canvas.height = 128;
       const context = canvas.getContext("2d");
       if (!context) return;
-      context.font = '76px "Geist Mono Badge"';
-      context.textAlign = "center";
+      const fontSize = 70;
+      const label = "RAGHAV AGARWAL";
+      const letters = [...label];
+      const tracking = fontSize * 0.04;
+      context.font = `400 ${fontSize}px "Geist Mono Badge"`;
+      context.textAlign = "left";
       context.textBaseline = "middle";
       context.fillStyle = "#ffffff";
-      context.fillText("RAGHAV AGARWAL", 512, 65);
+      const advances = letters.map((letter) => context.measureText(letter).width);
+      const textWidth = advances.reduce((width, advance) => width + advance, 0)
+        + tracking * (letters.length - 1);
+      let x = (canvas.width - textWidth) / 2;
+      letters.forEach((letter, index) => {
+        context.fillText(letter, x, 65);
+        x += advances[index] + tracking;
+      });
       current = new THREE.CanvasTexture(canvas);
       current.colorSpace = THREE.SRGBColorSpace;
       current.anisotropy = 8;
@@ -219,10 +230,11 @@ function BadgeName() {
   if (!texture) return null;
   return <mesh position={[0, 0.116, 0.014]} scale={[0.56, 0.075, 1]}>
     <planeGeometry args={[1, 1]} />
-    <meshPhysicalMaterial map={texture} color="#232526"
-      metalness={0.35} roughness={0.28}
-      clearcoat={0.8} clearcoatRoughness={0.16}
-      envMapIntensity={0.3} transparent alphaTest={0.06} depthWrite={false} />
+    <meshPhysicalMaterial map={texture} color="#141617"
+      metalness={0.2} roughness={0.54}
+      clearcoat={0.35} clearcoatRoughness={0.2}
+      envMapIntensity={0.08} specularIntensity={0.1}
+      transparent alphaTest={0.06} depthWrite={false} />
   </mesh>;
 }
 
