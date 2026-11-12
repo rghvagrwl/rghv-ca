@@ -157,6 +157,7 @@
 }
 
 .detailBackRow {
+  position: relative;
   display: flex;
   width: 100%;
   overflow: visible;
@@ -173,6 +174,13 @@
   font-size: 16px;
   line-height: inherit;
   text-align: left;
+}
+
+.detailBackRow::before {
+  position: absolute;
+  inset: 0 auto 0 -16px;
+  width: 16px;
+  content: "";
 }
 
 .detailDate {
@@ -521,6 +529,14 @@
   overflow: hidden;
 }
 
+.detailBackRow .arrowSlot {
+  width: 22px;
+}
+
+.detailBackRow .arrowIcon {
+  transform: translateX(0);
+}
+
 .listItem .arrowIcon {
   left: 0;
   transform: translateX(-18px);
@@ -538,6 +554,11 @@
   transform: translateX(0);
   transition-duration: 360ms;
   transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.detailBackRow:hover .arrowIcon,
+.detailBackRow:focus-visible .arrowIcon {
+  transform: translateX(-12px);
 }
 
 .captureItem {
@@ -700,14 +721,6 @@
 
   .listItem .arrowIcon {
     transform: translateX(-8px) !important;
-  }
-
-  .detailBackRow .arrowSlot {
-    width: 22px !important;
-  }
-
-  .detailBackRow .arrowIcon {
-    transform: translateX(0) !important;
   }
 
   .bioLink:hover {
