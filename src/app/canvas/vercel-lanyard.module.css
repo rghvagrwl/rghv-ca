@@ -8,6 +8,32 @@
   text-align: center;
 }
 
+.refractionFilter {
+  position: fixed;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.refractionViewport {
+  position: absolute;
+  inset: 0 0 auto;
+  height: max(150vh, 1200px);
+  overflow: clip;
+  pointer-events: none;
+}
+
+.refraction {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  transform: translateY(-200%);
+  -webkit-backdrop-filter: blur(.5px);
+  backdrop-filter: blur(.5px);
+  backdrop-filter: url('#lanyard-refraction');
+}
+
 .peekButton {
   position: absolute;
   z-index: 3;
@@ -31,6 +57,7 @@
   height: auto;
   aspect-ratio: 512 / 590;
   position: absolute;
+  z-index: 1;
   inset: 0 auto auto -20%;
   pointer-events: none;
   clip-path: inset(0 -200vw -200vh -200vw);
