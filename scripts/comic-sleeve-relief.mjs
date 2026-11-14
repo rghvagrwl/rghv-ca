@@ -1,4 +1,5 @@
-// Run with node scripts/comic-sleeve-relief.mjs. RGB stores dZ/dX, dZ/dY and physical height.
+// Run with node scripts/comic-sleeve-relief.mjs. RGB stores the surface slopes and
+// height; A encodes fine abrasion used only by handled sleeves.
 import sharp from "sharp";
 import { fileURLToPath } from "node:url";
 
@@ -49,14 +50,54 @@ for (let i = 0; i < creases.length; i++) {
   }
 }
 const sample = (x,y) => heights[Math.max(0, Math.min(height-1,y))*width + Math.max(0, Math.min(width-1,x))];
-const pixels = Buffer.alloc(width*height*3);
+// Short streaks left by repeated handling collect near corners and the mouth.
+// Bake them once so the animated film needs no extra sampler or procedural noise.
+let state = 1271993;
+function random() {
+  state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+  return state / 4294967296;
+}
+const abrasion = new Float32Array(width * height);
+const patches = [
+  // Center, patch spread and predominant scratch direction (image coordinates).
+  [0.085, 0.15, 0.11, 0.15, 0.82], [0.93, 0.11, 0.085, 0.09, 1.12],
+  [0.86, 0.94, 0.10, 0.08, -0.59], [0.03, 0.87, 0.05, 0.10, -1.21],
+  [0.58, 0.036, 0.20, 0.035, 0.19],
+];
+for (const [cx, cy, spreadX, spreadY, direction] of patches) {
+  for (let mark = 0; mark < 52; mark++) {
+    const x = width * (cx + spreadX * (random() + random() - 1));
+    const y = height * (cy + spreadY * (random() + random() - 1));
+    const length = 3 + 41 * random() ** 2;
+    const theta = direction + 0.9 * (random() - 0.5);
+    const dx = Math.cos(theta), dy = Math.sin(theta);
+    const curve = 0.13 * length * (random() - 0.5);
+    const strength = 0.34 + 0.66 * random();
+    for (let t = 0; t < length; t += 0.5) {
+      const arc = 4 * t / length * (1 - t / length);
+      const px = x + dx * t - dy * curve * arc;
+      const py = y + dy * t + dx * curve * arc;
+      for (let iy = Math.floor(py); iy <= Math.ceil(py); iy++) {
+        for (let ix = Math.floor(px); ix <= Math.ceil(px); ix++) {
+          if (iy < 0 || iy >= height || ix < 0 || ix >= width) continue;
+          const coverage = Math.max(0, 1 - Math.hypot(ix - px, iy - py));
+          const i = iy * width + ix;
+          abrasion[i] = Math.max(abrasion[i], arc * coverage * strength);
+        }
+      }
+    }
+  }
+}
+const pixels = Buffer.alloc(width * height * 4);
 for (let y=0; y<height; y++) for (let x=0; x<width; x++) {
-  const i=(y*width+x)*3;
+  const i=(y*width+x)*4;
   const gx=(sample(x+1,y)-sample(x-1,y))*(width-1)/(2*bagWidth);
   const gy=(sample(x,y-1)-sample(x,y+1))*(height-1)/(2*bagHeight);
   pixels[i]=Math.round(128 + Math.max(-1,Math.min(1,gx/maxSlope))*127);
   pixels[i+1]=Math.round(128 + Math.max(-1,Math.min(1,gy/maxSlope))*127);
   pixels[i+2]=Math.round(clamp(sample(x,y)/maxHeight)*255);
+  // Stay nearly opaque so browser decoding retains the RGB relief data.
+  pixels[i+3]=255-Math.round(abrasion[y*width+x]*63);
 }
 const path = fileURLToPath(new URL("../public/3d/comics/sleeve-relief.png", import.meta.url));
-await sharp(pixels, {raw:{width,height,channels:3}}).png({compressionLevel:9}).toFile(path);
+await sharp(pixels, {raw:{width,height,channels:4}}).png({compressionLevel:9}).toFile(path);

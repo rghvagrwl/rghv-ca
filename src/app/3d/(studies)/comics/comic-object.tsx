@@ -3,6 +3,8 @@ import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 import type { Issue } from "./catalog";
+import { scanConditions } from "./scan-condition";
+import { wornPaperGeometry } from "./worn-paper";
 import atlas from "./print-atlas.json";
 
 const BAG_TOP_MARGIN = 0.084;
@@ -85,13 +87,21 @@ function paperGeometry(issue: Issue) {
   return mesh.finish();
 }
 
-function sleeveGeometry(bag: number, height: number, half: number, seed: number) {
+function sleeveGeometry(bag: number, height: number, half: number, seed: number, wear: number) {
   const sleeveHeight = bagHeight(height);
   const mesh = surfaces();
   function depth(u: number, v: number) {
     const edge = Math.min(u, 1 - u, v, 1 - v);
     const air = THREE.MathUtils.smoothstep(edge, 0, 0.021);
     const slack = 0.0026 * (1 + Math.sin(u * 8 - v * 5 + seed)) + 0.002 * (1 + Math.sin(u * 3 + v * 10));
+    if (wear > 0) {
+      // Keep headroom for the curled paper, then draw the two sheets together
+      // over the empty margin. The compressed rim has a few deeper pockets.
+      const rim = 1 - THREE.MathUtils.smoothstep(edge, 0.012, 0.135);
+      const pocket = Math.sin(17 * u + 12 * v + seed) ** 2;
+      const contact = THREE.MathUtils.smoothstep(edge, 0, 0.011);
+      return 0.0006 + contact * (half + 0.003 + slack + wear * (0.012 + 0.009 * rim * pocket));
+    }
     return 0.0006 + air * (half + 0.003 + slack);
   }
   // Above the trim the film can bow independently of the paper. The side welds
@@ -99,35 +109,55 @@ function sleeveGeometry(bag: number, height: number, half: number, seed: number)
   function lipWeight(x: number, v: number) {
     return Math.sin(Math.PI * x) * THREE.MathUtils.smoothstep(v, 0.954, 1);
   }
+  function widthAt(x: number, v: number) {
+    const width = (x - 0.5) * bag;
+    if (!wear) return width;
+    const side = 2 * x - 1;
+    const edge = Math.abs(side) ** 10;
+    const ripple = 0.0038 * Math.sin(38 * v + seed + side) + 0.0023 * Math.sin(77 * v - seed * side);
+    return width + wear * edge * ripple;
+  }
   function heightAt(x: number, v: number) {
-    const dip = 0.0036 + 0.003 * Math.sin(9 * x + seed * 1.7);
+    const dip = 0.0036 + 0.003 * Math.sin(9 * x + seed * 1.7)
+      + wear * (0.010 + 0.008 * Math.sin(28 * x + seed) + 0.0035 * Math.cos(65 * x - seed));
     return (v - 0.5) * sleeveHeight + BAG_CENTER_Y - lipWeight(x, v) * dip;
   }
   function lipBow(x: number, v: number) {
-    return lipWeight(x, v) * (0.006 + 0.009 * Math.sin(8 * x + seed));
+    return lipWeight(x, v) * (0.006 + 0.009 * Math.sin(8 * x + seed) + wear * 0.015 * Math.sin(26 * x + seed));
+  }
+  // Place a vertex ring between the weld and the corners of the print. A
+  // regular coarse grid would cut diagonally through a lifted corner here.
+  function marginSample(t: number, segments: number) {
+    if (!wear) return t;
+    const inset = Math.min(t, 1 - t);
+    if (inset >= 1.5 / segments) return t;
+    const compressed = inset * segments * 0.010;
+    return t < 0.5 ? compressed : 1 - compressed;
   }
   for (const side of [1, -1]) {
     mesh.patch(42, 56, (u, v) => {
-      const x = side > 0 ? u : 1 - u;
+      const x = marginSample(side > 0 ? u : 1 - u, 42);
       // The back sheet ends just inside the fold on the front sheet.
-      const y = side > 0 ? v : 0.989 * v;
-      return [(x - 0.5) * bag, heightAt(x, y), lipBow(x, y) + side * depth(x, y), x, v, side > 0 ? 0 : 1];
+      const t = marginSample(v, 56);
+      const y = side > 0 ? t : 0.989 * t;
+      return [widthAt(x, y), heightAt(x, y), lipBow(x, y) + side * depth(x, y), x, t, side > 0 ? 0 : 1];
     });
   }
   // The front sheet turns through a rounded crest and continues down the back.
-  const flapGap = 0.0038;
-  mesh.patch(42, 4, (x, v) => {
+  const flapGap = 0.0038 + wear * 0.002;
+  mesh.patch(42, 4, (u, v) => {
+    const x = marginSample(u, 42);
     const angle = Math.PI * v;
     const radius = depth(x, 1) + flapGap / 2;
     const z = lipBow(x, 1) - flapGap / 2 + radius * Math.cos(angle);
-    return [(x - 0.5) * bag, heightAt(x, 1) + radius * Math.sin(angle), z, x, 1, 0];
+    return [widthAt(x, 1), heightAt(x, 1) + radius * Math.sin(angle), z, x, 1, 0];
   });
   mesh.patch(42, 12, (u, v) => {
     const inset = (1 - v) * 0.011;
-    const x = THREE.MathUtils.lerp(1 - inset, inset, u);
+    const x = THREE.MathUtils.lerp(1 - inset, inset, marginSample(u, 42));
     const y = 0.871 + 0.129 * v + 0.0018 * Math.sin(x * 7 + seed) * (1 - v);
     const fold = flapGap + 0.0024 * Math.sin(v * Math.PI);
-    return [(x - 0.5) * bag, heightAt(x, y), lipBow(x, y) - depth(x, y) - fold, x, v, 2];
+    return [widthAt(x, y), heightAt(x, y), lipBow(x, y) - depth(x, y) - fold, x, v, 2];
   });
   return mesh.finish();
 }
@@ -136,6 +166,7 @@ function sleeveGeometry(bag: number, height: number, half: number, seed: number)
 const filmSurface = /* glsl */ `
   uniform sampler2D reliefMap;
   uniform float seed;
+  uniform float sleeveWear;
 
   vec2 creaseAxes(float region) {
     return 1.0 - 2.0 * mod(vec2(seed + step(0.5, region), floor(seed * 0.5)), 2.0);
@@ -155,7 +186,9 @@ const filmSurface = /* glsl */ `
     return smoothstep(0.0, 0.012, min(edge.x, edge.y));
   }
   float foldStrength(vec2 p) {
-    return clamp(0.94 + 3.6 * flex.x * (2.0 * p.x - 1.0)
+    vec2 margin = min(p, 1.0 - p);
+    float press = 1.0 - smoothstep(0.012, 0.23, min(margin.x, margin.y));
+    return (1.0 + sleeveWear * (0.15 + 0.68 * press)) * clamp(0.94 + 3.6 * flex.x * (2.0 * p.x - 1.0)
                       + 4.0 * flex.y * (2.0 * p.y - 1.0), 0.48, 1.60);
   }
 `;
@@ -237,11 +270,36 @@ const studioLight = /* glsl */ `
     return step(0.0, travel) * (1.0 - smoothstep(-feather, feather, max(edge.x, edge.y)));
   }
 `;
+// Two of the clearest broken-ink folds on each of these fronts, traced in scan coordinates.
+const frontCreases: Partial<Record<string, readonly [THREE.Vector4, THREE.Vector4]>> = {
+  "terry-and-the-pirates-26": [new THREE.Vector4(0.004, 0.192, 0.527, 0.454), new THREE.Vector4(0.433, 0.011, 0.410, 0.056)],
+  "four-color-632": [new THREE.Vector4(0.804, 0.997, 0.998, 0.719), new THREE.Vector4(0.955, 0.997, 0.998, 0.925)],
+  "fightin-marines-22": [new THREE.Vector4(0.936, 0.998, 0.998, 0.945), new THREE.Vector4(0.974, 0.998, 0.998, 0.970)],
+  "strange-suspense-stories-27": [new THREE.Vector4(0.004, 0.506, 0.409, 0.998), new THREE.Vector4(0.004, 0.865, 0.144, 0.998)],
+};
 const paperFragment = varyings + /* glsl */ `
   uniform sampler2D frontArt;
   uniform sampler2D backArt;
   uniform vec4 printTile;
   uniform bool fullFront;
+  #ifdef FRONT_CREASES
+  uniform vec4 folds[2];
+  uniform float paperWidth;
+  uniform float paperHalfHeight;
+  // Signed slope of a shallow rounded ridge. Both flanks respond to the existing studio light.
+  vec2 foldSlope(vec2 p, vec4 fold, vec2 size) {
+    vec2 segment = (fold.zw - fold.xy) * size;
+    float span = length(segment);
+    vec2 axis = segment / span;
+    vec2 across = vec2(-axis.y, axis.x);
+    vec2 offset = (p - fold.xy) * size;
+    float along = dot(offset, axis);
+    float endFade = smoothstep(0.0, 0.018, min(along, span - along));
+    float d = dot(offset, across) / 0.007;
+    float slope = -0.32 * d * exp(-0.5 * d*d) * endFade;
+    return slope * vec2(across.x, -across.y);
+  }
+  #endif
   uniform bool fullBack;
   uniform sampler2D foilMask;
   uniform vec3 foilColor;
@@ -250,6 +308,7 @@ const paperFragment = varyings + /* glsl */ `
   uniform bool dieCut;
   uniform float overlay;
   uniform float leaves;
+  uniform float paperWear;
   uniform mat4 neighborFromWorld;
   uniform vec2 neighborHalfSize;
   uniform vec3 spineColor;
@@ -282,6 +341,16 @@ const paperFragment = varyings + /* glsl */ `
     if (region < 1.5 || outer) {
       vec2 uv = (front ? fullFront : fullBack) ? texCoord : printTile.xy + texCoord * printTile.zw;
       vec3 ink = front ? texture2D(frontArt, uv).rgb : texture2D(backArt, uv).rgb;
+      #ifdef FRONT_CREASES
+      if (front && region < 0.5) {
+        vec2 scan = vec2(texCoord.x, 1.0-texCoord.y);
+        vec2 size = vec2(paperWidth, 2.0*paperHalfHeight);
+        vec2 slope = foldSlope(scan, folds[0], size) + foldSlope(scan, folds[1], size);
+        vec3 tangent = normalize(vec3(objectNormal.z, 0.0, -objectNormal.x));
+        vec3 bentNormal = objectNormal - slope.x * tangent - slope.y * cross(objectNormal, tangent);
+        n = normalize(mat3(modelMatrix) * bentNormal);
+      }
+      #endif
       float direct = max(dot(n, key), 0.0) * (1.0 - 0.60 * neighborShadow());
       float sky = 0.5 + 0.5 * n.y;
       vec3 fill = mix(vec3(0.45, 0.46, 0.48), vec3(0.66, 0.69, 0.72), sky);
@@ -332,7 +401,13 @@ const paperFragment = varyings + /* glsl */ `
     } else if (region < 2.5) {
       float line = texCoord.y * leaves;
       float layers = cos(line * 6.28318) * (1.0 - smoothstep(0.12, 0.5, fwidth(line)));
-      gl_FragColor = vec4(vec3(0.57, 0.51, 0.40) * (0.86 + 0.12 * layers + 0.09 * dot(n,key)), 1.0);
+      vec3 stock = vec3(0.57, 0.51, 0.40);
+      if (paperWear > 0.0) {
+        float grain = 0.5 + 0.5 * sin(420.0 * texCoord.x + 1.8 * sin(texCoord.x * 98.0));
+        vec3 oldStock = mix(vec3(0.36, 0.245, 0.132), vec3(0.55, 0.415, 0.245), grain);
+        stock = mix(stock, oldStock, paperWear);
+      }
+      gl_FragColor = vec4(stock * (0.86 + 0.12 * layers + 0.09 * dot(n,key)), 1.0);
     } else if (region > 3.5) {
       vec3 ink = printedSpine ? texture2D(spineArt, texCoord).rgb : spineColor;
       gl_FragColor = vec4(ink * (0.65 + 0.40 * max(dot(n, key), 0.0)), 1.0);
@@ -352,8 +427,8 @@ const filmFragment = varyings + /* glsl */ `
   void main() {
     vec2 uv = texCoord;
     vec2 p = sleevePoint(uv, region);
-    vec2 relief = texture2D(reliefMap, reliefUV(p, region)).rg;
-    vec2 slope = (relief * 255.0 - 128.0) * (1.25 / 127.0);
+    vec4 relief = texture2D(reliefMap, reliefUV(p, region));
+    vec2 slope = (relief.rg * 255.0 - 128.0) * (1.25 / 127.0);
     slope *= creaseAxes(region) * foldStrength(p);
     // Shallow pockets between the sharper folds change curvature under a hand.
     vec2 slack = vec2(sin(8.6*p.x + 3.8*p.y + seed + 5.5*flex.x),
@@ -379,6 +454,12 @@ const filmFragment = varyings + /* glsl */ `
     // The doubled plastic at a weld catches the room even between direct highlights.
     float seam = weld * (0.14 + 0.16 * smoothstep(-0.2, 0.85, reflected.y))
                + 0.20 * smoothstep(0.70, 0.99, f);
+    // Small abrasions scatter reflected light along the handled edges. Away
+    // from a scuff the clear film transmits the ink without a diffuse veil.
+    float scuff = (1.0 - relief.a) * (255.0 / 63.0) * sleeveWear;
+    float scattered = scuff * (0.055 + 0.45 * max(key, max(strip, fill)) + 0.26 * f);
+    spec += (1.0 - spec) * scattered;
+    seam *= 1.0 + sleeveWear * 0.21 * crease;
     float alpha = spec + (1.0 - spec) * seam;
     vec3 color = mix(vec3(0.38,0.42,0.45), vec3(1.0,0.99,0.97), spec / max(alpha, 0.0001));
     gl_FragColor = vec4(color, alpha);
@@ -398,6 +479,8 @@ type ComicProps = {
   shelf: RefObject<(THREE.Group | null)[]>;
   neighbor?: Issue;
 };
+const creasedPaperFragment = "#define FRONT_CREASES\n" + paperFragment;
+
 function printTexture(texture: THREE.Texture, anisotropy: number) {
   if (texture.colorSpace === THREE.SRGBColorSpace && texture.anisotropy === anisotropy) return;
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -439,7 +522,7 @@ export function ComicObject({ issue, index, inspected, detailedFront, flex, shel
   const sheetIndex = Math.floor(index / atlas.perSheet);
   const sheet = atlas.sheets[sheetIndex];
   const suffix = sheetIndex || "";
-  const reliefMap = useLoader(THREE.TextureLoader, "/3d/comics/sleeve-relief.png");
+  const reliefMap = useLoader(THREE.TextureLoader, "/3d/comics/sleeve-relief.png?v=abrasion1");
   const [front, back] = useLoader(THREE.TextureLoader, [
     `/3d/comics/shelf-front${suffix}.webp?v=${sheet.version}`, `/3d/comics/shelf-back${suffix}.webp?v=${sheet.version}`,
   ]);
@@ -461,20 +544,23 @@ export function ComicObject({ issue, index, inspected, detailedFront, flex, shel
       (tileWidth - 1) / w, (tileHeight - 1) / h,
     );
   }, [index, sheet]);
-  const paper = useMemo(() => paperGeometry(issue), [issue]);
-  const sleeve = useMemo(() => sleeveGeometry(issue.bag, issue.height, half, index), [issue, half, index]);
+  const condition = scanConditions[issue.slug];
+  const paper = useMemo(() => condition ? wornPaperGeometry(issue, condition) : paperGeometry(issue), [issue, condition]);
+  const wear = condition?.wear ?? 0;
+  const sleeve = useMemo(() => sleeveGeometry(issue.bag, issue.height, half, index, wear), [issue, half, index, wear]);
   const uniforms = useMemo(() => ({
     flex: { value: new THREE.Vector2() }, paperWidth: { value: issue.width }, paperHalfHeight: { value: issue.height / 2 }, seed: { value: index },
     neighborFromWorld: { value: new THREE.Matrix4() }, neighborHalfSize: { value: new THREE.Vector2((neighbor?.width ?? 0) / 2, (neighbor?.height ?? 0) / 2) },
     spineColor: { value: new THREE.Color(issue.spineColor ?? "#191619") }, spineArt: { value: spineArt ?? null },
-    printedSpine: { value: !!spineArt },
+    printedSpine: { value: !!spineArt }, paperWear: { value: condition?.wear ?? 0 },
+    folds: { value: frontCreases[issue.slug] },
     printTile: { value: tile }, fullFront: { value: false }, fullBack: { value: false },
     foilMask: { value: foilMask ?? null }, hasMetal: { value: !!foilMask }, hasChromium: { value: !!issue.chromium },
     foilColor: { value: new THREE.Color(foilColors[issue.foil ?? "silver"]) },
     dieCut: { value: issue.dieCut === true },
     overlay: { value: issue.stock === "overlay" ? 1 : 0 },
-    reliefMap: { value: reliefMap }, frontArt: { value: front }, backArt: { value: back }, leaves: { value: (pages - 4) / 2 },
-  }), [front, back, reliefMap, issue, index, pages, neighbor, tile, foilMask, spineArt]);
+    sleeveWear: { value: wear }, reliefMap: { value: reliefMap }, frontArt: { value: front }, backArt: { value: back }, leaves: { value: (pages - 4) / 2 },
+  }), [condition, front, back, reliefMap, issue, index, pages, neighbor, tile, foilMask, spineArt, wear]);
   useEffect(() => {
     printTexture(front, anisotropy);
     printTexture(back, anisotropy);
@@ -500,7 +586,7 @@ export function ComicObject({ issue, index, inspected, detailedFront, flex, shel
       <meshBasicMaterial visible={false} />
     </mesh>
     <mesh geometry={paper} raycast={skipRaycast}>
-      <shaderMaterial ref={materialRef} uniforms={uniforms} vertexShader={vertex} fragmentShader={paperFragment} toneMapped={false} />
+      <shaderMaterial ref={materialRef} uniforms={uniforms} vertexShader={vertex} fragmentShader={frontCreases[issue.slug] ? creasedPaperFragment : paperFragment} toneMapped={false} />
     </mesh>
     <mesh geometry={sleeve} raycast={skipRaycast}>
       <shaderMaterial uniforms={uniforms} vertexShader={sleeveVertex} fragmentShader={filmFragment}

@@ -172,7 +172,13 @@ Front and back covers come from the same issue scan. Trim sizes are estimates us
 | Yellowjacket Comics #1 | Charlton, Sep 1944 | Ugly Blackheads Out in Seconds! Vacutex advertisement | [Scan](https://archive.org/details/Yellowjacket_Comics_001) · [Catalog](https://www.comics.org/issue/3843/) |
 | Four Color #632 — Zane Grey’s Fighting Caravans | Dell, Jun–Aug 1955 | Five color panels concluding the story beside Dell’s A Pledge to Parents | [Scan](https://archive.org/details/ZaneGreyComics-FightingCaravans632) · [Catalog](https://www.comics.org/issue/173356/) |
 | Four Color #373 — Sergeant Preston of the Yukon | Dell, Feb 1952 | Six color panels concluding the adventure with Sergeant Preston and King | [Scan](https://archive.org/details/SergeantPrestonComicFourColor373) · [Catalog](https://www.comics.org/issue/173180/) |
-| Terry and the Pirates #26 | Harvey, Apr 1951 | Terry Lee and Hotshot pinup with airplane identification tag | [Scan](https://archive.org/details/Terry_and_the_Pirates_26) · [Catalog](https://www.comics.org/issue/215972/) |
+| Terry and the Pirates #26 | Charlton, Jun 1955 | Terry Lee and Hotshot pinup with airplane identification tag | [Scan](https://archive.org/details/Terry_and_the_Pirates_26) · [Catalog](https://www.comics.org/issue/170822/) |
+
+### Condition of the photographed copies
+
+Both sides of the archival copies were checked separately against their scan backgrounds. *Terry and the Pirates* #26 has breaks in the front spine, loss at the top and foot, a diagonal crease crossing the front illustration, and a large missing corner on the reverse. *Ha Ha Comics* #1 has a piece missing from the lower right of its front and several breaks at the spine. *Blue Bolt* #1 has a ragged foot and a dark scanner bed at the edges. The contours exclude the visible background in these openings and preserve the printed margins.
+
+*Fightin’ Marines* #22, *Out of This World* #9, *Black Diamond Western* #20, *Strange Suspense Stories* #27 and *Four Color* #632 and #373 show smaller corner creases, spine rub or edge wear. A side with a full crop retains its full trim. Sleeve wear and the depth of folds in the paper are visual estimates for the 3D models. The flat cover scans do not document a specific collector sleeve.
 
 ## Alternative, animation and romance editions
 
