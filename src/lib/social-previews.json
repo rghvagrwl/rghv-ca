@@ -120,7 +120,7 @@
     "image": "/og/capture-vancouver.png"
   },
   "books": {
-    "title": "Books — Raghav Agarwal",
+    "title": "Books",
     "description": "An interactive shelf of print editions, modeled to their physical dimensions.",
     "image": {
       "url": "/og/books.jpg?v=b5b1a0db",
@@ -130,7 +130,7 @@
     }
   },
   "comics": {
-    "title": "Comics — Raghav Agarwal",
+    "title": "Comics",
     "description": "A small collection of comics, preserved in clear sleeves.",
     "image": {
       "url": "/og/comics.jpg?v=4bd8c081",

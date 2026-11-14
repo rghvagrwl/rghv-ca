@@ -3,9 +3,14 @@ import Link from "next/link";
 import { Arrow, ListRow } from "../canvas/list-row";
 import styles from "../canvas/page.module.css";
 
+const title = "3D";
+const description = "Interactive studies of everyday objects by Raghav Agarwal.";
+
 export const metadata: Metadata = {
-  title: "3D — Raghav Agarwal",
-  description: "Interactive studies of everyday objects by Raghav Agarwal.",
+  title,
+  description,
+  openGraph: { title, description },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default function StudiesIndex() {
