@@ -1,0 +1,64 @@
+.surface {
+  --paper: color-mix(in srgb, white 97%, black 3%);
+  --ink: rgb(0 0 0 / 100%);
+  --body-ink: rgb(0 0 0 / 80%);
+  --secondary-ink: rgb(0 0 0 / 60%);
+  --muted-ink: rgb(0 0 0 / 40%);
+  --faint-ink: rgb(0 0 0 / 20%);
+  --rule: rgb(0 0 0 / 10%);
+  --selection-bg: rgb(0 0 0 / 10%);
+  --capture-border: white;
+  --image-surface: rgb(0 0 0 / 5%);
+  --polaroid-backdrop: #eeeeee80;
+  --polaroid-close: #0008;
+  --polaroid-focus: #0006;
+  --gallery-overlay: rgb(247 247 247 / 80%);
+  --gallery-ink: #000;
+  --gallery-rule: rgb(0 0 0 / 10%);
+  color-scheme: light;
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(html:not([data-canvas-theme="light"])) .surface:not([data-theme="light"]) {
+    --paper: #111111;
+    --ink: rgb(255 255 255 / 94%);
+    --body-ink: rgb(255 255 255 / 78%);
+    --secondary-ink: rgb(255 255 255 / 60%);
+    --muted-ink: rgb(255 255 255 / 42%);
+    --faint-ink: rgb(255 255 255 / 23%);
+    --rule: rgb(255 255 255 / 5%);
+    --selection-bg: rgb(255 255 255 / 20%);
+    --capture-border: rgb(255 255 255 / 5%);
+    --image-surface: rgb(255 255 255 / 6%);
+    --polaroid-backdrop: rgb(17 17 17 / 88%);
+    --polaroid-close: rgb(255 255 255 / 65%);
+    --polaroid-focus: rgb(255 255 255 / 40%);
+    --gallery-overlay: rgb(17 17 17 / 84%);
+    --gallery-ink: #f2f2f2;
+    --gallery-rule: rgb(255 255 255 / 5%);
+    color-scheme: dark;
+  }
+}
+
+:global(html[data-canvas-theme="dark"]) .surface:not([data-theme="light"]),
+.surface[data-theme="dark"] {
+  --paper: #111111;
+  --ink: rgb(255 255 255 / 94%);
+  --body-ink: rgb(255 255 255 / 78%);
+  --secondary-ink: rgb(255 255 255 / 60%);
+  --muted-ink: rgb(255 255 255 / 42%);
+  --faint-ink: rgb(255 255 255 / 23%);
+  --rule: rgb(255 255 255 / 5%);
+  --selection-bg: rgb(255 255 255 / 20%);
+  --capture-border: rgb(255 255 255 / 5%);
+  --image-surface: rgb(255 255 255 / 6%);
+  --polaroid-backdrop: rgb(17 17 17 / 88%);
+  --polaroid-close: rgb(255 255 255 / 65%);
+  --polaroid-focus: rgb(255 255 255 / 40%);
+  --gallery-overlay: rgb(17 17 17 / 84%);
+  --gallery-ink: #f2f2f2;
+  --gallery-rule: rgb(255 255 255 / 5%);
+  color-scheme: dark;
+}

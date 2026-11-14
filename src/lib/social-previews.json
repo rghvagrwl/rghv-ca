@@ -118,5 +118,25 @@
     "title": "A week in Vancouver",
     "description": "A week in Vancouver. Photographs by Raghav Agarwal, May 2026.",
     "image": "/og/capture-vancouver.png"
+  },
+  "books": {
+    "title": "Books — Raghav Agarwal",
+    "description": "An interactive shelf of print editions, modeled to their physical dimensions.",
+    "image": {
+      "url": "/og/books.jpg?v=b5b1a0db",
+      "width": 3600,
+      "height": 1890,
+      "alt": "Five books stacked at different angles on white, with Virgil Abloh’s green ICONS at the base and Josef Albers’s Interaction of Color on top."
+    }
+  },
+  "comics": {
+    "title": "Comics — Raghav Agarwal",
+    "description": "A small collection of comics, preserved in clear sleeves.",
+    "image": {
+      "url": "/og/comics.jpg?v=20484348",
+      "width": 3600,
+      "height": 1890,
+      "alt": "Overhead view of Spider-Man Classics upright on a stack of sleeved comics, with Captain America at the left and Star Wars at the right."
+    }
   }
 }

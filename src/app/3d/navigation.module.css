@@ -1,0 +1,23 @@
+.content {
+  /* A temporary filter makes this the containing block for the fixed 3D stage. */
+  min-height: 100dvh;
+}
+
+@keyframes reveal {
+  from { opacity: 0; filter: blur(12px); }
+  to { opacity: 1; filter: none; }
+}
+
+.content main canvas:not([data-study-ready]) { visibility: hidden; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .content [data-study-ready],
+  .content main[data-canvas-site] > div {
+    animation: reveal 600ms cubic-bezier(.22,.61,.36,1);
+  }
+
+  .content [data-study-back],
+  .content main :is([role="slider"], [role="group"]) {
+    animation: reveal 360ms ease-out;
+  }
+}

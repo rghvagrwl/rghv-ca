@@ -1,0 +1,1198 @@
+{
+  "coverSheets": [
+    {
+      "url": "/books/shelf-preview.webp?v=e855ddec1143",
+      "width": 1840,
+      "height": 1872
+    },
+    {
+      "url": "/books/shelf-preview-1.webp?v=cc50ac8e6180",
+      "width": 1840,
+      "height": 1872
+    }
+  ],
+  "spineSheets": [
+    {
+      "url": "/books/shelf-spines-0.webp?v=2742e2dbd7f4",
+      "width": 2008,
+      "height": 1752
+    },
+    {
+      "url": "/books/shelf-spines-1.webp?v=e02362c1a96b",
+      "width": 521,
+      "height": 876
+    }
+  ],
+  "editions": {
+    "architecture-book": {
+      "front": "/books/architecture-book.webp?v=9887a0f8a3c4",
+      "frontTile": {
+        "sheet": 0,
+        "x": 6,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/architecture-book-back.webp?v=2d482dcf8c93",
+      "backTile": {
+        "sheet": 0,
+        "x": 6,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/architecture-book-spine.webp?v=d41e2453d7a2",
+      "spineTile": {
+        "sheet": 0,
+        "x": 6,
+        "y": 6,
+        "w": 90,
+        "h": 864
+      }
+    },
+    "art-book": {
+      "front": "/books/art-book.webp?v=0774427a8a02",
+      "frontTile": {
+        "sheet": 0,
+        "x": 236,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/art-book-back.webp?v=32984a21189a",
+      "backTile": {
+        "sheet": 0,
+        "x": 236,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/art-book-spine.webp?v=3114275dce3b",
+      "spineTile": {
+        "sheet": 0,
+        "x": 108,
+        "y": 6,
+        "w": 97,
+        "h": 864
+      }
+    },
+    "art-of-gathering": {
+      "front": "/books/art-of-gathering.webp?v=0617bf28a1f6",
+      "frontTile": {
+        "sheet": 0,
+        "x": 466,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/art-of-gathering-back.webp?v=eb39ed1e9087",
+      "backTile": {
+        "sheet": 0,
+        "x": 466,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/art-of-gathering-spine.webp?v=95de3d0042ab",
+      "spineTile": {
+        "sheet": 0,
+        "x": 217,
+        "y": 6,
+        "w": 87,
+        "h": 864
+      }
+    },
+    "art-of-noticing": {
+      "front": "/books/art-of-noticing.webp?v=ce3d632f2dbd",
+      "frontTile": {
+        "sheet": 0,
+        "x": 696,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/art-of-noticing-back.webp?v=60ab7e9ee602",
+      "backTile": {
+        "sheet": 0,
+        "x": 696,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/art-of-noticing-spine.webp?v=4aa1177d3ebb",
+      "spineTile": {
+        "sheet": 0,
+        "x": 316,
+        "y": 6,
+        "w": 95,
+        "h": 864
+      }
+    },
+    "art-of-travel": {
+      "front": "/books/art-of-travel.webp?v=1c98c4675cd0",
+      "frontTile": {
+        "sheet": 0,
+        "x": 926,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/art-of-travel-back.webp?v=8f50322cf0fd",
+      "backTile": {
+        "sheet": 0,
+        "x": 926,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/art-of-travel-spine.webp?v=443f2a292173",
+      "spineTile": {
+        "sheet": 0,
+        "x": 423,
+        "y": 6,
+        "w": 64,
+        "h": 864
+      }
+    },
+    "atomic-habits": {
+      "front": "/books/atomic-habits.webp?v=33f54d0776c0",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1156,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/atomic-habits-back.webp?v=5a7d8b6f95c0",
+      "backTile": {
+        "sheet": 0,
+        "x": 1156,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/atomic-habits-spine.webp?v=52e0bbd357e0",
+      "spineTile": {
+        "sheet": 0,
+        "x": 499,
+        "y": 6,
+        "w": 99,
+        "h": 864
+      }
+    },
+    "bird-by-bird": {
+      "front": "/books/bird-by-bird.webp?v=f02c3847a373",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1386,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/bird-by-bird-back.webp?v=c92c70e90464",
+      "backTile": {
+        "sheet": 0,
+        "x": 1386,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/bird-by-bird-spine.webp?v=ba6bfc7fa57f",
+      "spineTile": {
+        "sheet": 0,
+        "x": 610,
+        "y": 6,
+        "w": 81,
+        "h": 864
+      }
+    },
+    "black-swan": {
+      "front": "/books/black-swan.webp?v=de9e8ed1e0c2",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1616,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/black-swan-back.webp?v=73332955e368",
+      "backTile": {
+        "sheet": 0,
+        "x": 1616,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/black-swan-spine.webp?v=3f8f9b7a2cae",
+      "spineTile": {
+        "sheet": 0,
+        "x": 703,
+        "y": 6,
+        "w": 107,
+        "h": 864
+      }
+    },
+    "creative-act": {
+      "front": "/books/creative-act.webp?v=bc7d9591921b",
+      "frontTile": {
+        "sheet": 0,
+        "x": 6,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/creative-act-back.webp?v=ab686af39954",
+      "backTile": {
+        "sheet": 0,
+        "x": 6,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/creative-act-spine.webp?v=2fc40d9e2010",
+      "spineTile": {
+        "sheet": 0,
+        "x": 822,
+        "y": 6,
+        "w": 138,
+        "h": 864
+      }
+    },
+    "creative-confidence": {
+      "front": "/books/creative-confidence.webp?v=e2c48aae7fe6",
+      "frontTile": {
+        "sheet": 0,
+        "x": 236,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/creative-confidence-back.webp?v=8d1ef7de5131",
+      "backTile": {
+        "sheet": 0,
+        "x": 236,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/creative-confidence-spine.webp?v=8a9503ac6042",
+      "spineTile": {
+        "sheet": 0,
+        "x": 972,
+        "y": 6,
+        "w": 92,
+        "h": 864
+      }
+    },
+    "creative-selection": {
+      "front": "/books/creative-selection.webp?v=b777a99161f6",
+      "frontTile": {
+        "sheet": 0,
+        "x": 466,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/creative-selection-back.webp?v=181fe0ea7610",
+      "backTile": {
+        "sheet": 0,
+        "x": 466,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/creative-selection-spine.webp?v=a01472efbd11",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1076,
+        "y": 6,
+        "w": 89,
+        "h": 864
+      }
+    },
+    "creativity-inc": {
+      "front": "/books/creativity-inc.webp?v=01e35fa703d1",
+      "frontTile": {
+        "sheet": 0,
+        "x": 696,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/creativity-inc-back.webp?v=fdd7fbf94e53",
+      "backTile": {
+        "sheet": 0,
+        "x": 696,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/creativity-inc-spine.webp?v=adc0fdba0975",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1177,
+        "y": 6,
+        "w": 90,
+        "h": 864
+      }
+    },
+    "decolonizing-design": {
+      "front": "/books/decolonizing-design.webp?v=d7f2100f1714",
+      "frontTile": {
+        "sheet": 0,
+        "x": 926,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/decolonizing-design-back.webp?v=058de5528265",
+      "backTile": {
+        "sheet": 0,
+        "x": 926,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/decolonizing-design-spine.webp?v=b41fbf6ac731",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1279,
+        "y": 6,
+        "w": 44,
+        "h": 864
+      }
+    },
+    "deep-work": {
+      "front": "/books/deep-work.webp?v=bb828681b0ef",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1156,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/deep-work-back.webp?v=e16361a45e49",
+      "backTile": {
+        "sheet": 0,
+        "x": 1156,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/deep-work-spine.webp?v=339485267883",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1335,
+        "y": 6,
+        "w": 100,
+        "h": 864
+      }
+    },
+    "design-as-art": {
+      "front": "/books/design-as-art.webp?v=ccb7dd01c7be",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1386,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/design-as-art-back.webp?v=5aed79818199",
+      "backTile": {
+        "sheet": 0,
+        "x": 1386,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/design-as-art-spine.webp?v=506936300c86",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1447,
+        "y": 6,
+        "w": 81,
+        "h": 864
+      }
+    },
+    "design-of-everyday-things": {
+      "front": "/books/design-of-everyday-things.webp?v=fb00554bda6e",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1616,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/design-of-everyday-things-back.webp?v=18403cb269f7",
+      "backTile": {
+        "sheet": 0,
+        "x": 1616,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/design-of-everyday-things-spine.webp?v=e7f4d99bf376",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1540,
+        "y": 6,
+        "w": 104,
+        "h": 864
+      }
+    },
+    "designing-with-type": {
+      "front": "/books/designing-with-type.webp?v=c6b1e610635d",
+      "frontTile": {
+        "sheet": 0,
+        "x": 6,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/designing-with-type-back.webp?v=264a3b8b2491",
+      "backTile": {
+        "sheet": 0,
+        "x": 6,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/designing-with-type-spine.webp?v=aa2975e35be9",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1656,
+        "y": 6,
+        "w": 41,
+        "h": 864
+      }
+    },
+    "everyday-beauty": {
+      "front": "/books/everyday-beauty.webp?v=65c56a22cfd7",
+      "frontTile": {
+        "sheet": 0,
+        "x": 236,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/everyday-beauty-back.webp?v=a666bf38226c",
+      "backTile": {
+        "sheet": 0,
+        "x": 236,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/everyday-beauty-spine.webp?v=c23a2043ab31",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1709,
+        "y": 6,
+        "w": 125,
+        "h": 864
+      }
+    },
+    "graphic-design-everyone": {
+      "front": "/books/graphic-design-everyone.webp?v=a59346201b96",
+      "frontTile": {
+        "sheet": 0,
+        "x": 466,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/graphic-design-everyone-back.webp?v=1093e94967e3",
+      "backTile": {
+        "sheet": 0,
+        "x": 466,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/graphic-design-everyone-spine.webp?v=a142a13d4d96",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1846,
+        "y": 6,
+        "w": 86,
+        "h": 864
+      }
+    },
+    "grid-systems": {
+      "front": "/books/grid-systems.webp?v=df90ce418990",
+      "frontTile": {
+        "sheet": 0,
+        "x": 696,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/grid-systems-back.webp?v=441b81f10c97",
+      "backTile": {
+        "sheet": 0,
+        "x": 696,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/grid-systems-spine.webp?v=e5b2552ed66d",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1944,
+        "y": 6,
+        "w": 58,
+        "h": 864
+      }
+    },
+    "how-buildings-learn": {
+      "front": "/books/how-buildings-learn.webp?v=f232ef878a1c",
+      "frontTile": {
+        "sheet": 0,
+        "x": 926,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/how-buildings-learn-back.webp?v=05d1c698ad38",
+      "backTile": {
+        "sheet": 0,
+        "x": 926,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/how-buildings-learn-spine.webp?v=5547b5148f8c",
+      "spineTile": {
+        "sheet": 0,
+        "x": 6,
+        "y": 882,
+        "w": 72,
+        "h": 864
+      }
+    },
+    "how-to-do-nothing": {
+      "front": "/books/how-to-do-nothing.webp?v=c261ff392132",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1156,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/how-to-do-nothing-back.webp?v=be17a987e63b",
+      "backTile": {
+        "sheet": 0,
+        "x": 1156,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/how-to-do-nothing-spine.webp?v=eea543dcfd04",
+      "spineTile": {
+        "sheet": 0,
+        "x": 90,
+        "y": 882,
+        "w": 70,
+        "h": 864
+      }
+    },
+    "icons": {
+      "front": "/books/icons.webp?v=398ce9d45472",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1386,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/icons-back.webp?v=060014880a3b",
+      "backTile": {
+        "sheet": 0,
+        "x": 1386,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/icons-spine.webp?v=eb1a63e721bf",
+      "spineTile": {
+        "sheet": 0,
+        "x": 172,
+        "y": 882,
+        "w": 87,
+        "h": 864
+      }
+    },
+    "image-of-city": {
+      "front": "/books/image-of-city.webp?v=3f0ae5073635",
+      "frontTile": {
+        "sheet": 0,
+        "x": 1616,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/image-of-city-back.webp?v=a934c82724fc",
+      "backTile": {
+        "sheet": 0,
+        "x": 1616,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/image-of-city-spine.webp?v=af994cb02e99",
+      "spineTile": {
+        "sheet": 0,
+        "x": 271,
+        "y": 882,
+        "w": 47,
+        "h": 864
+      }
+    },
+    "interaction-of-color": {
+      "front": "/books/interaction-of-color.webp?v=eed93ab6d42c",
+      "frontTile": {
+        "sheet": 1,
+        "x": 6,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/interaction-of-color-back.webp?v=5cee91e9773f",
+      "backTile": {
+        "sheet": 1,
+        "x": 6,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/interaction-of-color-spine.webp?v=d244b17e3fd6",
+      "spineTile": {
+        "sheet": 0,
+        "x": 330,
+        "y": 882,
+        "w": 56,
+        "h": 864
+      }
+    },
+    "language-of-new-media": {
+      "front": "/books/language-of-new-media.webp?v=7b7557b16f53",
+      "frontTile": {
+        "sheet": 1,
+        "x": 236,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/language-of-new-media-back.webp?v=a16ce191c8fc",
+      "backTile": {
+        "sheet": 1,
+        "x": 236,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/language-of-new-media-spine.webp?v=630e375becb6",
+      "spineTile": {
+        "sheet": 0,
+        "x": 398,
+        "y": 882,
+        "w": 56,
+        "h": 864
+      }
+    },
+    "lean-startup": {
+      "front": "/books/lean-startup.webp?v=b8357deb28df",
+      "frontTile": {
+        "sheet": 1,
+        "x": 466,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/lean-startup-back.webp?v=1df154797d53",
+      "backTile": {
+        "sheet": 1,
+        "x": 466,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/lean-startup-spine.webp?v=2267b6296674",
+      "spineTile": {
+        "sheet": 0,
+        "x": 466,
+        "y": 882,
+        "w": 108,
+        "h": 864
+      }
+    },
+    "learning-from-las-vegas": {
+      "front": "/books/learning-from-las-vegas.webp?v=18ce0b5e7ff9",
+      "frontTile": {
+        "sheet": 1,
+        "x": 696,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/learning-from-las-vegas-back.webp?v=c213de36e3da",
+      "backTile": {
+        "sheet": 1,
+        "x": 696,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/learning-from-las-vegas-spine.webp?v=702625521484",
+      "spineTile": {
+        "sheet": 0,
+        "x": 586,
+        "y": 882,
+        "w": 45,
+        "h": 864
+      }
+    },
+    "looking-sideways": {
+      "front": "/books/looking-sideways.webp?v=6ba56f0dbd97",
+      "frontTile": {
+        "sheet": 1,
+        "x": 926,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/looking-sideways-back.webp?v=adcb2d8ce5a9",
+      "backTile": {
+        "sheet": 1,
+        "x": 926,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/looking-sideways-spine.webp?v=f6f4a89393b0",
+      "spineTile": {
+        "sheet": 0,
+        "x": 643,
+        "y": 882,
+        "w": 208,
+        "h": 864
+      }
+    },
+    "make-time": {
+      "front": "/books/make-time.webp?v=bd8e3205884c",
+      "frontTile": {
+        "sheet": 1,
+        "x": 1156,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/make-time-back.webp?v=e594dd17d55c",
+      "backTile": {
+        "sheet": 1,
+        "x": 1156,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/make-time-spine.webp?v=cd36a26f85bf",
+      "spineTile": {
+        "sheet": 0,
+        "x": 863,
+        "y": 882,
+        "w": 92,
+        "h": 864
+      }
+    },
+    "mismatch": {
+      "front": "/books/mismatch.webp?v=268b16e74658",
+      "frontTile": {
+        "sheet": 1,
+        "x": 1386,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/mismatch-back.webp?v=e9b16001853a",
+      "backTile": {
+        "sheet": 1,
+        "x": 1386,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/mismatch-spine.webp?v=6f42d3749383",
+      "spineTile": {
+        "sheet": 0,
+        "x": 967,
+        "y": 882,
+        "w": 51,
+        "h": 864
+      }
+    },
+    "photography-history": {
+      "front": "/books/photography-history.webp?v=89509750e1da",
+      "frontTile": {
+        "sheet": 1,
+        "x": 1616,
+        "y": 6,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/photography-history-back.webp?v=11c8d126c45c",
+      "backTile": {
+        "sheet": 1,
+        "x": 1616,
+        "y": 318,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/photography-history-spine.webp?v=754a278dbb1f",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1030,
+        "y": 882,
+        "w": 105,
+        "h": 864
+      }
+    },
+    "quiet": {
+      "front": "/books/quiet.webp?v=f263d313672e",
+      "frontTile": {
+        "sheet": 1,
+        "x": 6,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/quiet-back.webp?v=f1f855a93bc9",
+      "backTile": {
+        "sheet": 1,
+        "x": 6,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/quiet-spine.webp?v=4712c623cf02",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1147,
+        "y": 882,
+        "w": 107,
+        "h": 864
+      }
+    },
+    "range": {
+      "front": "/books/range.webp?v=4c12ac4013b9",
+      "frontTile": {
+        "sheet": 1,
+        "x": 236,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/range-back.webp?v=c04d83d1e817",
+      "backTile": {
+        "sheet": 1,
+        "x": 236,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/range-spine.webp?v=3871c6ca2db6",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1266,
+        "y": 882,
+        "w": 83,
+        "h": 864
+      }
+    },
+    "rework": {
+      "front": "/books/rework.webp?v=301484f8e753",
+      "frontTile": {
+        "sheet": 1,
+        "x": 466,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/rework-back.webp?v=2e74d5621f60",
+      "backTile": {
+        "sheet": 1,
+        "x": 466,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/rework-spine.webp?v=aaf5a144b2c3",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1361,
+        "y": 882,
+        "w": 104,
+        "h": 864
+      }
+    },
+    "running": {
+      "front": "/books/running.webp?v=5c1a3309fc7f",
+      "frontTile": {
+        "sheet": 1,
+        "x": 696,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/running-back.webp?v=4ff2a73b24be",
+      "backTile": {
+        "sheet": 1,
+        "x": 696,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/running-spine.webp?v=dc3aa509e5a9",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1477,
+        "y": 882,
+        "w": 60,
+        "h": 864
+      }
+    },
+    "shoe-dog": {
+      "front": "/books/shoe-dog.webp?v=32ce8758ebe1",
+      "frontTile": {
+        "sheet": 1,
+        "x": 926,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/shoe-dog-back.webp?v=a9ab780db8dd",
+      "backTile": {
+        "sheet": 1,
+        "x": 926,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/shoe-dog-spine.webp?v=871ecb170317",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1549,
+        "y": 882,
+        "w": 106,
+        "h": 864
+      }
+    },
+    "speculative-everything": {
+      "front": "/books/speculative-everything.webp?v=b6c30266002b",
+      "frontTile": {
+        "sheet": 1,
+        "x": 1156,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/speculative-everything-back.webp?v=a587dbc3c805",
+      "backTile": {
+        "sheet": 1,
+        "x": 1156,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/speculative-everything-spine.webp?v=0d4ed1721a0f",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1667,
+        "y": 882,
+        "w": 45,
+        "h": 864
+      }
+    },
+    "steal-like-an-artist": {
+      "front": "/books/steal-like-an-artist.webp?v=a2a3de84343c",
+      "frontTile": {
+        "sheet": 1,
+        "x": 1386,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/steal-like-an-artist-back.webp?v=59deafb4e83f",
+      "backTile": {
+        "sheet": 1,
+        "x": 1386,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/steal-like-an-artist-spine.webp?v=97fc32d54131",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1724,
+        "y": 882,
+        "w": 82,
+        "h": 864
+      }
+    },
+    "steve-jobs": {
+      "front": "/books/steve-jobs.webp?v=68dcb234fdc6",
+      "frontTile": {
+        "sheet": 1,
+        "x": 1616,
+        "y": 630,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/steve-jobs-back.webp?v=4833d95dd34d",
+      "backTile": {
+        "sheet": 1,
+        "x": 1616,
+        "y": 942,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/steve-jobs-spine.webp?v=0c11bcdf4222",
+      "spineTile": {
+        "sheet": 0,
+        "x": 1818,
+        "y": 882,
+        "w": 169,
+        "h": 864
+      }
+    },
+    "the-code-book": {
+      "front": "/books/the-code-book.webp?v=c238006d1162",
+      "frontTile": {
+        "sheet": 1,
+        "x": 6,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/the-code-book-back.webp?v=b560be3bd7ea",
+      "backTile": {
+        "sheet": 1,
+        "x": 6,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/the-code-book-spine.webp?v=67e8d1c7b23b",
+      "spineTile": {
+        "sheet": 1,
+        "x": 6,
+        "y": 6,
+        "w": 107,
+        "h": 864
+      }
+    },
+    "the-information": {
+      "front": "/books/the-information.webp?v=52b9de30f97b",
+      "frontTile": {
+        "sheet": 1,
+        "x": 236,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/the-information-back.webp?v=d05fe755cb94",
+      "backTile": {
+        "sheet": 1,
+        "x": 236,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/the-information-spine.webp?v=f83ca241e8ca",
+      "spineTile": {
+        "sheet": 1,
+        "x": 125,
+        "y": 6,
+        "w": 128,
+        "h": 864
+      }
+    },
+    "thinking-with-type": {
+      "front": "/books/thinking-with-type.webp?v=c12f56f22e12",
+      "frontTile": {
+        "sheet": 1,
+        "x": 466,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/thinking-with-type-back.webp?v=807509a1347c",
+      "backTile": {
+        "sheet": 1,
+        "x": 466,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/thinking-with-type-spine.webp?v=ff20419ae1e7",
+      "spineTile": {
+        "sheet": 1,
+        "x": 265,
+        "y": 6,
+        "w": 100,
+        "h": 864
+      }
+    },
+    "war-of-art": {
+      "front": "/books/war-of-art.webp?v=d03c7d56de0a",
+      "frontTile": {
+        "sheet": 1,
+        "x": 696,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/war-of-art-back.webp?v=4bb75263a843",
+      "backTile": {
+        "sheet": 1,
+        "x": 696,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/war-of-art-spine.webp?v=944a45fa13f9",
+      "spineTile": {
+        "sheet": 1,
+        "x": 377,
+        "y": 6,
+        "w": 56,
+        "h": 864
+      }
+    },
+    "ways-of-seeing": {
+      "front": "/books/ways-of-seeing.webp?v=ed6bc1d0534e",
+      "frontTile": {
+        "sheet": 1,
+        "x": 926,
+        "y": 1254,
+        "w": 218,
+        "h": 300
+      },
+      "back": "/books/ways-of-seeing-back.webp?v=86a0862ea6fd",
+      "backTile": {
+        "sheet": 1,
+        "x": 926,
+        "y": 1566,
+        "w": 218,
+        "h": 300
+      },
+      "spine": "/books/ways-of-seeing-spine.webp?v=97e301d9141e",
+      "spineTile": {
+        "sheet": 1,
+        "x": 445,
+        "y": 6,
+        "w": 70,
+        "h": 864
+      }
+    }
+  }
+}

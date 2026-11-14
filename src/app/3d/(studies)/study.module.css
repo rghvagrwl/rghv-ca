@@ -1,0 +1,34 @@
+.study {
+  position: fixed;
+  inset: 0;
+  overflow: clip;
+}
+
+.back {
+  position: fixed;
+  bottom: max(6px, env(safe-area-inset-bottom));
+  left: max(8px, env(safe-area-inset-left));
+  z-index: 2;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 3px;
+  padding: 0 10px;
+  background: transparent;
+  color: var(--secondary-ink);
+  font: 400 12px/1.5 system-ui, sans-serif;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color 160ms ease;
+}
+
+.back svg { width: 14px; height: 14px; }
+.back:hover, .back:focus-visible { color: var(--ink); }
+
+@media (scripting: enabled) {
+  .study:not(:has([data-study-ready])) :is(.back, [role="slider"]) { display: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .study { transition: background-color 200ms ease, color 200ms ease; }
+}

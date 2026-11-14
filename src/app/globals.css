@@ -43,8 +43,11 @@
   scrollbar-color: gray transparent;
 }
 
-html:has([data-canvas-site]) {
+html:has([data-canvas-site]:not([data-canvas-site="study"])) {
   scrollbar-gutter: stable;
+}
+
+html:has([data-canvas-site]) {
   --canvas-page-bg: #f7f7f7;
 }
 
