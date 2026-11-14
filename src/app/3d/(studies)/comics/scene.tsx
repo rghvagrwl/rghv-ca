@@ -7,10 +7,13 @@ import ShelfRuler from "../../_books/shelf-ruler";
 import { ShelfRail } from "../../_books/shelf-navigation";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { issues } from "./catalog";
+import atlas from "./print-atlas.json";
 import { ComicObject } from "./comic-object";
 import * as THREE from "three";
 import styles from "./comics.module.css";
 
+const sections = atlas.sheets.map((_, i) => issues.slice(i * atlas.perSheet, (i + 1) * atlas.perSheet));
+const slotsPerStep = 4;
 const spacing = 0.91;
 const positions = issues.map((_, index) => (index - (issues.length - 1) / 2) * spacing);
 const collectionKey = issues.map(issue => issue.slug).join(",");
@@ -33,12 +36,17 @@ function Collection({ rail }: { rail: ShelfRail }) {
   const controls = useRef<Controls>(initialControls());
   const { camera, gl, size, invalidate } = useThree();
   const roots = useRef<Array<THREE.Group | null>>([]);
+  const [shelfStep, setShelfStep] = useState(0);
   const [inspected, setInspected] = useState(-1);
   const flexes = useRef(issues.map((_, index) => ({ bend: restingBend(index), twist: 0 })));
   const springs = useRef(issues.map(() => ({ bendVelocity: 0, twistVelocity: 0 })));
   const expansion = useRef(0);
   const hoverTilt = useRef({ enabled: false, yaw: 0, pitch: 0, point: new THREE.Vector3() });
   const baseZoom = size.height / (2 * cameraDistance * Math.tan(THREE.MathUtils.degToRad(fieldOfView) / 2));
+  // Prefetch a screenful plus a few offscreen covers while the shelf moves.
+  const reach = Math.ceil(size.width / (2 * baseZoom * spacing)) + 5;
+  const firstVisible = shelfStep * slotsPerStep - reach;
+  const lastVisible = (shelfStep + 1) * slotsPerStep + reach;
   // Leave room for the entire front and sleeve when a long phone is held upright.
   const widthToDistance = size.height / (2 * size.width * 0.86 * Math.tan(THREE.MathUtils.degToRad(fieldOfView) / 2));
 
@@ -160,7 +168,6 @@ function Collection({ rail }: { rail: ShelfRail }) {
       coverHeight, yaw: wasOpen ? c.yaw : 0,
       pitch: wasOpen ? c.pitch : 0, railX: c.railX, moved: false, wasOpen };
     gl.domElement.style.cursor = "grabbing";
-    event.nativeEvent.preventDefault();
     invalidate();
   };
   const hover = (event: ThreeEvent<PointerEvent>, index: number) => {
@@ -203,7 +210,10 @@ function Collection({ rail }: { rail: ShelfRail }) {
     const open = expansion.current;
     const subject = c.selected;
     camera.position.x = c.railX;
-    rail.report(indexAtX(c.railX));
+    const shelfIndex = indexAtX(c.railX);
+    rail.report(shelfIndex);
+    const step = Math.floor(shelfIndex / slotsPerStep);
+    if (step !== shelfStep) setShelfStep(step);
     const inspectionDistance = Math.max(cameraDistance - 1.05, (issues[subject]?.bag ?? 0) * widthToDistance + 0.9);
     camera.position.z = toward(camera.position.z, THREE.MathUtils.lerp(cameraDistance, inspectionDistance, open), 10);
     const aimHeight = shelfAimHeight + 0.055 * open;
@@ -265,16 +275,27 @@ function Collection({ rail }: { rail: ShelfRail }) {
   }, -1);
 
   return <>
-    {issues.map((issue, index) => (
-      <group key={issue.image} ref={node => { roots.current[index] = node; }}
-        position={[positions[index], shelfCenter(index), 0]} rotation={[0, shelfYaw, 0]}
-        onPointerDown={event => pick(event, index)}
-        onPointerMove={event => hover(event, index)}
-        onPointerOut={() => leave(index)}>
-        <ComicObject issue={issue} index={index} inspected={inspected === index} flex={{ current: flexes.current[index] }}
-          shelf={roots} neighbor={issues[index + 1]} />
-      </group>
-    ))}
+    {sections.map((section, sectionIndex) => {
+      const start = sectionIndex * atlas.perSheet;
+      const end = start + section.length;
+      const keepSelected = inspected >= start && inspected < end;
+      if (sectionIndex !== 0 && !keepSelected && (end <= firstVisible || start > lastVisible)) return null;
+      // Only the first section blocks the initial ready marker. A later texture
+      // download can resolve independently while the previous section is visible.
+      return <Suspense key={sectionIndex} fallback={null}>
+        {sectionIndex === 0 && <StudyReady />}
+        {section.map((issue, slot) => {
+          const index = start + slot;
+          return <group key={issue.slug} ref={node => { roots.current[index] = node; }}
+            position={[positions[index], shelfCenter(index), 0]} rotation={[0, shelfYaw, 0]}
+            onPointerDown={event => pick(event, index)}
+            onPointerMove={event => hover(event, index)} onPointerOut={() => leave(index)}>
+            <ComicObject issue={issue} index={index} inspected={inspected === index} flex={{ current: flexes.current[index] }}
+              shelf={roots} neighbor={issues[index + 1]} />
+          </group>;
+        })}
+      </Suspense>;
+    })}
     <mesh position={[0, 1.23, -1]} onPointerDown={event => pick(event, -1)}>
       <planeGeometry args={[(issues.length - 1) * spacing + 24, 12]} />
       <meshBasicMaterial visible={false} />
@@ -292,7 +313,7 @@ export default function ComicsScene() {
           gl.toneMapping = THREE.NeutralToneMapping; gl.domElement.tabIndex = 0;
           gl.domElement.setAttribute("role", "application");
           gl.domElement.setAttribute("aria-label", "Comics in clear sleeves. Select a comic, then drag to inspect it. Swipe or scroll to browse."); }}>
-        <Suspense fallback={null}><Collection key={collectionKey} rail={rail} /><StudyReady /></Suspense>
+        <Collection key={collectionKey} rail={rail} />
       </Canvas>
     </div>
     <ShelfRuler rail={rail} items={issues} label="Browse comics" />

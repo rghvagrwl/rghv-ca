@@ -243,7 +243,8 @@ const paperFragment = varyings + /* glsl */ `
   uniform vec4 printTile;
   uniform sampler2D foilMask;
   uniform vec3 foilColor;
-  uniform bool hasFoil;
+  uniform bool hasMetal;
+  uniform bool hasChromium;
   uniform bool dieCut;
   uniform float overlay;
   uniform float leaves;
@@ -294,9 +295,11 @@ const paperFragment = varyings + /* glsl */ `
           }
         }
         float glint = max(dot(n, normalize(key + eye)), 0.0);
-        if (hasFoil) {
-          float stamp = texture2D(foilMask, texCoord).r;
-          if (stamp > 0.001) {
+        if (hasMetal) {
+          vec2 metal = texture2D(foilMask, texCoord).rg;
+          float stamp = metal.r;
+          float chrome = hasChromium ? metal.g : 0.0;
+          if (max(stamp, chrome) > 0.001) {
             // The flat stamping reflects strip lights across the printed contours
             // even when the loose sleeve above it is catching a different light.
             vec3 reflected = reflect(-eye, n);
@@ -308,6 +311,12 @@ const paperFragment = varyings + /* glsl */ `
             // Keep lettering and etched detail visible through the brightest pass.
             float detail = 0.70 + 0.30 * dot(ink, vec3(0.2126, 0.7152, 0.0722));
             print += (1.0 - print) * foilColor * stamp * reflection * detail;
+            if (chrome > 0.001) {
+              // Translucent printed color over a reflective metallic panel.
+              // Ink density controls how much of the chrome shows through.
+              vec3 metalLight = (0.10 + 0.90 * sqrt(ink)) * (0.22 * sheen + 0.95 * strip);
+              print += chrome * ((1.0 - print) * metalLight - 0.12 * print * (1.0 - strip));
+            }
           }
         }
         if (overlay > 0.0) {
@@ -377,6 +386,7 @@ const filmFragment = varyings + /* glsl */ `
 
 type Flex = { bend: number; twist: number };
 const skipRaycast = () => {};
+const foilColors = { gold: "#efc965", silver: "#e8edf2", red: "#ff6053", blue: "#68a9ff" };
 type ComicProps = {
   issue: Issue;
   index: number;
@@ -393,10 +403,14 @@ function printTexture(texture: THREE.Texture, anisotropy: number) {
 }
 
 export function ComicObject({ issue, index, inspected, flex, shelf, neighbor }: ComicProps) {
-  const [front, back, reliefMap] = useLoader(THREE.TextureLoader, [
-    `/3d/comics/shelf-front.webp?v=${atlas.version}`, `/3d/comics/shelf-back.webp?v=${atlas.version}`, "/3d/comics/sleeve-relief.png",
+  const sheetIndex = Math.floor(index / atlas.perSheet);
+  const sheet = atlas.sheets[sheetIndex];
+  const suffix = sheetIndex || "";
+  const reliefMap = useLoader(THREE.TextureLoader, "/3d/comics/sleeve-relief.png");
+  const [front, back] = useLoader(THREE.TextureLoader, [
+    `/3d/comics/shelf-front${suffix}.webp?v=${sheet.version}`, `/3d/comics/shelf-back${suffix}.webp?v=${sheet.version}`,
   ]);
-  const [foilMask] = useLoader(THREE.TextureLoader, issue.foil ? [`/3d/comics/${issue.slug}-foil.png${issue.dieCut ? "?v=cut" : ""}`] : []);
+  const [foilMask] = useLoader(THREE.TextureLoader, (issue.foil || issue.chromium) ? [`/3d/comics/${issue.slug}-foil.png${issue.dieCut ? "?v=cut" : ""}`] : []);
   const [spineArt] = useLoader(THREE.TextureLoader, issue.printedSpine ? [`/3d/comics/${issue.slug}-spine.webp`] : []);
   const gl = useThree(state => state.gl);
   const invalidate = useThree(state => state.invalidate);
@@ -404,16 +418,16 @@ export function ComicObject({ issue, index, inspected, flex, shelf, neighbor }: 
   const anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy());
   const { pages, half } = issue;
   const tile = useMemo(() => {
-    const index = atlas.slugs.indexOf(issue.slug);
-    const { width: tileWidth, height: tileHeight, gutter, columns: atlasColumns, rows: atlasRows } = atlas;
+    const slot = index % atlas.perSheet;
+    const { width: tileWidth, height: tileHeight, gutter, columns: atlasColumns } = atlas;
     const cellW = tileWidth + 2 * gutter, cellH = tileHeight + 2 * gutter;
-    const w = atlasColumns * cellW, h = atlasRows * cellH;
+    const w = atlasColumns * cellW, h = sheet.rows * cellH;
     return new THREE.Vector4(
-      ((index % atlasColumns) * cellW + gutter + 0.5) / w,
-      1 - (Math.floor(index / atlasColumns) * cellH + gutter + tileHeight - 0.5) / h,
+      ((slot % atlasColumns) * cellW + gutter + 0.5) / w,
+      1 - (Math.floor(slot / atlasColumns) * cellH + gutter + tileHeight - 0.5) / h,
       (tileWidth - 1) / w, (tileHeight - 1) / h,
     );
-  }, [issue.slug]);
+  }, [index, sheet]);
   const paper = useMemo(() => paperGeometry(issue), [issue]);
   const sleeve = useMemo(() => sleeveGeometry(issue.bag, issue.height, half, index), [issue, half, index]);
   const uniforms = useMemo(() => ({
@@ -421,8 +435,8 @@ export function ComicObject({ issue, index, inspected, flex, shelf, neighbor }: 
     neighborFromWorld: { value: new THREE.Matrix4() }, neighborHalfSize: { value: new THREE.Vector2((neighbor?.width ?? 0) / 2, (neighbor?.height ?? 0) / 2) },
     spineColor: { value: new THREE.Color(issue.spineColor ?? "#191619") }, spineArt: { value: spineArt ?? null },
     printedSpine: { value: !!spineArt },
-    printTile: { value: tile.clone() }, foilMask: { value: foilMask ?? null }, hasFoil: { value: !!issue.foil },
-    foilColor: { value: new THREE.Color(issue.foil === "gold" ? "#efc965" : "#e8edf2") },
+    printTile: { value: tile.clone() }, foilMask: { value: foilMask ?? null }, hasMetal: { value: !!foilMask }, hasChromium: { value: !!issue.chromium },
+    foilColor: { value: new THREE.Color(foilColors[issue.foil ?? "silver"]) },
     dieCut: { value: issue.dieCut === true },
     overlay: { value: issue.stock === "overlay" ? 1 : 0 },
     reliefMap: { value: reliefMap }, frontArt: { value: front }, backArt: { value: back }, leaves: { value: (pages - 4) / 2 },
