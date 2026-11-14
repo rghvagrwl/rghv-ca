@@ -133,10 +133,15 @@
     "title": "Comics — Raghav Agarwal",
     "description": "A small collection of comics, preserved in clear sleeves.",
     "image": {
-      "url": "/og/comics.jpg?v=20484348",
-      "width": 3600,
-      "height": 1890,
-      "alt": "Overhead view of Spider-Man Classics upright on a stack of sleeved comics, with Captain America at the left and Star Wars at the right."
+      "url": "/og/comics.jpg?v=4bd8c081",
+      "width": 4800,
+      "height": 2520,
+      "alt": "Eight sleeved Marvel comics fanned out on white, with the red cover of The Amazing Spider-Man #300 centered on top."
+    },
+    "twitterImage": {
+      "url": "/og/comics-twitter.jpg?v=c0a32bf3",
+      "width": 4000,
+      "height": 2100
     }
   }
 }
