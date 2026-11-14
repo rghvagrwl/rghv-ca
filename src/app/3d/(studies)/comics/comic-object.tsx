@@ -241,6 +241,8 @@ const paperFragment = varyings + /* glsl */ `
   uniform sampler2D frontArt;
   uniform sampler2D backArt;
   uniform vec4 printTile;
+  uniform bool fullFront;
+  uniform bool fullBack;
   uniform sampler2D foilMask;
   uniform vec3 foilColor;
   uniform bool hasMetal;
@@ -278,7 +280,7 @@ const paperFragment = varyings + /* glsl */ `
     bool outer = region > 4.5;
     bool front = region < 0.5 || outer;
     if (region < 1.5 || outer) {
-      vec2 uv = printTile.xy + texCoord * printTile.zw;
+      vec2 uv = (front ? fullFront : fullBack) ? texCoord : printTile.xy + texCoord * printTile.zw;
       vec3 ink = front ? texture2D(frontArt, uv).rgb : texture2D(backArt, uv).rgb;
       float direct = max(dot(n, key), 0.0) * (1.0 - 0.60 * neighborShadow());
       float sky = 0.5 + 0.5 * n.y;
@@ -390,6 +392,7 @@ const foilColors = { gold: "#efc965", silver: "#e8edf2", red: "#ff6053", blue: "
 type ComicProps = {
   issue: Issue;
   index: number;
+  detailedFront: boolean;
   inspected: boolean;
   flex: RefObject<Flex>;
   shelf: RefObject<(THREE.Group | null)[]>;
@@ -402,7 +405,37 @@ function printTexture(texture: THREE.Texture, anisotropy: number) {
   texture.needsUpdate = true;
 }
 
-export function ComicObject({ issue, index, inspected, flex, shelf, neighbor }: ComicProps) {
+// Each side upgrades independently. An offscreen or abandoned request releases its
+// image and GPU texture, while the shared preview remains ready underneath it.
+function useOriginalPrint(url: string, enabled: boolean, side: "front" | "back", preview: THREE.Texture,
+  materialRef: RefObject<THREE.ShaderMaterial | null>, anisotropy: number, invalidate: () => void) {
+  useEffect(() => {
+    const material = materialRef.current;
+    if (!enabled || !material) return;
+    const art = material.uniforms[side === "front" ? "frontArt" : "backArt"];
+    const full = material.uniforms[side === "front" ? "fullFront" : "fullBack"];
+    const image = new Image();
+    image.decoding = "async";
+    const texture = new THREE.Texture(image);
+    image.onload = () => {
+      printTexture(texture, anisotropy);
+      art.value = texture;
+      full.value = true;
+      invalidate();
+    };
+    image.src = url;
+    return () => {
+      image.onload = null;
+      if (!image.complete) image.removeAttribute("src");
+      art.value = preview;
+      full.value = false;
+      texture.dispose();
+      invalidate();
+    };
+  }, [url, enabled, side, preview, materialRef, anisotropy, invalidate]);
+}
+
+export function ComicObject({ issue, index, inspected, detailedFront, flex, shelf, neighbor }: ComicProps) {
   const sheetIndex = Math.floor(index / atlas.perSheet);
   const sheet = atlas.sheets[sheetIndex];
   const suffix = sheetIndex || "";
@@ -435,7 +468,8 @@ export function ComicObject({ issue, index, inspected, flex, shelf, neighbor }: 
     neighborFromWorld: { value: new THREE.Matrix4() }, neighborHalfSize: { value: new THREE.Vector2((neighbor?.width ?? 0) / 2, (neighbor?.height ?? 0) / 2) },
     spineColor: { value: new THREE.Color(issue.spineColor ?? "#191619") }, spineArt: { value: spineArt ?? null },
     printedSpine: { value: !!spineArt },
-    printTile: { value: tile.clone() }, foilMask: { value: foilMask ?? null }, hasMetal: { value: !!foilMask }, hasChromium: { value: !!issue.chromium },
+    printTile: { value: tile }, fullFront: { value: false }, fullBack: { value: false },
+    foilMask: { value: foilMask ?? null }, hasMetal: { value: !!foilMask }, hasChromium: { value: !!issue.chromium },
     foilColor: { value: new THREE.Color(foilColors[issue.foil ?? "silver"]) },
     dieCut: { value: issue.dieCut === true },
     overlay: { value: issue.stock === "overlay" ? 1 : 0 },
@@ -447,35 +481,8 @@ export function ComicObject({ issue, index, inspected, flex, shelf, neighbor }: 
     if (spineArt) printTexture(spineArt, anisotropy);
     invalidate();
   }, [front, back, spineArt, anisotropy, invalidate]);
-  useEffect(() => {
-    if (!inspected) return;
-    const material = materialRef.current;
-    if (!material) return;
-    // The atlas remains visible until both sides of the inspected copy are ready.
-    // Dispose individual textures on release, including partially loaded pairs.
-    const loader = new THREE.TextureLoader();
-    let active = true, loaded = 0;
-    function ready(texture: THREE.Texture) {
-      if (!active || !material) return;
-      printTexture(texture, anisotropy);
-      if (++loaded !== 2) return;
-      material.uniforms.frontArt.value = detailFront;
-      material.uniforms.backArt.value = detailBack;
-      material.uniforms.printTile.value.set(0, 0, 1, 1);
-      invalidate();
-    }
-    const detailFront = loader.load(issue.image, ready);
-    const detailBack = loader.load(issue.back, ready);
-    return () => {
-      active = false;
-      material.uniforms.frontArt.value = front;
-      material.uniforms.backArt.value = back;
-      material.uniforms.printTile.value.copy(tile);
-      detailFront.dispose();
-      detailBack.dispose();
-      invalidate();
-    };
-  }, [inspected, issue, front, back, tile, invalidate, anisotropy]);
+  useOriginalPrint(issue.image, inspected || detailedFront, "front", front, materialRef, anisotropy, invalidate);
+  useOriginalPrint(issue.back, inspected, "back", back, materialRef, anisotropy, invalidate);
   useEffect(() => () => { paper.dispose(); sleeve.dispose(); }, [paper, sleeve]);
   // Both sheets follow the bound paper. Extra film relief is confined to the sleeve program.
   useFrame(() => {

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { writeFile } from "node:fs/promises";
+import { readdir, unlink, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { issues } from "../src/app/3d/(studies)/comics/catalog.ts";
@@ -33,3 +33,9 @@ for (let start = 0; start < issues.length; start += perSheet) {
 }
 const destination = new URL("../src/app/3d/(studies)/comics/print-atlas.json", import.meta.url);
 await writeFile(destination, JSON.stringify({ perSheet, columns, width, height, gutter, sheets }, null, 2) + "\n");
+
+// Remove sheets left over when the collection shrinks. Each sheet contains cover art.
+for (const filename of await readdir(root)) {
+  const sheet = /^shelf-(?:front|back)(\d*)\.webp$/.exec(filename);
+  if (sheet && Number(sheet[1]) >= sheets.length) await unlink(new URL(filename, root));
+}

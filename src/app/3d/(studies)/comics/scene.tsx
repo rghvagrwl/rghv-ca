@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable react-hooks/immutability -- Three.js scene nodes and the interaction controller are updated imperatively each frame. */
 
-import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import StudyReady from "../../_study-ready";
 import ShelfRuler from "../../_books/shelf-ruler";
 import { ShelfRail } from "../../_books/shelf-navigation";
@@ -32,11 +32,23 @@ const clamp = THREE.MathUtils.clamp;
 const indexAtX = (x: number) => clamp((x - positions[0]) / spacing, 0, issues.length - 1);
 const nearest = (x: number) => Math.round(indexAtX(x));
 
-function Collection({ rail }: { rail: ShelfRail }) {
+function subscribeToSize(update: () => void) {
+  window.addEventListener("resize", update);
+  return () => window.removeEventListener("resize", update);
+}
+function pixelDensity() {
+  const area = Math.max(1, window.innerWidth * window.innerHeight);
+  return Math.max(1, Math.min(window.devicePixelRatio, 3, Math.sqrt(8_300_000 / area)));
+}
+
+function Collection({ rail, density }: { rail: ShelfRail; density: number }) {
   const controls = useRef<Controls>(initialControls());
-  const { camera, gl, size, invalidate } = useThree();
+  const { camera, gl, size, setDpr, invalidate } = useThree();
   const roots = useRef<Array<THREE.Group | null>>([]);
   const [shelfStep, setShelfStep] = useState(0);
+  const [detailCenter, setDetailCenter] = useState(0);
+  const detailFocus = useRef<{ index: number; timer?: number }>({ index: 0 });
+  const cadence = useRef({ frames: 0, seconds: 0 });
   const [inspected, setInspected] = useState(-1);
   const flexes = useRef(issues.map((_, index) => ({ bend: restingBend(index), twist: 0 })));
   const springs = useRef(issues.map(() => ({ bendVelocity: 0, twistVelocity: 0 })));
@@ -45,10 +57,16 @@ function Collection({ rail }: { rail: ShelfRail }) {
   const baseZoom = size.height / (2 * cameraDistance * Math.tan(THREE.MathUtils.degToRad(fieldOfView) / 2));
   // Prefetch a screenful plus a few offscreen covers while the shelf moves.
   const reach = Math.ceil(size.width / (2 * baseZoom * spacing)) + 5;
+  const detailRadius = Math.min(6, Math.ceil(size.width / (2 * baseZoom * spacing) + 0.5));
   const firstVisible = shelfStep * slotsPerStep - reach;
   const lastVisible = (shelfStep + 1) * slotsPerStep + reach;
   // Leave room for the entire front and sleeve when a long phone is held upright.
   const widthToDistance = size.height / (2 * size.width * 0.86 * Math.tan(THREE.MathUtils.degToRad(fieldOfView) / 2));
+
+  useEffect(() => {
+    const focus = detailFocus.current;
+    return () => window.clearTimeout(focus.timer);
+  }, []);
 
   const choose = useCallback((index: number) => {
     const c = controls.current;
@@ -212,6 +230,15 @@ function Collection({ rail }: { rail: ShelfRail }) {
     camera.position.x = c.railX;
     const shelfIndex = indexAtX(c.railX);
     rail.report(shelfIndex);
+    // Keep the last sharp group while scrubbing. Only fetch original prints
+    // around a slot once the camera has lingered there.
+    const center = Math.round(shelfIndex);
+    const focus = detailFocus.current;
+    if (center !== focus.index) {
+      focus.index = center;
+      window.clearTimeout(focus.timer);
+      focus.timer = window.setTimeout(() => setDetailCenter(center), 160);
+    }
     const step = Math.floor(shelfIndex / slotsPerStep);
     if (step !== shelfStep) setShelfStep(step);
     const inspectionDistance = Math.max(cameraDistance - 1.05, (issues[subject]?.bag ?? 0) * widthToDistance + 0.9);
@@ -271,7 +298,26 @@ function Collection({ rail }: { rail: ShelfRail }) {
     c.bendTarget *= loadDecay;
     c.twistTarget *= loadDecay;
     if (Math.abs(c.bendTarget) + Math.abs(c.twistTarget) > 0.0001) moving = true;
-    if (moving) invalidate();
+    // Give the resting print native display density. Lower the fill cost during
+    // motion only when sustained frame times show this device needs it.
+    const meter = cadence.current;
+    if (moving) {
+      if (meter.frames > 0) meter.seconds += Math.min(delta, 0.1);
+      meter.frames++;
+      if (meter.frames >= 8 && meter.seconds >= 0.35) {
+        const drawingDpr = gl.getPixelRatio();
+        if (meter.seconds / (meter.frames - 1) > 1 / 42 && drawingDpr > 1.5) {
+          setDpr(Math.max(1.5, drawingDpr * 0.8));
+        }
+        meter.frames = 0;
+        meter.seconds = 0;
+      }
+      invalidate();
+    } else {
+      meter.frames = 0;
+      meter.seconds = 0;
+      if (gl.getPixelRatio() !== density) { setDpr(density); invalidate(); }
+    }
   }, -1);
 
   return <>
@@ -290,7 +336,9 @@ function Collection({ rail }: { rail: ShelfRail }) {
             position={[positions[index], shelfCenter(index), 0]} rotation={[0, shelfYaw, 0]}
             onPointerDown={event => pick(event, index)}
             onPointerMove={event => hover(event, index)} onPointerOut={() => leave(index)}>
-            <ComicObject issue={issue} index={index} inspected={inspected === index} flex={{ current: flexes.current[index] }}
+            <ComicObject issue={issue} index={index} inspected={inspected === index}
+              detailedFront={Math.abs(index - detailCenter) <= detailRadius && issue.height * baseZoom * density * 1.06 > atlas.height}
+              flex={{ current: flexes.current[index] }}
               shelf={roots} neighbor={issues[index + 1]} />
           </group>;
         })}
@@ -305,15 +353,16 @@ function Collection({ rail }: { rail: ShelfRail }) {
 
 export default function ComicsScene() {
   const [rail] = useState(() => new ShelfRail(0));
+  const density = useSyncExternalStore(subscribeToSize, pixelDensity, () => 1);
   return <main className={styles.stage} aria-label="Comics">
     <div className={styles.canvas}>
       <Canvas camera={{ position: [firstX, shelfAimHeight + shelfElevation * cameraDistance, cameraDistance], fov: fieldOfView, near: 0.1, far: 100 }}
-        frameloop="demand" dpr={[1, 1.75]} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
+        frameloop="demand" dpr={density} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
         onCreated={({ gl, camera }) => { camera.lookAt(firstX, shelfAimHeight, 0); gl.setClearColor(0, 0);
           gl.toneMapping = THREE.NeutralToneMapping; gl.domElement.tabIndex = 0;
           gl.domElement.setAttribute("role", "application");
           gl.domElement.setAttribute("aria-label", "Comics in clear sleeves. Select a comic, then drag to inspect it. Swipe or scroll to browse."); }}>
-        <Collection key={collectionKey} rail={rail} />
+        <Collection key={collectionKey} rail={rail} density={density} />
       </Canvas>
     </div>
     <ShelfRuler rail={rail} items={issues} label="Browse comics" />

@@ -5,10 +5,10 @@ Each row identifies the front printing and the photographed reverse. Different c
 | Issue | Edition and front evidence | Back evidence | Back art |
 | --- | --- | --- | --- |
 | Fantastic Four #48 | [Grand Comics Database](https://www.comics.org/issue/19911/), [cover scan](https://thoughtfulmirth.wordpress.com/wp-content/uploads/2015/02/galactus-1.jpg) | [Photographed copy](https://www.ebay.com/itm/306264101397) | Mike Marvel Dynaflex advertisement |
-| Star Wars #1 | [30¢ July 1977 issue](https://www.comics.org/issue/31248/), [front scan](https://storage.googleapis.com/qc-website/size_f/item-658995.jpg) | [Back scan](https://storage.googleapis.com/qc-website/size_f/item_image-479763.jpg) of the [same copy](https://www.qualitycomix.com/comics/item/658995/starwars1vf851stapplukeskywalkerdarthvader) | Spalding Street Ball advertisement with Rick Barry and Dr. J |
+| Star Wars #1 | [30¢ July 1977 issue](https://www.comics.org/issue/31248/), [front scan](https://storage.googleapis.com/qc-website/size_l/item-658995.jpg) | [Back scan](https://storage.googleapis.com/qc-website/size_l/item_image-479763.jpg) of the [same copy](https://www.qualitycomix.com/comics/item/658995/starwars1vf851stapplukeskywalkerdarthvader) | Spalding Street Ball advertisement with Rick Barry and Dr. J |
 | Spider-Man Classics #1 | [US newsstand edition, April 1993](https://www.comics.org/issue/1767178/), [front photograph](https://i.ebayimg.com/images/g/2CkAAOSw9rRnkRsP/s-l1600.jpg) | [Back photograph](https://i.ebayimg.com/images/g/leQAAOSwZWhnkRsR/s-l1600.jpg) of the [same copy](https://www.ebay.com/itm/135512235989) | Wolverine, X-Men on Video |
 | Uncanny X-Men #141 | [cover scan](https://1.bp.blogspot.com/-fGRhiQA894Q/UvOtI4dVHDI/AAAAAAAAPoQ/myaohaEp_mg/s1600/X-Men_Vol_1_141.jpg) | [Photographed CGC reverse](https://www.whatnot.com/listing/TGlzdGluZ05vZGU6MTMyMzgyOTQ0) | LEGO Expert Builder advertisement |
-| Batman #423 | [GCD direct edition](https://www.comics.org/issue/44906/), [cover scan](https://media.mycomicshop.com/n_ii/600/8282123.jpg) | [Photographed first-print reverse](https://www.mycomicshop.com/search?ItemID=64111411) | Top Secret/S.I. product line advertisement |
+| Batman #423 | [GCD direct edition](https://www.comics.org/issue/44906/), [cover scan](https://media.mycomicshop.com/n_ii/originalimage/8282123.jpg) | [Photographed first-print reverse](https://www.mycomicshop.com/search?ItemID=64111411) | Top Secret/S.I. product line advertisement |
 | Amazing Spider-Man #300 | [Marvel issue record](https://www.marvel.com/comics/issue/6706/slug), [front scan](https://www.mycomicshop.com/search?ItemID=64173706) | [Photographed reverse](https://www.mycomicshop.com/search?ItemID=62930655) | Top Secret/S.I. “Beat Bond at His Own Game” advertisement |
 
 ## Physical model
@@ -98,10 +98,6 @@ Each front and reverse was independently rectified from photographs of the same 
 
 Widths use the gallery’s 6⅞- or 6⅝-inch options at a common nominal height of 10¼ inches, selected from the observed ratios of the paper in the scans. Exact trim and stock caliper were not measured. The silver/regular sleeve is used for the wider format. [Sleeve formats](https://www.bcwsupplies.com/blog/2017/02/19/comic-bags-boards-size/)
 
-### Swamp Thing #47
-
-April 1986, 75¢ direct sale, 50th-anniversary panel. Steve Bissette and John Totleben cover. The reverse shows Monogram’s The Animal four-wheel-drive Make-and-Play kit. CGC 4760713017. Glossy cover. GCD describes the series interior as newsprint/Mando. [Edition](https://www.comics.org/issue/41286/) · [Physical format](https://www.comics.org/series/2999/) · [Photographed copy](https://fantastcollection.com/products/d-c-comics-swamp-thing-47-4-86-fantast-cgc-9-8-white-pages-1) · [Front](https://cdn.shopify.com/s/files/1/0624/3126/4922/files/4760713017-F.jpg?v=1793044764) · [Back](https://cdn.shopify.com/s/files/1/0624/3126/4922/files/4760713017-B.jpg?v=1793044763).
-
 ### Shade, the Changing Man #1
 
 June–July 1977. U.S. 35¢ printing, with a UPC. Cover by Steve Ditko. The reverse shows Spalding’s Street Ball, starring Rick Barry and Dr. J. CGC 4760717004. Glossy paper cover over newsprint. [Edition](https://www.comics.org/issue/31100/) · [Physical format](https://www.comics.org/series/2382/) · [Photographed copy](https://fantastcollection.com/products/d-c-comics-shade-the-changing-man-1-6-7-77-fantast-cgc-9-8-white-pages-3) · [Front](https://cdn.shopify.com/s/files/1/0624/3126/4922/files/4760717004-F.jpg?v=1793724146) · [Back](https://cdn.shopify.com/s/files/1/0624/3126/4922/files/4760717004-B.jpg?v=1793724146).
@@ -137,7 +133,7 @@ June 1960, U.S. 10¢. Gil Kane and Murphy Anderson’s Challenge of the Gorilla 
 
 ## Independent issues
 
-The recto and verso of each issue were cropped from a single photographed copy. All nine have folded, saddle-stitched bindings. The seven conventionally sized issues use the nominal modern U.S. comic trim of 6⅝ × 10¼ inches. The two oversized issues have separately documented dimensions. Thickness is inferred from the printed format and page count. Precise paper caliper and coatings were not measured. [Printer trim specification](https://www.rinkprinting.com/file_download/925578ce-bcd4-44a6-88a2-e46dc07b1026)
+Both covers of each issue were cropped from one photographed copy. These editions are saddle stitched. The nominal trim is 6⅝ × 10¼ inches, except for the oversized Teenage Mutant Ninja Turtles issue documented below.
 
 ### Hellboy: Seed of Destruction #1
 
@@ -147,14 +143,6 @@ Dark Horse, March 1994, $2.50. Mike Mignola cover with an Arthur Adams inset. Th
 
 Fantagraphics, July 1987. The first printing shows the single samurai against an orange and yellow sky. Black-and-white interiors. The reverse is a full-color science-fiction aircraft illustration with a white margin. [Edition](https://www.comics.org/issue/43084/) · [Paired copy](https://www.mycomicshop.com/search?ItemID=64173822) · [Front](https://media.mycomicshop.com/n_ii/originalimage/8282067.jpg) · [Reverse](https://media.mycomicshop.com/n_ii/originalimage/8282064.jpg).
 
-### The Rocketeer Special Edition #1
-
-Eclipse, November 1984, $1.50. Dave Stevens cover. The reverse is a painted illustration of children playing Rocketeer with a cream paper border. [Edition](https://www.comics.org/issue/39283/) · [Paired copy](https://www.mycomicshop.com/search?ItemID=62254568) · [Front](https://media.mycomicshop.com/n_ii/originalimage/7814911.jpg) · [Reverse](https://media.mycomicshop.com/n_ii/originalimage/7814908.jpg).
-
-### Love and Rockets #1
-
-Gilbert, Jaime and Mario Hernandez’s self-published 1981 fanzine. Black ink on cream paper wrappers, including the faux UPC on the front and a group illustration on the reverse. The shop records white interior paper, 32 interior pages and an 8½ × 11-inch trim. The GCD total includes the covers. [Edition](https://www.comics.org/issue/212389/) · [Paired copy](https://www.mycomicshop.com/search?ItemID=64173740) · [Front](https://media.mycomicshop.com/n_ii/originalimage/8282605.jpg) · [Reverse](https://media.mycomicshop.com/n_ii/originalimage/8282602.jpg).
-
 ### Spawn #1
 
 Image through Malibu, May 1992. The $1.95 direct-market edition has Todd McFarlane and Ken Steacy cover art. The reverse is an illustrated EIM comic mail-order advertisement. [Edition](https://www.comics.org/issue/51236/) · [Paired copy](https://www.mycomicshop.com/search?ItemID=64950413) · [Front](https://media.mycomicshop.com/n_ii/originalimage/8608995.jpg) · [Reverse](https://media.mycomicshop.com/n_ii/originalimage/8608996.jpg).
@@ -163,17 +151,9 @@ Image through Malibu, May 1992. The $1.95 direct-market edition has Todd McFarla
 
 Cartoon Books, July 1993. First printing of the original $2.95 Jeff Smith comic. Purple color cover over black-and-white interiors. A small monochrome gag panel is printed against solid black on the reverse. [Edition](https://www.comics.org/issue/53234/) · [Paired copy](https://www.mycomicshop.com/search?ItemID=63050422) · [Front](https://media.mycomicshop.com/n_ii/originalimage/7976828.jpg) · [Reverse](https://media.mycomicshop.com/n_ii/originalimage/7976829.jpg).
 
-### The Savage Dragon #1
-
-Image through Malibu, July 1992. The newsstand copy has the pink-and-blue masthead, UPC box, newsprint interior and an American Entertainment summer catalogue ad on its reverse. The CGC-labelled holder was cropped to the physical edges. [Edition and interior paper](https://atomicavenue.com/comics/series/20802/the-savage-dragon-mini-series) · [Edition page count](https://www.ebay.com/p/23056919136) [Edition](https://www.comics.org/series/13396/) · [Paired copy](https://www.mycomicshop.com/search?ItemID=64872455) · [Front](https://media.mycomicshop.com/n_ii/originalimage/8468118.jpg) · [Reverse](https://media.mycomicshop.com/n_ii/originalimage/8468120.jpg).
-
 ### Teenage Mutant Ninja Turtles #4
 
 Mirage Studios’ 1985 first printing. The publisher confirms the oversized 7⅜ × 10⅞-inch trim and Peter Laird artwork. The black-and-green image wraps across both sides of the folded cover. The GCD describes 44 pages including the cover. [Issue record](https://www.comics.org/issue/245472/) [Edition](https://www.miragelicensing.com/comics/mirage/volume01/04/04.html) · [Paired copy](https://www.mycomicshop.com/search?ItemID=63967129) · [Front](https://media.mycomicshop.com/n_ii/originalimage/8241759.jpg) · [Reverse](https://media.mycomicshop.com/n_ii/originalimage/8241760.jpg).
-
-### Caliber Presents #1
-
-Caliber Press, January 1989. Tim Vigil’s color Cuda cover, black-and-white interior and James O’Barr’s portrait of the Crow on the reverse. The dealer records 48 pages of interior content. GCD’s cover-inclusive estimate is 52. [Edition](https://www.comics.org/issue/216833/) · [Paired copy](https://www.mycomicshop.com/search?ItemID=63484952) · [Front](https://media.mycomicshop.com/n_ii/originalimage/8109726.jpg) · [Reverse](https://media.mycomicshop.com/n_ii/originalimage/8109730.jpg).
 
 ## Archival editions
 
@@ -190,26 +170,17 @@ Front and back covers come from the same issue scan. Trim sizes are estimates us
 | Blue Bolt #1 | Novelty Press, Jun 1940 | Boy! Look at These Bargains! mail-order premiums | [Scan](https://archive.org/details/BlueBoltV101) · [Catalog](https://www.comics.org/issue/845/) |
 | Strange Suspense Stories #27 | Charlton, Oct 1955 | Full-color Extra Money! mail-order ad | [Scan](https://archive.org/details/Strange_Suspense_Stories_027) · [Catalog](https://www.comics.org/series/1095/details/timeline/) |
 | Yellowjacket Comics #1 | Charlton, Sep 1944 | Ugly Blackheads Out in Seconds! Vacutex advertisement | [Scan](https://archive.org/details/Yellowjacket_Comics_001) · [Catalog](https://www.comics.org/issue/3843/) |
-| Baffling Mysteries #14 | Ace, Mar 1953 | Electric Spot Reducer mail-order advertisement | [Scan](https://archive.org/details/baffling-mysteries-14) · [Catalog](https://www.comics.org/issue/94333/) |
-| Crime Does Not Pay #48 | Lev Gleason, Nov 1946 | Progressive Chest Pull & Bar Bell Combination advertisement; scan credit leaf excluded | [Scan](https://archive.org/details/CrimeDoesNotPay048) · [Catalog](https://www.comics.org/issue/234824/) |
 | Four Color #632 — Zane Grey’s Fighting Caravans | Dell, Jun–Aug 1955 | Five color panels concluding the story beside Dell’s A Pledge to Parents | [Scan](https://archive.org/details/ZaneGreyComics-FightingCaravans632) · [Catalog](https://www.comics.org/issue/173356/) |
 | Four Color #373 — Sergeant Preston of the Yukon | Dell, Feb 1952 | Six color panels concluding the adventure with Sergeant Preston and King | [Scan](https://archive.org/details/SergeantPrestonComicFourColor373) · [Catalog](https://www.comics.org/issue/173180/) |
 | Terry and the Pirates #26 | Harvey, Apr 1951 | Terry Lee and Hotshot pinup with airplane identification tag | [Scan](https://archive.org/details/Terry_and_the_Pirates_26) · [Catalog](https://www.comics.org/issue/215972/) |
 
-## Alternative, animation, romance, and horror editions
+## Alternative, animation and romance editions
 
-Photographed front and reverse come from the same physical copy in each linked Fantast Collection listing. Both faces were individually cropped to the printed paper at all four corners. Page counts include covers. Trim uses nominal US format unless otherwise indicated. Western Love uses an approximate Golden Age format matched to the scanned proportions. Hup uses issue-specific published dimensions.
+Photographed front and reverse come from the same physical copy in each linked Fantast Collection listing. Both faces were individually cropped to the printed paper at all four corners. Page counts include covers. Trim uses nominal US format unless otherwise indicated. Western Love uses an approximate Golden Age format matched to the scanned proportions.
 
 - **Western Love #2** (Prize Publications, September–October 1949, 52 pages). Western romance with a photographic cover. The reverse advertises a camera and other mail-order premiums. [Scanned copy](https://fantastcollection.com/products/prize-publications-western-love-2-9-10-49-fantast-cgc-4-0-cream-to-off-white-pages), [Issue details](https://www.comics.org/issue/315757/), [Format](https://www.comics.org/series/679/).
 - **Judge Dredd #2** (Eagle Comics, December 1983, 36 pages). British science fiction in its American color edition. The printed reverse features Judge Dredd and the word “Freeze!” [Scanned copy](https://fantastcollection.com/products/eagle-comics-judge-dredd-2-12-83-fantast-cgc-9-8-white-pages), [Issue details](https://www.comics.org/issue/38089/).
-- **The Original Astro Boy #4** (NOW Comics, December 1987, 28 pages). American color Astro Boy comic. The reverse carries a NOW Comics promotion with a red face above “Do You Blame Her?” [Scanned copy](https://fantastcollection.com/products/now-comics-original-astro-boy-4-12-87-fantast-cgc-9-4-white-pages), [Issue details](https://www.comics.org/series/19761/details/).
 - **Destroyer Duck #1** (Eclipse, February 1982, 36 pages). Steve Gerber and Jack Kirby’s funny-animal benefit comic. The reverse promotes Eclipse Magazine, Sabre and Scorpio Rose. [Scanned copy](https://fantastcollection.com/products/eclipse-comics-destroyer-duck-1-2-82-cgc-9-8-white-pages-1), [Issue details](https://www.comics.org/issue/36010/).
-- **Twisted Tales #2** (Pacific Comics, April 1983, 36 pages). Painted horror anthology. The reverse has a magenta Alien Worlds advertisement. [Scanned copy](https://fantastcollection.com/products/pacific-comics-twisted-tales-2-4-83-fantast-cgc-9-6-white-pages-copy), [Issue details](https://www.comics.org/issue/37341/).
-- **Hup #4** (Last Gasp, 1992, 36 pages). Robert Crumb’s underground anthology has the R. Crumb Dartboard printed on the back. Wolfgang’s lists this issue at 7 × 9¾ inches. [Scanned copy](https://fantastcollection.com/products/last-gasp-hup-4-1-92-fantast-cgc-9-6-white-pages), [Issue details](https://www.comics.org/issue/276209/), [Dimensions](https://www.wolfgangs.com/comics/last-gasp-hup-4/vintage-comic/ZZZ043173.html).
-- **Aliens #6** (Dark Horse, July 1989, 36 pages). Dark Horse science-fiction horror. The reverse advertises the Dark Horse adaptation of The Abyss. [Scanned copy](https://fantastcollection.com/products/dark-horse-aliens-6-7-89-fantast-cgc-9-8-white-pages), [Issue details](https://www.comics.org/issue/46499/).
-- **Cartune Land #1** (Magic Carpet, April 1987, 36 pages). Painted science-fantasy cover with a black-and-white motorcycle illustration on the back. [Scanned copy](https://fantastcollection.com/products/magic-carpet-cartune-land-1-4-87-cgc-9-8-white-pages), [Issue details](https://www.comics.org/issue/289283/).
-- **Cry for Dawn #9** (Cry for Dawn Productions, Spring 1992, 44 pages). Horror anthology with a red framed illustration and its printed caption. The reverse features a pale face against black. [Scanned copy](https://fantastcollection.com/products/cfd-publications-cry-for-dawn-9-spring-1992-cgc-8-5-white-pages), [Issue details](https://www.comics.org/issue/364259/).
-- **Death Dealer #1** (Verotik, July 1995, 52 pages). First printing, $5.95. Squarebound cardstock with an embossed red masthead over Frank Frazetta’s painting. A red outlined Verotik V and UPC appear on the back. [Scanned copy](https://fantastcollection.com/products/verotik-death-dealer-1-7-95-cgc-8-5-white-pages), [Issue details](https://www.comics.org/issue/57365/), [Binding](https://www.comics.org/series/5482/), [Embossed first printing](https://www.atomicavenue.com/atomic/TitleDetail.aspx?TitleID=12249).
 - **The Great Gazoo #1** (Charlton, August 1973, 36 pages). Hanna-Barbera humor. The reverse is a sideways illustrated advertisement for 132 Roman soldiers. [Scanned copy](https://fantastcollection.com/products/charlton-comics-great-gazoo-1-8-73-cgc-9-6-white-pages), [Issue details](https://www.comics.org/issue/170337/).
 - **Robotech: The Macross Saga #7** (Comico, November 1985, 36 pages). Mike Leeke and Chris Kalnick’s two-sided wraparound art continues onto the back. The series uses a glossy cover, newsprint interior and saddle stitching. [Scanned copy](https://fantastcollection.com/products/comico-robotech-the-macross-saga-7-11-85-fantast-cgc-9-8-white-pages), [Issue details](https://www.comics.org/issue/203920/), [Paper and binding](https://www.comics.org/series/11694/).
 
