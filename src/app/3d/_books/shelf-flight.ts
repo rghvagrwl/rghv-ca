@@ -13,17 +13,16 @@ export function frameShelf(camera: OrthographicCamera, width: number, height: nu
   camera.updateMatrixWorld();
 }
 
-// The lens and eye travel together so a millimetre at the book's pivot keeps
-// the same screen scale as the camera changes from parallel to converging rays.
-export function frameInspection(camera: PerspectiveCamera, centerX: number, pivotDepth: number,
-    distance: number, pixelsPerUnit: number, width: number, height: number) {
-  const eyeDepth = pivotDepth + distance;
+// Specify the projection by its magnification at the shelf and the eye's
+// distance from that plane. Both stay continuous through a change of focus.
+export function frameInspection(camera: PerspectiveCamera, centerX: number, eyeDepth: number,
+    pixelsPerUnit: number, width: number, height: number) {
   camera.position.set(centerX, eyeDepth * Math.sin(shelfPitch), eyeDepth * Math.cos(shelfPitch));
   camera.rotation.set(-shelfPitch, 0, 0);
   camera.aspect = width / height;
-  camera.fov = MathUtils.radToDeg(2 * Math.atan(height / (2 * pixelsPerUnit * distance)));
-  camera.near = Math.max(0.05, distance - 12);
-  camera.far = distance + 40;
+  camera.fov = MathUtils.radToDeg(2 * Math.atan(height / (2 * pixelsPerUnit * eyeDepth)));
+  camera.near = Math.max(0.05, eyeDepth - 12);
+  camera.far = eyeDepth + 40;
   camera.updateProjectionMatrix();
   camera.updateMatrixWorld();
 }

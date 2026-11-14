@@ -121,9 +121,9 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
   const revealClock = useRef({ elapsed: 0, firstView: true });
   const library = useRef<ReturnType<typeof mountBooks> | null>(null);
   const controls = useRef<Controls>({ selected: -1, hover: -1, hoverX: 0, hoverY: 0, grip: null, yaw: 0, pitch: 0, reduced: false });
-  const animation = useRef(editions.map(() => ({
+  const animation = useRef(shelf.poses.map(p => ({
     focus: { position: 0, velocity: 0 }, rate: 12.5, padding: 0, captionWidth: 0,
-    handoffScale: 0, handoffStart: 0, elevation: 0, handoffElevation: 0,
+    startDepth: -viewUpZ * p.y + viewUpY * p.z,
     returnTurn: 0, returnPose: new THREE.Quaternion(),
     bend: { position: 0, velocity: 0 }, twist: { position: 0, velocity: 0 },
     hover: 0, lookX: 0, lookY: 0, yaw: 0, pitch: 0,
@@ -135,6 +135,8 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
   const rail = useRef({ position: spineX(initialBookIndex), target: spineX(initialBookIndex),
     velocity: 0, focusRate: 0, scrubbing: false, wheel: false });
   const zoom = size.height * 0.72 / maxHeight;
+  // Measure both lenses at the fixed shelf plane, where all closed spines sit.
+  const view = useRef({ scale: zoom, convergence: 0, fromScale: zoom, fromConvergence: 0, elapsed: 1, duration: 1 });
   // Fit the rotating book between the top margin and the actual wrapped text.
   const topMargin = clamp(size.height * 0.085, 14, 88);
   const bottomMargin = captionSize.height + clamp(size.height * 0.034, 12, 32);
@@ -154,6 +156,16 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
     const blend = reopening.current, node = roots.current[i];
     const incoming = animation.current[i];
     const exchanging = i >= 0 && c.selected >= 0 && i !== c.selected;
+    if (i !== c.selected) {
+      const shot = view.current;
+      shot.fromScale = shot.scale;
+      shot.fromConvergence = shot.convergence;
+      shot.duration = i < 0 ? 1.05 : 0.90;
+      shot.elapsed = 0;
+      roots.current.forEach((book, index) => {
+        if (book) animation.current[index].startDepth = -viewUpZ * book.position.y + viewUpY * book.position.z;
+      });
+    }
     if (i !== c.selected && incoming?.focus.position > 0 && node) {
       // Picking a returning cover back up must start from its visible pose,
       // not the unwrapped drag angles it had before it was released.
@@ -166,19 +178,10 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
         outgoing.returnTurn = turnProgress(outgoing.focus.position);
         outgoing.returnPose.copy(node.quaternion);
       }
-      outgoing.rate = exchanging ? 8 : 5.8;
+      outgoing.rate = exchanging ? 7.5 : 5.8;
     }
     if (incoming) {
-      incoming.handoffScale = 0;
-      const lens = get().camera;
-      if (exchanging && node && lens instanceof THREE.PerspectiveCamera) {
-        const depth = -viewUpZ * node.position.y + viewUpY * node.position.z;
-        const eyeDepth = -viewUpZ * lens.position.y + viewUpY * lens.position.z;
-        incoming.handoffScale = get().size.height * lens.projectionMatrix.elements[5] / (2 * (eyeDepth - depth));
-        incoming.handoffStart = clamp(incoming.focus.position, 0, 1);
-        incoming.handoffElevation = incoming.elevation;
-      }
-      incoming.rate = exchanging ? 8 : 12.5;
+      incoming.rate = exchanging ? 7.5 : 10;
       // Lead the turn slightly so an edge spine has room to unfold on screen.
       rail.current.focusRate = incoming.rate * 1.08;
       rail.current.target = shelf.poses[i].x;
@@ -188,7 +191,7 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
     c.selected = i; c.yaw = 0; c.pitch = 0; c.hover = -1;
     captionPending.current = i >= 0;
     onSelect(i); invalidate();
-  }, [get, invalidate, onSelect]);
+  }, [invalidate, onSelect]);
   const art = useLoader(THREE.TextureLoader, INITIAL_ART);
   const cadence = useRef({ frames: 0, seconds: 0, ratio: 1, active: false });
 
@@ -363,12 +366,20 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
     const index = indexAtX(r.position);
     navigator.report(index);
 
+    const shot = view.current;
+    shot.elapsed = c.reduced ? shot.duration : Math.min(shot.duration, shot.elapsed + dt);
+    const blend = THREE.MathUtils.smootherstep(shot.elapsed, 0, shot.duration);
+    if (shot.elapsed < shot.duration) moving = true;
+    const selectedPose = shelf.poses[c.selected];
+    const openDepth = selectedPose ? (selectedPose.z + selectedPose.w + 0.42) / viewUpY : 0;
+    const targetConvergence = selectedPose ? 1 / (selectedPose.eyeDistance + openDepth) : 0;
+    shot.convergence = lerp(shot.fromConvergence, targetConvergence, blend);
+    // In perspective, apparent size depends on depth divided by eye distance.
+    // Move the covers in that same space so their approach doesn't outrun the lens.
+    const depthBlend = shot.fromConvergence > 0 && targetConvergence > 0
+      ? blend * targetConvergence / shot.convergence : blend;
     let totalPadding = 0;
-    let zoomWeight = 0;
-    let weightedZoom = 0;
-    let pivotDepthSum = 0;
-    let inverseDistanceSum = 0;
-    let handoffScale = 0, handoffDepth = 0;
+    let targetScale = zoom;
     for (let i = 0; i < state.length; i++) {
       const node = roots.current[i]; if (!node) continue;
       const p = shelf.poses[i], s = state[i], active = i === c.selected;
@@ -392,16 +403,10 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
       } else if (pull === 0) {
         s.yaw = 0; s.pitch = 0;
       }
-      node.position.z = p.z + (p.w + 0.42) * slide;
-      // An incoming spine is already enlarged by the current lens. Start
-      // lifting as it pulls out; reversing mid-handoff retraces the same lift.
-      s.elevation = turn;
-      if (s.handoffScale) {
-        s.elevation = pull >= s.handoffStart
-          ? lerp(s.handoffElevation, 1, (pull - s.handoffStart) / (1 - s.handoffStart || 1))
-          : s.handoffElevation * pull / s.handoffStart;
-      }
-      node.position.y = lerp(p.y, -viewUpZ * node.position.z / viewUpY, s.elevation);
+      const depth = lerp(s.startDepth, active ? openDepth : -viewUpZ * p.y + viewUpY * p.z, depthBlend);
+      const up = (viewUpY * p.y + viewUpZ * p.z) * (1 - turn);
+      node.position.y = viewUpY * up - viewUpZ * depth;
+      node.position.z = viewUpZ * up + viewUpY * depth;
       if (!active && pull > 0 && s.returnTurn > 0) {
         node.quaternion.slerpQuaternions(SHELVED_ROTATION, s.returnPose, Math.min(1, turn / s.returnTurn));
       } else {
@@ -467,28 +472,19 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
         }
       }
       s.padding = 0;
-      if (pull > 0) {
+      if (active || pull > 0) {
         const { radius, eyeDistance } = p;
         const bookZoom = Math.min(size.height * 0.70 / p.openHeight, focusHeight / p.openHeight,
           size.width * 0.78 / p.openWidth, size.width * 0.46 / p.projectedHalfWidth,
           verticalZoom(topRoom, lift, radius, eyeDistance), verticalZoom(bottomRoom, -lift, radius, eyeDistance));
-        const pivotDepth = -viewUpZ * node.position.y + viewUpY * node.position.z;
-        if (active && s.handoffScale && pull < 1) {
-          handoffScale = lerp(s.handoffScale, bookZoom, smoothstep(pull, s.handoffStart, 1));
-          handoffDepth = pivotDepth;
-        } else if (active && pull === 1) s.handoffScale = 0;
+        if (active) targetScale = bookZoom * eyeDistance * targetConvergence;
         // In perspective the back corners of neighboring covers lean into the
         // gap. Leave room for the caption all the way back to their fore-edges.
         const neighborDepth = Math.max(shelf.poses[i - 1]?.w ?? 0, shelf.poses[i + 1]?.w ?? 0);
-        const gapScale = 1 + (pivotDepth + neighborDepth) / eyeDistance;
+        const gapScale = 1 + (depth + neighborDepth) / eyeDistance;
         const captionClearance = (s.captionWidth / 2 + 12) / bookZoom;
         const coverClearance = p.projectedHalfWidth + 0.08;
         s.padding = (Math.max(captionClearance, coverClearance) * gapScale - p.halfX - GAP) * pull;
-        const weight = smoothstep(pull, 0, 1);
-        zoomWeight += weight;
-        weightedZoom += weight * bookZoom;
-        pivotDepthSum += weight * pivotDepth;
-        inverseDistanceSum += weight / eyeDistance;
       }
       totalPadding += s.padding;
     }
@@ -507,53 +503,18 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
     // following those displaced spines would send the camera across the opening gap twice.
     const center = r.position;
     const ortho = browseCamera.current;
-    const strength = Math.min(1, zoomWeight);
-    const perspective = strength > 0.002;
-    const pivotDepth = zoomWeight > 0 ? pivotDepthSum / zoomWeight : 0;
-    const inverseDistance = perspective ? inverseDistanceSum / Math.max(1, zoomWeight) : 0;
-    let fit = (weightedZoom + zoom * Math.max(0, 1 - zoomWeight)) / Math.max(1, zoomWeight);
-    // During a handoff, ease the incoming cover from its actual on-screen
-    // size. Compensate for the magnification as it travels toward the eye.
-    if (handoffScale) fit = handoffScale * (1 - (handoffDepth - pivotDepth) * inverseDistance);
-    for (let i = 0; i < state.length; i++) {
-      const book = roots.current[i], pull = state[i].focus.position;
-      // The settled inspection lens already fits every rotation. Individual
-      // corners only need checking as a binding enters or leaves the row.
-      if (!book || pull <= 0 || pull === 1) continue;
-      const e = editions[i], m = book.matrix.elements;
-      // Fit the actual projected corners. The nearest corner magnifies most,
-      // and can cross the caption even when the pivot is perfectly centered.
-      let safe = fit;
-      // Reserve the caption margin as the book lifts into its inspection
-      // position. Applying the full margin on the shelf makes the lens shrink then grow.
-      const turn = turnProgress(pull);
-      const pixelLift = turn * lift;
-      const topRoom = size.height / 2 - turn * topMargin;
-      const bottomRoom = size.height / 2 - turn * bottomMargin;
-      for (let corner = 0; corner < 8; corner++) {
-        const x = (corner & 1 ? 1 : -1) * e.width / 200;
-        const y = (corner & 2 ? 1 : -1) * e.height / 200;
-        const foreEdge = corner & 1 ? state[i].bend.position + (corner & 2 ? 1 : -1) * state[i].twist.position : 0;
-        const z = (corner & 4 ? 1 : -1) * e.thickness / 200 + foreEdge;
-        // Frame its width at the destination. An outgoing cover can leave
-        // the viewport during a handoff without zooming out the whole shelf.
-        const coverX = m[0] * x + m[4] * y + m[8] * z;
-        const worldY = m[1] * x + m[5] * y + m[9] * z + m[13];
-        const worldZ = m[2] * x + m[6] * y + m[10] * z + m[14];
-        const up = viewUpY * worldY + viewUpZ * worldZ;
-        const depth = -viewUpZ * worldY + viewUpY * worldZ;
-        const depthScale = 1 - (depth - pivotDepth) * inverseDistance;
-        const verticalRoom = up >= 0 ? topRoom * depthScale - pixelLift : bottomRoom * depthScale + pixelLift;
-        safe = Math.min(safe, size.width * 0.46 * depthScale / Math.max(0.0001, Math.abs(coverX)),
-          Math.max(1, verticalRoom) / Math.max(0.0001, Math.abs(up)));
-      }
-      fit = lerp(fit, safe, smoothstep(pull, 0, 0.65));
-    }
+    // The covers move forward as they turn. Frame the selected book's resting
+    // pose directly so neither moving cover can pull the lens back mid-switch.
+    shot.scale = lerp(shot.fromScale, targetScale, blend);
+
+    // At effectively parallel projection, use the orthographic camera to
+    // retain depth precision rather than placing a perspective eye at infinity.
+    const perspective = shot.convergence > 0.00005;
     const lens = perspective ? inspectCamera : ortho;
-    if (perspective) frameInspection(inspectCamera, center, pivotDepth, 1 / inverseDistance, fit, size.width, size.height);
+    if (perspective) frameInspection(inspectCamera, center, 1 / shot.convergence, shot.scale, size.width, size.height);
     else {
       if (ortho.position.x !== center) { ortho.position.x = center; ortho.updateMatrixWorld(); }
-      if (Math.abs(fit - ortho.zoom) > 0.0001) { ortho.zoom = fit; ortho.updateProjectionMatrix(); }
+      if (Math.abs(shot.scale - ortho.zoom) > 0.0001) { ortho.zoom = shot.scale; ortho.updateProjectionMatrix(); }
     }
     if (camera !== lens) set({ camera: lens });
     if (showingCases.current !== perspective) {
@@ -564,7 +525,8 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
     for (let i = 0; i < state.length; i++) {
       const turn = turnProgress(state[i].focus.position), book = roots.current[i];
       if (turn > 0 && book) {
-        const offset = turn * lift / fit;
+        const depth = -viewUpZ * book.position.y + viewUpY * book.position.z;
+        const offset = turn * lift * (1 - depth * shot.convergence) / shot.scale;
         book.position.y += viewUpY * offset;
         book.position.z += viewUpZ * offset;
       }
@@ -573,7 +535,7 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
     // skip books entirely; their first entrance will still play on the way back.
     const wave = revealClock.current;
     wave.elapsed += Math.min(delta, 0.1);
-    const halfWidth = size.width / (2 * fit);
+    const halfWidth = size.width / (2 * shot.scale);
     const firstView = wave.firstView;
     // The camera starts over book zero, leaving empty space on its left.
     const firstX = shelf.poses[0].x;
@@ -590,7 +552,7 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
       const p = shelf.poses[i];
       // In perspective the far end of a closed book can enter first.
       const farDepth = -viewUpZ * FLOOR + viewUpY * (node.position.z - p.w / 2);
-      const reach = halfWidth * (1 + (pivotDepth - farDepth) * inverseDistance);
+      const reach = halfWidth * (1 - farDepth * shot.convergence);
       if (Math.abs(node.position.x - center) > reach + p.halfX) continue;
       const delay = firstView && initialSpan > 0 ? shelfSweepDuration * (p.x - firstX) / initialSpan : 0;
       books.beginSpineReveal(i, wave.elapsed, delay);
@@ -598,8 +560,7 @@ function Shelf({ onSelect, onRevealCaption, onReady, density, captionSize, navig
     wave.firstView = false;
     const drawing = books.advanceSpineReveals(wave.elapsed);
     if (!moving && !drawing) {
-      const halfView = size.width / (2 * fit) * (1 + Math.max(0, pivotDepth) * inverseDistance);
-      library.current?.sharpen(Math.round(index), Math.floor(indexAtX(center - halfView)), Math.ceil(indexAtX(center + halfView)));
+      library.current?.sharpen(Math.round(index), Math.floor(indexAtX(center - halfWidth)), Math.ceil(indexAtX(center + halfWidth)));
     }
     library.current?.updateSpineContacts();
     // Keep print razor-sharp at rest. Lower the moving framebuffer only
