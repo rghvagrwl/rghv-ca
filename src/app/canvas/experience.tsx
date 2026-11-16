@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { workProjects } from "../new/content";
 import SiteFooter from "../new/footer-stats";
 import InternshipPhotos from "./internship-photos";
+import { ListRow } from "./list-row";
 import Portrait from "./portrait";
 import styles from "./page.module.css";
 import storyStyles from "./vercel-story.module.css";
@@ -119,7 +120,8 @@ type Selection =
   | { kind: "workAll" }
   | { kind: "otherWorkAll" }
   | { kind: "captureAll" }
-  | { kind: "writingAll" };
+  | { kind: "writingAll" }
+  | { kind: "studies" };
 
 function getTitle(selection: Selection) {
   switch (selection.kind) {
@@ -130,6 +132,7 @@ function getTitle(selection: Selection) {
     case "otherWorkAll": return "Other work";
     case "captureAll": return "Captures";
     case "writingAll": return "Writing";
+    case "studies": return "3D";
   }
 }
 
@@ -618,7 +621,7 @@ function DetailContent({ selection }: { selection: Selection }) {
     return <UnordinaryStory />;
   }
 
-  if (selection.kind === "workAll" || selection.kind === "otherWorkAll" || selection.kind === "captureAll" || selection.kind === "writingAll") return null;
+  if (selection.kind === "workAll" || selection.kind === "otherWorkAll" || selection.kind === "captureAll" || selection.kind === "writingAll" || selection.kind === "studies") return null;
 
   const images: readonly string[] = selection.kind === "work"
     ? work[selection.index].images
@@ -643,6 +646,7 @@ function DetailContent({ selection }: { selection: Selection }) {
 }
 
 function selectionFromPath(pathname: string): Selection | null {
+  if (/^\/3d\/?$/.test(pathname)) return { kind: "studies" };
   if (/^\/writing\/?$/.test(pathname)) return { kind: "writingAll" };
   if (/^\/work\/?$/.test(pathname)) return { kind: "workAll" };
   if (/^\/work\/other-work\/?$/.test(pathname)) return { kind: "otherWorkAll" };
@@ -671,6 +675,7 @@ function pathFor(selection: Selection | null) {
     case "otherWorkAll": return "/work/other-work";
     case "captureAll": return "/captures";
     case "writingAll": return "/writing";
+    case "studies": return "/3d";
   }
 }
 
@@ -884,9 +889,12 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
                 </button>
               </h1>
               {isVercelWork ? <VercelLanyard /> : null}
-              {selection.kind === "workAll" || selection.kind === "otherWorkAll" || selection.kind === "captureAll" || selection.kind === "writingAll" ? (
+              {selection.kind === "workAll" || selection.kind === "otherWorkAll" || selection.kind === "captureAll" || selection.kind === "writingAll" || selection.kind === "studies" ? (
                   <div className={`${styles.detailList} ${styles.navigation}`}>
-                    {selection.kind === "workAll" ? allWork.map(({ project, index }) => (
+                    {selection.kind === "studies" ? <>
+                      <ListRow title="Books" date="2026" href="/3d/books" />
+                      <ListRow title="Comics" date="2026" href="/3d/comics" />
+                    </> : selection.kind === "workAll" ? allWork.map(({ project, index }) => (
                       <button className={`${styles.item} ${styles.listItem} ${styles.hoverItem} ${styles.arrowItem} ${styles.listButton}`} key={project.id} type="button" onClick={() => openDetail({ kind: "work", index })}>
                         <Arrow />
                         <span className={styles.arrowTitle}>{project.name}</span>
@@ -907,7 +915,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
                   </div>
               ) : null}
             </div>
-            {selection.kind !== "workAll" && selection.kind !== "otherWorkAll" && selection.kind !== "captureAll" && selection.kind !== "writingAll" && (
+            {selection.kind !== "workAll" && selection.kind !== "otherWorkAll" && selection.kind !== "captureAll" && selection.kind !== "writingAll" && selection.kind !== "studies" && (
               <div className={`${styles.detailContent} ${selection.kind === "writing" ? styles.writingContent : ""} ${selection.kind === "capture" ? styles.captureContent : ""} ${selection.kind === "work" && ["vercel-2026", "chrono", "minimum", "unordinary"].includes(work[selection.index].id) ? styles.storyContent : ""}`}>
                 <DetailContent selection={selection} />
               </div>
