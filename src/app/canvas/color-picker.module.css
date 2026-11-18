@@ -1,0 +1,214 @@
+.stage {
+  --picker-bg: #fff;
+  --picker-text: #171717;
+  --picker-hover: #f2f2f2;
+  --picker-line: #00000014;
+  --picker-line-hover: #00000036;
+  --picker-line-focus: #00000057;
+  --picker-ring: rgb(0 0 0 / 16%);
+  --panel-motion: cubic-bezier(.4, 0, .2, 1);
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  border-radius: 8px;
+  background: white;
+  color: var(--picker-text);
+  scroll-margin-block: 18vh;
+}
+
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: 4.022917% 3.891667%;
+  border-radius: 4px;
+  background: black;
+  pointer-events: none;
+}
+
+.demo {
+  --panel-gap: 8px;
+  --panel-height: 236px;
+  position: relative;
+  width: min(274px, calc(100% - 32px));
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.trigger, .hex {
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 6px;
+  background: var(--picker-bg);
+  color: var(--picker-text);
+  box-shadow: 0 0 0 1px var(--picker-line);
+  transition: box-shadow 150ms ease, background 150ms ease;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 40px;
+  padding: 4px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.trigger:hover { background: var(--picker-hover); }
+.trigger:hover, .hex:hover { box-shadow: 0 0 0 1px var(--picker-line-hover); }
+.trigger:focus-visible, .hex:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--picker-line-focus), 0 0 0 4px var(--picker-ring);
+}
+
+.swatch {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--chosen);
+  box-shadow: inset 0 0 0 1px rgb(128 128 128 / 20%);
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + var(--panel-gap));
+  left: 0;
+  z-index: 10;
+  box-sizing: border-box;
+  width: min(256px, 100%);
+  height: var(--panel-height);
+  padding: 12px;
+  border: 1px solid var(--picker-line);
+  border-radius: 8px;
+  background: var(--picker-bg);
+  box-shadow: 0 4px 6px #0000000a, 0 12px 16px -4px #00000014;
+  transform-origin: center;
+  transform: scale(.95);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 170ms var(--panel-motion), opacity 170ms var(--panel-motion), visibility 0s 170ms;
+}
+
+.demo[data-open=true] .popover {
+  transform: scale(1);
+  opacity: 1;
+  visibility: visible;
+  transition-duration: 190ms, 190ms, 0s;
+  transition-delay: 0s;
+}
+
+.spectrum {
+  position: relative;
+  width: 100%;
+  height: 144px;
+  border-radius: 4px;
+  background: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent), var(--hue);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.cursor, .hueThumb {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 3px solid white;
+  box-shadow: 0 0 1px #0006;
+}
+
+.cursor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transition: width 95ms ease-out 25ms, height 95ms ease-out 25ms;
+}
+
+.cursor[data-pressed=true] {
+  width: 20px;
+  height: 20px;
+  background: var(--chosen);
+  transition: width 105ms ease-out, height 105ms ease-out;
+}
+
+.hueTrack {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  margin: 10px 0 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+.hue {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: inherit;
+  cursor: pointer;
+  touch-action: none;
+}
+.hue::-webkit-slider-thumb { appearance: none; width: 0; height: 16px; }
+.hue::-moz-range-thumb { width: 0; height: 16px; border: none; }
+.hue::-moz-range-track { background: transparent; }
+
+.hueThumb {
+  top: 50%;
+  width: 6px;
+  height: 16px;
+  border-radius: 6px;
+  transition: width 55ms ease-out 25ms, height 55ms ease-out 25ms;
+}
+.hueThumb[data-pressed=true] {
+  width: 12px;
+  height: 20px;
+  background: var(--hue);
+  transition: width 100ms ease-out, height 100ms ease-out;
+}
+
+.hex {
+  display: block;
+  width: 100%;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.hex::selection { background: var(--picker-text); color: var(--picker-bg); }
+.spectrum:focus-visible, .hue:focus-visible { outline: 2px solid #0070f3; outline-offset: 3px; }
+
+@media (prefers-color-scheme: dark) {
+  :global(html:not([data-canvas-theme=light])) .stage {
+    --picker-bg: #0a0a0a;
+    --picker-text: #ededed;
+    --picker-hover: #1a1a1a;
+    --picker-line: #ffffff24;
+    --picker-line-hover: #ffffff3d;
+    --picker-line-focus: #ffffff82;
+    --picker-ring: rgb(255 255 255 / 24%);
+  }
+}
+:global(html[data-canvas-theme=dark]) .stage {
+  --picker-bg: #0a0a0a;
+  --picker-text: #ededed;
+  --picker-hover: #1a1a1a;
+  --picker-line: #ffffff24;
+  --picker-line-hover: #ffffff3d;
+  --picker-line-focus: #ffffff82;
+  --picker-ring: rgb(255 255 255 / 24%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage .demo .popover, .stage .trigger, .stage .cursor, .stage .hueThumb, .stage .hex { transition: none; }
+}

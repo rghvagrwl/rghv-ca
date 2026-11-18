@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { workProjects } from "../new/content";
 import SiteFooter from "../new/footer-stats";
 import InternshipPhotos from "./internship-photos";
+import ColorPicker from "./color-picker";
 import { ListRow } from "./list-row";
 import Portrait from "./portrait";
 import styles from "./page.module.css";
@@ -352,11 +353,13 @@ function VercelStory() {
       </div>
 
       <div className={storyStyles.mediaGroup}>
-        {connectImages.map(({ src, alt }, index) => (
-          <figure className={storyStyles.media} key={src}>
-            <GalleryImage src={src} alt={alt} first={index === 0} smooth />
-          </figure>
-        ))}
+        <figure className={storyStyles.media}>
+          <GalleryImage {...connectImages[0]} first smooth />
+        </figure>
+        <ColorPicker />
+        <figure className={storyStyles.media}>
+          <GalleryImage {...connectImages[1]} first={false} smooth />
+        </figure>
       </div>
 
       <hr className={storyStyles.divider} />
