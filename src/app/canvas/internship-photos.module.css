@@ -98,7 +98,7 @@
 
 .overlay {
   --rule: var(--gallery-rule, rgb(0 0 0 / 10%));
-  --ink: #000;
+  --ink: var(--gallery-ink, #000);
   position: fixed;
   z-index: 100;
   inset: 0;
@@ -108,6 +108,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--gallery-overlay, rgb(247 247 247 / 80%));
+  color: var(--ink);
   backdrop-filter: blur(0);
   -webkit-backdrop-filter: blur(0);
   opacity: 0;
@@ -117,8 +118,6 @@
   line-height: 1.5;
   transition: opacity 560ms ease 260ms, backdrop-filter 560ms ease 260ms, visibility 0s linear 820ms;
 }
-
-.overlay { --ink: var(--gallery-ink, #000); }
 
 .overlayOpen {
   opacity: 1;

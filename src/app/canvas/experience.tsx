@@ -52,10 +52,6 @@ function savedTheme(): Theme | null {
   }
 }
 
-function deviceTheme(): Theme {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
 const captures = [
   {
     slug: "tonys-pizza-in-sf",
@@ -694,27 +690,22 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
   const themeTimer = useRef<number | null>(null);
 
   useEffect(() => {
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
     const syncTheme = () => {
-      const preference = savedTheme();
-      const next = preference ?? deviceTheme();
+      const next = savedTheme() ?? "light";
       themeRef.current = next;
       setTheme(next);
-      if (preference) document.documentElement.dataset.canvasTheme = preference;
-      else delete document.documentElement.dataset.canvasTheme;
+      document.documentElement.dataset.canvasTheme = next;
     };
     syncTheme();
-    media.addEventListener("change", syncTheme);
     window.addEventListener("storage", syncTheme);
     return () => {
-      media.removeEventListener("change", syncTheme);
       window.removeEventListener("storage", syncTheme);
       if (themeTimer.current) window.clearTimeout(themeTimer.current);
     };
   }, []);
 
   function toggleTheme() {
-    const next: Theme = (themeRef.current ?? deviceTheme()) === "dark" ? "light" : "dark";
+    const next: Theme = (themeRef.current ?? "light") === "dark" ? "light" : "dark";
     themeRef.current = next;
     const page = pageRef.current;
     if (page && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
