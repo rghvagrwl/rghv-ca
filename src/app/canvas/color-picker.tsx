@@ -73,6 +73,8 @@ function PickerDemo({ initialColor }: { initialColor: string }) {
 
   useLayoutEffect(() => {
     if (!open) return;
+    // Leave the keyboard closed when opening the picker on a touch screen.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     field.current?.focus({ preventScroll: true });
     field.current?.select();
   }, [open]);
@@ -102,6 +104,12 @@ function PickerDemo({ initialColor }: { initialColor: string }) {
   function pick(event: PointerEvent<HTMLDivElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
     setColor([hue, unit((event.clientX - bounds.left) / bounds.width), unit(1 - (event.clientY - bounds.top) / bounds.height)]);
+    setDraft(null);
+  }
+  function pickHue(event: PointerEvent<HTMLInputElement>) {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const nextHue = unit((event.clientX - bounds.left) / bounds.width) * 360;
+    setColor(([, currentSaturation, currentBrightness]) => [nextHue, currentSaturation, currentBrightness]);
     setDraft(null);
   }
   function nudge(event: KeyboardEvent<HTMLDivElement>) {
@@ -147,8 +155,16 @@ function PickerDemo({ initialColor }: { initialColor: string }) {
           <input className={styles.hue} aria-label="Hue" type="range" min="0" max="360" step="0.1" value={hue}
             onPointerDown={event => {
               if (!event.isPrimary || event.button !== 0) return;
+              // Own the drag instead of relying on the hidden native range thumb.
+              event.preventDefault();
+              event.currentTarget.focus({ preventScroll: true });
               event.currentTarget.setPointerCapture(event.pointerId);
               hueHandle.press();
+              pickHue(event);
+            }}
+            onPointerMove={event => { if (event.currentTarget.hasPointerCapture(event.pointerId)) pickHue(event); }}
+            onPointerUp={event => {
+              if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
             }}
             onLostPointerCapture={hueHandle.release}
             onChange={event => { setColor([Number(event.target.value), saturation, brightness]); setDraft(null); }}/>
