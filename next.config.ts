@@ -29,6 +29,19 @@ const nextConfig: NextConfig = {
       // Next internals, the API, anything with a file extension in /public, and
       // /new itself (which would otherwise become /new/new).
       beforeFiles: [
+        // Vercel's image optimizer reads source files before resolving aliases.
+        // Serve prepared replacements directly for optimizer URLs in cached pages.
+        ...optimizedMedia.aliases
+          .filter(({ source }) => /\.(png|jpe?g|webp|avif)$/i.test(source))
+          .map(({ source, destination }) => ({
+            source: "/_next/image",
+            has: [{
+              type: "query" as const,
+              key: "url",
+              value: source.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+            }],
+            destination,
+          })),
         ...optimizedMedia.aliases.map(({ source, destination }) => ({
           source: encodeURI(source),
           destination,
