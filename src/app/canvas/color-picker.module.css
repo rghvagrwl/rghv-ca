@@ -73,14 +73,6 @@
     aspect-ratio: 1;
   }
 
-  .demo {
-    transition: transform 190ms var(--panel-motion);
-  }
-
-  .demo[data-open=true] {
-    transform: translateY(calc((var(--panel-height) + var(--panel-gap)) / -2));
-  }
-
   .themeControl > button {
     width: 44px;
     height: 44px;
@@ -243,12 +235,6 @@
 .hex::selection { background: var(--picker-text); color: var(--picker-bg); }
 .spectrum:focus-visible, .hue:focus-visible { outline: 2px solid #0070f3; outline-offset: 3px; }
 
-@media (max-width: 360px) {
-  .demo { --panel-height: 208px; }
-  .spectrum { height: 116px; }
-  .popover { left: -16px; }
-}
-
 @media (prefers-color-scheme: dark) {
   :global(html:not([data-canvas-theme=light])) .stage {
     --stage-bg: rgb(255 255 255 / 4%);
@@ -274,5 +260,5 @@
   --picker-ring: rgb(255 255 255 / 24%);
 }
 @media (prefers-reduced-motion: reduce) {
-  .stage .demo, .stage .demo .popover, .stage .trigger, .stage .cursor, .stage .hueThumb, .stage .hex, .stage .themeControl > button, .stage .themeControl svg { transition: none; }
+  .stage .demo .popover, .stage .trigger, .stage .cursor, .stage .hueThumb, .stage .hex, .stage .themeControl > button, .stage .themeControl svg { transition: none; }
 }
