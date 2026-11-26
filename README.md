@@ -34,3 +34,9 @@ The access key signs a seven-day, HTTP-only login cookie. The page is omitted fr
 The private page does not load the site's analytics scripts. Login requests are limited to 10 per minute and event writes to 60 per minute per client IP. Only a short-lived HMAC digest of the IP is stored for rate limiting. The event endpoint remains public so browsers can report visits; entries can therefore be forged, though the read endpoint still requires the access key.
 
 Tracking starts after deployment. It stores approximate Vercel city/country, an anonymous visitor cookie, page visits, external link opens, and visible-tab time. It does not store IP addresses or query strings. The log keeps at most 5,000 events and removes events older than 90 days. A session is grouped by tab with a 30-minute inactivity window. Active time is approximate because a browser may close before its final beacon reaches the server.
+
+## Capture albums
+
+See [the capture media guide](docs/captures.md) for adding albums, importing responsive photographs, and the image budgets enforced before each production build.
+
+See [the full media audit](docs/media.md) for storage savings, lossless screenshot optimization, video quality measurements, and `npm run check:media`.

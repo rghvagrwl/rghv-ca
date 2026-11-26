@@ -84,11 +84,11 @@ const workProjectsSource: WorkProject[] = [
     year: "2026",
     date: "2026-08-01",
     images: [
-      "/vercel/Vercel 1.png",
-      "/vercel/Vercel 2.png",
-      "/vercel/Vercel 3.png",
-      "/vercel/Vercel 4.png",
-      "/vercel/Vercel 5.png",
+      "/media/de7b4c62daa02fbb.webp",
+      "/media/00506ab5fc874120.webp",
+      "/media/d1fd3139c915c955.webp",
+      "/media/bba0a4be0a61960a.webp",
+      "/media/dd4fe4a0898843a8.webp",
     ],
   },
   {
@@ -96,7 +96,7 @@ const workProjectsSource: WorkProject[] = [
     title: "Ando",
     year: "2026",
     date: "2026-05-01",
-    images: ["/ando/Ando 1.png", "/ando/Ando 2.png", "/ando/Ando 3.png"],
+    images: ["/media/2d2cf041c7480b02.webp", "/media/228c91d8a3239df9.webp", "/media/bf6a898bcbe15a26.webp"],
   },
   {
     id: "chrono",
@@ -117,7 +117,7 @@ const workProjectsSource: WorkProject[] = [
     title: "Tembo",
     year: "2026",
     date: "2026-04-01",
-    images: ["/tembo/Tembo 1.png", "/tembo/Tembo 2.png"],
+    images: ["/media/c9682caa2318a765.webp", "/media/3007893e834bfcfd.webp"],
   },
   {
     id: "context",
@@ -217,8 +217,8 @@ const workProjectsSource: WorkProject[] = [
     images: [
       "/minimum/Minimum 1.webp",
       "/minimum/Minimum 2.webp",
-      "/minimum/service-cards.png",
-      "/minimum/build-interface-framed.png",
+      "/media/f2a4d228882bfb4b.webp",
+      "/media/49331317ddb76b7a.webp",
       "/minimum/Minimum 5.webp",
       "/minimum/Minimum 6.webp",
     ],

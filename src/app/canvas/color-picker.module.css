@@ -1,4 +1,6 @@
 .stage {
+  --stage-bg: rgb(0 0 0 / 4%);
+  --theme-control-rgb: 0 0 0;
   --picker-bg: #fff;
   --picker-text: #171717;
   --picker-hover: #f2f2f2;
@@ -15,28 +17,63 @@
   place-items: center;
   overflow: visible;
   border-radius: 8px;
-  background: white;
+  background: var(--stage-bg);
   color: var(--picker-text);
   scroll-margin-block: 18vh;
-}
-
-.stage::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  margin: 4.022917% 3.891667%;
-  border-radius: 4px;
-  background: black;
-  pointer-events: none;
 }
 
 .demo {
   --panel-gap: 8px;
   --panel-height: 236px;
   position: relative;
-  width: min(274px, calc(100% - 32px));
+  width: min(274px, 68%);
   font-size: 14px;
   line-height: 20px;
+}
+
+.themeControl {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+}
+
+.themeControl > button {
+  width: 32px;
+  height: 32px;
+  flex-basis: 32px;
+  margin: 0;
+  border: 0.5px solid rgb(var(--theme-control-rgb) / 10%);
+  border-radius: 50%;
+  color: rgb(var(--theme-control-rgb) / 25%);
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.themeControl > button:hover {
+  color: rgb(var(--theme-control-rgb) / 40%);
+}
+
+.themeControl > button:active {
+  color: rgb(var(--theme-control-rgb) / 25%);
+}
+
+.themeControl > button svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 120ms ease-out;
+}
+
+.themeControl > button:active svg {
+  transform: scale(.9);
+}
+
+@media (max-width: 700px) {
+  .themeControl > button {
+    width: 28px;
+    height: 28px;
+    flex-basis: 28px;
+  }
 }
 
 .trigger, .hex {
@@ -191,6 +228,8 @@
 
 @media (prefers-color-scheme: dark) {
   :global(html:not([data-canvas-theme=light])) .stage {
+    --stage-bg: rgb(255 255 255 / 4%);
+    --theme-control-rgb: 255 255 255;
     --picker-bg: #0a0a0a;
     --picker-text: #ededed;
     --picker-hover: #1a1a1a;
@@ -201,6 +240,8 @@
   }
 }
 :global(html[data-canvas-theme=dark]) .stage {
+  --stage-bg: rgb(255 255 255 / 4%);
+  --theme-control-rgb: 255 255 255;
   --picker-bg: #0a0a0a;
   --picker-text: #ededed;
   --picker-hover: #1a1a1a;
@@ -210,5 +251,5 @@
   --picker-ring: rgb(255 255 255 / 24%);
 }
 @media (prefers-reduced-motion: reduce) {
-  .stage .demo .popover, .stage .trigger, .stage .cursor, .stage .hueThumb, .stage .hex { transition: none; }
+  .stage .demo .popover, .stage .trigger, .stage .cursor, .stage .hueThumb, .stage .hex, .stage .themeControl > button, .stage .themeControl svg { transition: none; }
 }

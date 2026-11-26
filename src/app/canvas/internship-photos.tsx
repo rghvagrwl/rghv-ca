@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
+import GalleryPhoto from "./gallery-photo";
 import pageStyles from "./page.module.css";
 import styles from "./internship-photos.module.css";
 
@@ -82,12 +83,18 @@ export default function InternshipPhotos({
   title = "Photos from my internship",
   backLabel = "Vercel",
   galleryId = "internship-photo-gallery",
+  coverSrc,
 }: {
   photos?: Photo[];
   title?: string;
   backLabel?: string;
   galleryId?: string;
+  coverSrc?: string;
 }) {
+  const coverPhoto = photos.find((photo) => photo.src === coverSrc);
+  const stackPhotos = coverPhoto
+    ? [...photos.filter((photo) => photo.src !== coverSrc).slice(0, 2), coverPhoto]
+    : photos.slice(0, 3);
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [scrollLocked, setScrollLocked] = useState(false);
@@ -192,7 +199,7 @@ export default function InternshipPhotos({
           onPointerCancel={resetTracking}
         >
           <span className={styles.stack} aria-hidden="true">
-            {photos.slice(0, 3).map((photo, index) => (
+            {stackPhotos.map((photo, index) => (
               <span className={`${styles.stackPhoto} ${styles[`stackPhoto${index + 1}`]}`} key={photo.src} data-stack-photo>
                 <Image src={photo.src} alt="" width={68} height={48} sizes="68px" />
               </span>
@@ -232,12 +239,11 @@ export default function InternshipPhotos({
           <div className={styles.galleryScroll}>
             <div className={`${pageStyles.gallery} ${pageStyles.captureGallery} ${styles.gallery}`} onClick={(event) => event.stopPropagation()}>
               {photos.map((photo, index) => (
-                <figure
+                <GalleryPhoto
                   className={`${pageStyles.galleryFigure} ${photo.displayAspect ? styles.portraitCrop : ""}`}
                   key={photo.src}
                   style={{
                     "--capture-aspect": photo.displayAspect ?? `${photo.width} / ${photo.height}`,
-                    "--capture-tilt": index % 2 === 0 ? "-0.5deg" : "0.5deg",
                     "--photo-position": photo.objectPosition ?? "center",
                   } as CSSProperties}
                 >
@@ -249,9 +255,10 @@ export default function InternshipPhotos({
                     height={photo.height}
                     sizes="(max-width: 552px) calc(100vw - 40px), 512px"
                     loading={index === 0 && open ? "eager" : "lazy"}
+                    draggable={false}
                   />
                   </span>
-                </figure>
+                </GalleryPhoto>
               ))}
             </div>
           </div>

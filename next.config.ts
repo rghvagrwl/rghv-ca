@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import optimizedMedia from "./src/lib/optimized-media.json";
 
 // The previous site remains available on its separate new.rghv.ca host.
 const previousSiteHost = [
@@ -28,6 +29,10 @@ const nextConfig: NextConfig = {
       // Next internals, the API, anything with a file extension in /public, and
       // /new itself (which would otherwise become /new/new).
       beforeFiles: [
+        ...optimizedMedia.aliases.map(({ source, destination }) => ({
+          source: encodeURI(source),
+          destination,
+        })),
         {
           source: "/work/:slug",
           has: canvasHost,
@@ -75,6 +80,10 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: "/media/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
       {
         source: "/:path*.(avif|webp)",
         headers: [

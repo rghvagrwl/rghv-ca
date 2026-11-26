@@ -1,0 +1,31 @@
+.frame {
+  cursor: default;
+  user-select: none;
+}
+
+.surface {
+  transition: transform 550ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.frame[data-pointer-motion] .surface {
+  transform: translate3d(
+    calc(var(--gallery-pointer-x, 0px) * var(--photo-depth, 1)),
+    calc(var(--gallery-pointer-y, 0px) * var(--photo-depth, 1)),
+    0
+  );
+}
+
+.frame:nth-child(3n + 2) {
+  --photo-depth: .75;
+}
+
+.frame:nth-child(3n) {
+  --photo-depth: 1.1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame[data-pointer-motion] .surface {
+    transform: none;
+    transition: none;
+  }
+}

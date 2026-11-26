@@ -2,7 +2,7 @@
   "home": {
     "title": "Raghav Agarwal",
     "description": "A designer working across product, brand, and digital interfaces.",
-    "image": "/og/home.png"
+    "image": "/og/work.png"
   },
   "work": {
     "title": "Selected work",
@@ -22,96 +22,91 @@
   "work-vercel": {
     "title": "Vercel",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-vercel.png"
+    "image": "/og/work.png"
   },
   "work-ando": {
     "title": "Ando",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-ando.png"
+    "image": "/og/work.png"
   },
   "work-chrono": {
     "title": "Chrono",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-chrono.png"
+    "image": "/og/work.png"
   },
   "work-socratica": {
     "title": "Socratica",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-socratica.png"
+    "image": "/og/work.png"
   },
   "work-tembo": {
     "title": "Tembo",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-tembo.png"
+    "image": "/og/work.png"
   },
   "work-context": {
     "title": "Context",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-context.png"
+    "image": "/og/work.png"
   },
   "work-instafleet": {
     "title": "Instafleet",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-instafleet.png"
+    "image": "/og/work.png"
   },
   "work-merge-club": {
     "title": "Merge",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-merge-club.png"
+    "image": "/og/work.png"
   },
   "work-on-deck-founders": {
     "title": "ODF",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-on-deck-founders.png"
+    "image": "/og/work.png"
   },
   "work-prism-collective": {
     "title": "Prism Collective",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-prism-collective.png"
+    "image": "/og/work.png"
   },
   "work-unordinary": {
     "title": "Unordinary",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-unordinary.png"
+    "image": "/og/work.png"
   },
   "work-crisped": {
     "title": "Crisped",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-crisped.png"
+    "image": "/og/work.png"
   },
   "work-zero-email": {
     "title": "Zero",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-zero-email.png"
+    "image": "/og/work.png"
   },
   "work-minimum": {
     "title": "Minimum",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-minimum.png"
+    "image": "/og/work.png"
   },
   "work-faktor": {
     "title": "Faktor",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-faktor.png"
+    "image": "/og/work.png"
   },
   "work-para": {
     "title": "Para",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-para.png"
+    "image": "/og/work.png"
   },
   "work-no-category": {
     "title": "Miscellaneous",
     "description": "By Raghav Agarwal",
-    "image": "/og/work-no-category.png"
-  },
-  "capture-tonys-pizza-in-sf": {
-    "title": "Tony's pizza for dinner",
-    "description": "Tony's pizza for dinner. Photographs by Raghav Agarwal, June 29, 2026.",
-    "image": "/og/capture-tonys-pizza-in-sf.png"
+    "image": "/og/work.png"
   },
   "capture-over-the-bridge": {
-    "title": "First-time over the bridge",
-    "description": "First-time over the bridge. Photographs by Raghav Agarwal, June 20, 2026.",
+    "title": "Over the bridge",
+    "description": "Over the bridge. Photographs by Raghav Agarwal, June 20, 2026.",
     "image": "/og/capture-over-the-bridge.png"
   },
   "capture-vancouver": {
@@ -143,5 +138,30 @@
       "width": 4000,
       "height": 2100
     }
+  },
+  "capture-first-time-in-sf": {
+    "title": "First time in SF",
+    "description": "First time in SF. Photographs by Raghav Agarwal, March 2026.",
+    "image": "/og/capture-first-time-in-sf.jpg"
+  },
+  "capture-yates-mountain": {
+    "title": "Yates Mountain",
+    "description": "Yates Mountain. Photographs by Raghav Agarwal, July 2025.",
+    "image": "/og/capture-yates-mountain.jpg"
+  },
+  "capture-surrail-ridge": {
+    "title": "Surrail Ridge",
+    "description": "Surrail Ridge. Photographs by Raghav Agarwal, April 2025.",
+    "image": "/og/capture-surrail-ridge.jpg"
+  },
+  "capture-stampede-25": {
+    "title": "Stampede",
+    "description": "Stampede. Photographs by Raghav Agarwal, July 2025.",
+    "image": "/og/capture-stampede-25.jpg"
+  },
+  "capture-niagara-to-montreal": {
+    "title": "Niagara to Montreal",
+    "description": "Niagara to Montreal. Photographs by Raghav Agarwal, August 2025.",
+    "image": "/og/capture-niagara-to-montreal.jpg"
   }
 }

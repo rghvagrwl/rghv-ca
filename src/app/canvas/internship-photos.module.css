@@ -32,6 +32,8 @@
   display: block;
   width: 90px;
   height: 68px;
+  transform: translate3d(calc(var(--gallery-pointer-x, 0px) * .4), calc(var(--gallery-pointer-y, 0px) * .4), 0);
+  transition: transform 550ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .stackPhoto {
@@ -68,6 +70,21 @@
 .stackPhoto3 {
   z-index: 3;
   transform: rotate(0deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .stack {
+      animation: stackScrollSettle 1s linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+@keyframes stackScrollSettle {
+  from { translate: 0 3px; }
+  to { translate: 0 -3px; }
 }
 
 .stackButton:focus-visible .stackPhoto1 {
@@ -186,6 +203,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .stack {
+    transform: none;
+  }
+
   .stackPhoto {
     translate: none;
   }

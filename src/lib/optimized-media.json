@@ -1,0 +1,517 @@
+{
+  "images": [
+    {
+      "source": "/3d/comics/batman-500-foil.png",
+      "destination": "/3d/comics/batman-500-foil.png",
+      "kind": "lossless-png",
+      "width": 960,
+      "height": 1485,
+      "originalBytes": 29541,
+      "bytes": 28916,
+      "pixelHash": "fd9781d3869970bd8c089d4dd68514e457758634fc817bb2b465b3b128d93306",
+      "fileHash": "8363e60e2cfd83b237c4f870eea4a55e47e0d5b2e642deccd701afc29d7b52c2"
+    },
+    {
+      "source": "/3d/comics/sleeve-relief.png",
+      "destination": "/3d/comics/sleeve-relief.png",
+      "kind": "lossless-png",
+      "width": 512,
+      "height": 784,
+      "originalBytes": 241920,
+      "bytes": 149903,
+      "pixelHash": "73b12990b662d7b7ab246f0586ce8acb4bbfa9fcedcd92c84d4893f2216582c4",
+      "fileHash": "c3b42a64dfd68b8a00d5d603cab92edeb7c0e84e9088aff358f21efa8955a6ab"
+    },
+    {
+      "source": "/ando/Ando 1.png",
+      "destination": "/media/2d2cf041c7480b02.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 211863,
+      "bytes": 82820,
+      "pixelHash": "a141ef925649d542ebe76d8d5b2a41b89cab4fd1d8d557c33d14da79f68957de",
+      "fileHash": "2d2cf041c7480b02fd85d3a3ee2720978dbe896396ca720144f61cb8af22a2c6"
+    },
+    {
+      "source": "/ando/Ando 2.png",
+      "destination": "/media/228c91d8a3239df9.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 596101,
+      "bytes": 341160,
+      "pixelHash": "a8e1eb33c97f3c50723e8eb465169e379e62e087b08976b619c5d92a4aa8438a",
+      "fileHash": "228c91d8a3239df9f875c4e8a9127acf490e930c9f5199f43beffce55a040dde"
+    },
+    {
+      "source": "/ando/Ando 3.png",
+      "destination": "/media/bf6a898bcbe15a26.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 205823,
+      "bytes": 49926,
+      "pixelHash": "84a5d811d40b5859975ab604caf949b30fac5678aa72f0a3a17f6f8e3ccffd68",
+      "fileHash": "bf6a898bcbe15a2605e94301ff5dfe45f0b0b266dc1294ec87fe1fce7fc438cc"
+    },
+    {
+      "source": "/minimum/build-interface-framed.png",
+      "destination": "/media/49331317ddb76b7a.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 313963,
+      "bytes": 55782,
+      "pixelHash": "911ac30efe08c58c40bf364dbb946fb0c160cdf64fd7ae94e5762f36eefdc5db",
+      "fileHash": "49331317ddb76b7a3e80439060114703c9ef1ea34fbaf8079795284e73d8f685"
+    },
+    {
+      "source": "/minimum/discord-march-2024.png",
+      "destination": "/media/a1b9df323fb0e6c4.webp",
+      "kind": "lossless-webp",
+      "width": 3024,
+      "height": 1834,
+      "originalBytes": 646901,
+      "bytes": 148946,
+      "pixelHash": "3033ff71cb23452901fe43eeb8c9f10459d734f9b97738b754f33555276f2f6b",
+      "fileHash": "a1b9df323fb0e6c4b1ca8dc2137ca711d75b07987d66ce6e6da319c15740551a"
+    },
+    {
+      "source": "/minimum/discord-october-2025.png",
+      "destination": "/media/be75c629e2434cd0.webp",
+      "kind": "lossless-webp",
+      "width": 3024,
+      "height": 1832,
+      "originalBytes": 637240,
+      "bytes": 255598,
+      "pixelHash": "0a78d74098e825df1c21d3dbd3fe55f9285ef482985958188a328a1bae466963",
+      "fileHash": "be75c629e2434cd0564434e12b6847c651d75003816c8fa32d606af42584e284"
+    },
+    {
+      "source": "/minimum/first-dashboard-design-detail.png",
+      "destination": "/media/2571427da4fc86ac.webp",
+      "kind": "lossless-webp",
+      "width": 3024,
+      "height": 1822,
+      "originalBytes": 698503,
+      "bytes": 247828,
+      "pixelHash": "c62090ed72a49b10eaa3e9da55bd45f6a9931421d0f144b57df71b72427ce320",
+      "fileHash": "2571427da4fc86ac5f5b229ee36aa4a3ee89864a820c6cd9cdb14548371efe07"
+    },
+    {
+      "source": "/minimum/later-dashboard-design.png",
+      "destination": "/media/daad9b90817c98e6.webp",
+      "kind": "lossless-webp",
+      "width": 3456,
+      "height": 2234,
+      "originalBytes": 1021461,
+      "bytes": 205686,
+      "pixelHash": "6d01e96330ae49083f8e1171c2df6c2490ee0f09ece36710553491afff27ffa7",
+      "fileHash": "daad9b90817c98e660894562cd1a919a63a4a13c4439e6a6018fd44f4ea0e6ab"
+    },
+    {
+      "source": "/minimum/minimum-final-website.png",
+      "destination": "/media/77838e0c0894129a.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 515847,
+      "bytes": 207106,
+      "pixelHash": "372bf95a5b905da66b31cc3ec619bf6424d029ab105a0add8945b54abfabda70",
+      "fileHash": "77838e0c0894129a6b84f47bef1709211d14ae575959cec8fa32e0daaa04a828"
+    },
+    {
+      "source": "/minimum/service-cards.png",
+      "destination": "/media/f2a4d228882bfb4b.webp",
+      "kind": "lossless-webp",
+      "width": 3840,
+      "height": 2160,
+      "originalBytes": 292989,
+      "bytes": 60516,
+      "pixelHash": "be2ff47956bcff950f8e57c0d788224bc3f8f3e9671e471e802fc801d8928422",
+      "fileHash": "f2a4d228882bfb4b5e31984a7372a77317387f98d9464cb45bad4140f87baa40"
+    },
+    {
+      "source": "/og/capture-over-the-bridge.png",
+      "destination": "/og/capture-over-the-bridge.png",
+      "kind": "lossless-png",
+      "width": 1200,
+      "height": 630,
+      "originalBytes": 122909,
+      "bytes": 95161,
+      "pixelHash": "eb77874320a0180c67e458d2da40eb0e7479822413369e3487a37e59939911ee",
+      "fileHash": "da11b7c2dbbf0bf9ae5475650f65e050e87f6ccdb855613d2e32e2d746fec4d7"
+    },
+    {
+      "source": "/og/capture-vancouver.png",
+      "destination": "/og/capture-vancouver.png",
+      "kind": "lossless-png",
+      "width": 1200,
+      "height": 630,
+      "originalBytes": 182975,
+      "bytes": 149950,
+      "pixelHash": "1b561b8b0cfdf571b34d860d768a82b4e12d14a4506b5a1271ada9ccbc609b27",
+      "fileHash": "7b08a51e328a5bff811d1f4bc892f241bca5272567dadd2de5ea27e548882768"
+    },
+    {
+      "source": "/og/captures.png",
+      "destination": "/og/captures.png",
+      "kind": "lossless-png",
+      "width": 1200,
+      "height": 630,
+      "originalBytes": 190904,
+      "bytes": 146034,
+      "pixelHash": "858923bd0f91215a04165deafee05cfec7a6ff192419a8ccbc6bc360a789d15a",
+      "fileHash": "78eb933ff4de735d9159ae9d4d62cf0665f8a1b8b3e02dc80c5c0febf72c548a"
+    },
+    {
+      "source": "/og/home.png",
+      "destination": "/og/work.png",
+      "kind": "lossless-png",
+      "width": 1200,
+      "height": 630,
+      "originalBytes": 183352,
+      "bytes": 119745,
+      "pixelHash": "c79f84f0b35766d65df77c99940b40105245bbabd3fdd2c87cf315de4dc0d8ee",
+      "fileHash": "97889fe5869c0027906f2baae8aa6a9bf743269222860341de24edbee844fafc"
+    },
+    {
+      "source": "/og/work.png",
+      "destination": "/og/work.png",
+      "kind": "lossless-png",
+      "width": 1200,
+      "height": 630,
+      "originalBytes": 180666,
+      "bytes": 119745,
+      "pixelHash": "c79f84f0b35766d65df77c99940b40105245bbabd3fdd2c87cf315de4dc0d8ee",
+      "fileHash": "97889fe5869c0027906f2baae8aa6a9bf743269222860341de24edbee844fafc"
+    },
+    {
+      "source": "/tembo/Tembo 1.png",
+      "destination": "/media/c9682caa2318a765.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 181714,
+      "bytes": 77778,
+      "pixelHash": "91fdce6f58c77f58686edf3e5b617dd573f93435e9610b29633e03ff6a9a646c",
+      "fileHash": "c9682caa2318a765830655057775f4c7c3d94df04f0eaac5d8853b26d2b4c1d2"
+    },
+    {
+      "source": "/tembo/Tembo 2.png",
+      "destination": "/media/3007893e834bfcfd.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 586405,
+      "bytes": 340306,
+      "pixelHash": "a996d461474122a2681d03d0f1261270bb7cd7a5dc2cc4010be9480abf169aec",
+      "fileHash": "3007893e834bfcfd706c88dde129541fd725bcb4277ad7d3671192ca3f0bbcfc"
+    },
+    {
+      "source": "/vercel/Vercel 1.png",
+      "destination": "/media/de7b4c62daa02fbb.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 405027,
+      "bytes": 231000,
+      "pixelHash": "059fa5735e3063c41e1e7a715c5be82ca5c5910fdf43054082fa6976e3bebd1a",
+      "fileHash": "de7b4c62daa02fbb1a1436eb5f494f5731d2bcd6f329b7f2330ce6cb4904b48a"
+    },
+    {
+      "source": "/vercel/Vercel 2.png",
+      "destination": "/media/00506ab5fc874120.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 114614,
+      "bytes": 42584,
+      "pixelHash": "bac324d1dcbdf97d283f6c63135be3fff84086b0abc69316c910d293824f659b",
+      "fileHash": "00506ab5fc8741202c7b5b25d3d1792687d91587ce74014dd0caf29c0fe78c44"
+    },
+    {
+      "source": "/vercel/Vercel 3.png",
+      "destination": "/media/d1fd3139c915c955.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 143726,
+      "bytes": 62618,
+      "pixelHash": "19236dc8bdbd4848994cc49b7fa8fe19834cf6aabb77f9fa03725026044f3308",
+      "fileHash": "d1fd3139c915c95589afd2d183dc1a6915298d90c4e76ce5cc2ead3884364239"
+    },
+    {
+      "source": "/vercel/Vercel 4.png",
+      "destination": "/media/bba0a4be0a61960a.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 182277,
+      "bytes": 86678,
+      "pixelHash": "df7ebb7eeb37349796e61c0ac4527c735287f4b169d6d54026aa77a5ae71e3fa",
+      "fileHash": "bba0a4be0a61960a5eddc1a0203de22cc8e5ff3f434c9722b687c1f173367a35"
+    },
+    {
+      "source": "/vercel/Vercel 5.png",
+      "destination": "/media/dd4fe4a0898843a8.webp",
+      "kind": "lossless-webp",
+      "width": 2880,
+      "height": 1620,
+      "originalBytes": 437963,
+      "bytes": 241474,
+      "pixelHash": "ea12f9d77c2f1bc798ffb18d1f0f4424f88008b4604d671a0b5ff5f59bd66137",
+      "fileHash": "dd4fe4a0898843a81ed13aa0a0b7752dbe6316bdf7b4857b0b90a609b7a47f49"
+    }
+  ],
+  "beforeBytes": 254818556,
+  "videos": [
+    {
+      "source": "/vercel/chat-sidebar-interaction.mp4",
+      "destination": "/media/59c7435c8dad70e2.mp4",
+      "originalBytes": 81528226,
+      "bytes": 20081898,
+      "fileHash": "59c7435c8dad70e23e7e8676a38c266091c0f45ecc279f35f18519e99d66934b",
+      "width": 4082,
+      "height": 2304,
+      "fps": 60,
+      "quality": {
+        "name": "chat-sidebar-interaction",
+        "framesCompared": 1279,
+        "meanSSIM": 0.9996259507427667,
+        "minimumFrameSSIM": 0.998382,
+        "originalBytes": 81528226,
+        "optimizedBytes": 20081898
+      }
+    },
+    {
+      "source": "/vercel/url.mp4",
+      "destination": "/media/29cd9eedaa0eace8.mp4",
+      "originalBytes": 28668931,
+      "bytes": 7465233,
+      "fileHash": "29cd9eedaa0eace8609e71dbcc8e619d4e4202204cc65f6c32b696e1f3ba6781",
+      "width": 4096,
+      "height": 2304,
+      "fps": 60,
+      "quality": {
+        "name": "url",
+        "framesCompared": 1347,
+        "meanSSIM": 0.9997420720118853,
+        "minimumFrameSSIM": 0.998136,
+        "originalBytes": 28668931,
+        "optimizedBytes": 7465233
+      }
+    }
+  ],
+  "aliases": [
+    {
+      "source": "/og/work-ando.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-chrono.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-context.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-crisped.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-faktor.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-instafleet.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-merge-club.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-minimum.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-no-category.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-on-deck-founders.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-para.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-prism-collective.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-socratica.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-tembo.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-unordinary.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-vercel.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/og/work-zero-email.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/ando/Ando 1.png",
+      "destination": "/media/2d2cf041c7480b02.webp"
+    },
+    {
+      "source": "/ando/Ando 2.png",
+      "destination": "/media/228c91d8a3239df9.webp"
+    },
+    {
+      "source": "/ando/Ando 3.png",
+      "destination": "/media/bf6a898bcbe15a26.webp"
+    },
+    {
+      "source": "/minimum/build-interface-framed.png",
+      "destination": "/media/49331317ddb76b7a.webp"
+    },
+    {
+      "source": "/minimum/discord-march-2024.png",
+      "destination": "/media/a1b9df323fb0e6c4.webp"
+    },
+    {
+      "source": "/minimum/discord-october-2025.png",
+      "destination": "/media/be75c629e2434cd0.webp"
+    },
+    {
+      "source": "/minimum/first-dashboard-design-detail.png",
+      "destination": "/media/2571427da4fc86ac.webp"
+    },
+    {
+      "source": "/minimum/later-dashboard-design.png",
+      "destination": "/media/daad9b90817c98e6.webp"
+    },
+    {
+      "source": "/minimum/minimum-final-website.png",
+      "destination": "/media/77838e0c0894129a.webp"
+    },
+    {
+      "source": "/minimum/service-cards.png",
+      "destination": "/media/f2a4d228882bfb4b.webp"
+    },
+    {
+      "source": "/tembo/Tembo 1.png",
+      "destination": "/media/c9682caa2318a765.webp"
+    },
+    {
+      "source": "/tembo/Tembo 2.png",
+      "destination": "/media/3007893e834bfcfd.webp"
+    },
+    {
+      "source": "/vercel/Vercel 1.png",
+      "destination": "/media/de7b4c62daa02fbb.webp"
+    },
+    {
+      "source": "/vercel/Vercel 2.png",
+      "destination": "/media/00506ab5fc874120.webp"
+    },
+    {
+      "source": "/vercel/Vercel 3.png",
+      "destination": "/media/d1fd3139c915c955.webp"
+    },
+    {
+      "source": "/vercel/Vercel 4.png",
+      "destination": "/media/bba0a4be0a61960a.webp"
+    },
+    {
+      "source": "/vercel/Vercel 5.png",
+      "destination": "/media/dd4fe4a0898843a8.webp"
+    },
+    {
+      "source": "/vercel/chat-sidebar-interaction.mp4",
+      "destination": "/media/59c7435c8dad70e2.mp4"
+    },
+    {
+      "source": "/vercel/url.mp4",
+      "destination": "/media/29cd9eedaa0eace8.mp4"
+    },
+    {
+      "source": "/og/home.png",
+      "destination": "/og/work.png"
+    },
+    {
+      "source": "/photo/over-the-bridge-june-2026/05.webp",
+      "destination": "/photo/captures/f9a060153e0e-1024.webp"
+    },
+    {
+      "source": "/photo/over-the-bridge-june-2026/04.webp",
+      "destination": "/photo/captures/7ff75a1682a0-1024.webp"
+    },
+    {
+      "source": "/photo/over-the-bridge-june-2026/03.webp",
+      "destination": "/photo/captures/fd7d144e71a2-1024.webp"
+    },
+    {
+      "source": "/photo/over-the-bridge-june-2026/02.webp",
+      "destination": "/photo/captures/ff4bb0f360be-1024.webp"
+    },
+    {
+      "source": "/photo/over-the-bridge-june-2026/01.webp",
+      "destination": "/photo/captures/240e8a85fcc8-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/12.webp",
+      "destination": "/photo/captures/c08becb919ab-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/11.webp",
+      "destination": "/photo/captures/28ea61eb33ec-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/10.webp",
+      "destination": "/photo/captures/b111da703f89-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/09.webp",
+      "destination": "/photo/captures/aeaecefc25b2-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/07.webp",
+      "destination": "/photo/captures/e66ed07499c2-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/05.webp",
+      "destination": "/photo/captures/dd6bd399ef1d-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/04.webp",
+      "destination": "/photo/captures/dd187d643b08-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/03.webp",
+      "destination": "/photo/captures/4b5e979fe5b7-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/02.webp",
+      "destination": "/photo/captures/e46611886b4b-1024.webp"
+    },
+    {
+      "source": "/photo/vancouver-may-2026/01.webp",
+      "destination": "/photo/captures/821fb2f05e3f-1024.webp"
+    }
+  ]
+}

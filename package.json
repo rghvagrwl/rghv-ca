@@ -6,7 +6,10 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:captures": "node scripts/check-capture-images.mjs",
+    "check:media": "node scripts/check-media.mjs",
+    "prebuild": "npm run check:captures && npm run check:media"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

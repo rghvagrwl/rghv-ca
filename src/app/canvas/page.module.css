@@ -169,8 +169,23 @@
   gap: 48px;
 }
 
-.captureGallery .galleryFigure {
-  transform: rotate(var(--capture-tilt));
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .captureGallery .galleryFigure {
+      animation: photoScrollSettle 1s linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    .captureGallery .galleryFigure:nth-child(even) {
+      animation-direction: reverse;
+    }
+  }
+}
+
+@keyframes photoScrollSettle {
+  from { translate: 0 14px; }
+  to { translate: 0 -14px; }
 }
 
 .captureGallery .detailImageFrame {

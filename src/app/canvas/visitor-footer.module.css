@@ -29,7 +29,7 @@
 .themeButton:hover { color: var(--muted-ink); }
 .themeButton:active { color: var(--faint-ink); }
 .themeButton:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
-.controls .themeButton .themeIcon {
+.themeButton .themeIcon {
   position: absolute;
   inset: 0;
   display: grid;
@@ -40,7 +40,7 @@
   transition: opacity 90ms ease, filter 90ms ease !important;
 }
 
-.controls .themeButton .themeIconVisible {
+.themeButton .themeIconVisible {
   opacity: 1;
   filter: blur(0);
   transition-delay: 90ms !important;
@@ -49,8 +49,8 @@
 .themeButton svg { width: 16px; height: 16px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .controls .themeButton .themeIcon { transition: none !important; }
-  .controls .themeButton .themeIconVisible { transition-delay: 0ms !important; }
+  .themeButton .themeIcon { transition: none !important; }
+  .themeButton .themeIconVisible { transition-delay: 0ms !important; }
 }
 
 .controls :global(.nv-footer) { flex: 1; min-width: 0; }

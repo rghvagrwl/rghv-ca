@@ -167,8 +167,8 @@ const workProjects = [
     images: [
       "/minimum/Minimum 1.webp",
       "/minimum/Minimum 2.webp",
-      "/minimum/service-cards.png",
-      "/minimum/build-interface-framed.png",
+      "/media/f2a4d228882bfb4b.webp",
+      "/media/49331317ddb76b7a.webp",
       "/minimum/Minimum 5.webp",
       "/minimum/Minimum 6.webp",
     ],
@@ -262,13 +262,13 @@ const workProjects = [
     id: "ando",
     title: "ANDO",
     year: "2026",
-    images: ["/ando/Ando 1.png", "/ando/Ando 2.png", "/ando/Ando 3.png"],
+    images: ["/media/2d2cf041c7480b02.webp", "/media/228c91d8a3239df9.webp", "/media/bf6a898bcbe15a26.webp"],
   },
   {
     id: "tembo",
     title: "TEMBO",
     year: "2026",
-    images: ["/tembo/Tembo 1.png", "/tembo/Tembo 2.png"],
+    images: ["/media/c9682caa2318a765.webp", "/media/3007893e834bfcfd.webp"],
   },
   {
     id: "zero-email",

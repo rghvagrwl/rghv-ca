@@ -41,6 +41,8 @@ export default function PortraitSurface() {
     const fragment = `${derivatives ? "#extension GL_OES_standard_derivatives : enable" : ""}
       precision highp float;
       uniform float pixelWidth;
+      uniform float edgeWidth;
+      uniform mediump float edgeOpacity;
       uniform mediump float sweepProgress;
       uniform mediump float sweepActive;
       uniform mediump float surfaceShine;
@@ -155,6 +157,8 @@ export default function PortraitSurface() {
         float band = exp(-pow((diagonal - sweepCentre) / .13, 2.));
         float sweep = band * sin(sweepProgress * 3.141593) * sweepActive;
         color = mix(color, vec3(1.), sweep * .32);
+        float edgeCoverage = 1. - smoothstep(edgeWidth - outerAA, edgeWidth + outerAA, outerDistance);
+        color = mix(color, vec3(0.), edgeCoverage * edgeOpacity);
         gl_FragColor = vec4(color, outerCoverage);
       }`;
     const shaders: WebGLShader[] = [];
@@ -187,6 +191,7 @@ export default function PortraitSurface() {
     const shadowPass = gl.getUniformLocation(program, "shadowPass"), shadowShift = gl.getUniformLocation(program, "shadowShift");
     const shadowOpacity = gl.getUniformLocation(program, "shadowOpacity");
     const pixelWidth = gl.getUniformLocation(program, "pixelWidth");
+    const edgeWidth = gl.getUniformLocation(program, "edgeWidth"), edgeOpacity = gl.getUniformLocation(program, "edgeOpacity");
     const sweepProgress = gl.getUniformLocation(program, "sweepProgress"), sweepActive = gl.getUniformLocation(program, "sweepActive");
     const travel = gl.getUniformLocation(program, "travel"), surfaceShine = gl.getUniformLocation(program, "surfaceShine");
     gl.enable(gl.BLEND);
@@ -214,6 +219,12 @@ export default function PortraitSurface() {
       // Read the same eased progress that moves and scales the card.
       const progress = Number(motion?.effect?.getComputedTiming().progress ?? 0);
       const moving = motion?.playState === "running";
+      // Fade the edge with the same eased progress as the opening/closing card.
+      const edgeProgress = moving
+        ? (flightDirection < 0 ? progress : 1 - progress)
+        : (!isSmall() && element!.closest("dialog")?.dataset.closing !== "true" ? 1 : 0);
+      gl!.uniform1f(edgeWidth, .35 / Math.max(element!.clientWidth * .82, 1));
+      gl!.uniform1f(edgeOpacity, .12 * edgeProgress);
       // Zero velocity at both endpoints: no clipped bend or late settling.
       const arch = 16 * progress * progress * (1 - progress) * (1 - progress);
       const flight = reduced.matches || !moving ? 0 : arch * flightDirection * .65;

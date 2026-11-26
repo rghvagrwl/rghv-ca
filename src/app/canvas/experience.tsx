@@ -1,12 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import { captures, captureImageAspect } from "../../lib/captures";
+import CaptureImage from "./capture-image";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { workProjects } from "../new/content";
 import SiteFooter from "../new/footer-stats";
 import InternshipPhotos from "./internship-photos";
 import ColorPicker from "./color-picker";
+import GalleryPhoto, { useGalleryPointerMotion } from "./gallery-photo";
 import { ListRow } from "./list-row";
 import Portrait from "./portrait";
 import styles from "./page.module.css";
@@ -52,59 +55,6 @@ function savedTheme(): Theme | null {
   }
 }
 
-const captures = [
-  {
-    slug: "tonys-pizza-in-sf",
-    title: "Tony's pizza for dinner",
-    date: "June 29, 2026",
-    listDate: "Jun 2026",
-    aspectRatio: "4 / 3",
-    images: [
-      "/photo/tonys-pizza-sf-june-2026/01.webp",
-      "/photo/tonys-pizza-sf-june-2026/02.webp",
-      "/photo/tonys-pizza-sf-june-2026/04.webp",
-      "/photo/tonys-pizza-sf-june-2026/05.webp",
-    ],
-  },
-  {
-    slug: "over-the-bridge",
-    title: "First-time over the bridge",
-    date: "June 20, 2026",
-    listDate: "Jun 2026",
-    aspectRatio: "16 / 9",
-    images: [
-      "/photo/over-the-bridge-june-2026/05.webp",
-      "/photo/over-the-bridge-june-2026/04.webp",
-      "/photo/over-the-bridge-june-2026/03.webp",
-      "/photo/over-the-bridge-june-2026/02.webp",
-      "/photo/over-the-bridge-june-2026/01.webp",
-    ],
-  },
-  {
-    slug: "vancouver",
-    title: "A week in Vancouver",
-    date: "May 2026",
-    listDate: "May 2026",
-    aspectRatio: "16 / 9",
-    imageAspects: ["4 / 3", "4 / 3", "4 / 3", "4 / 3", "4 / 3", "16 / 9", "16 / 9", "16 / 9", "16 / 9", "16 / 9"],
-    images: [
-      "/photo/vancouver-may-2026/12.webp",
-      "/photo/vancouver-may-2026/11.webp",
-      "/photo/vancouver-may-2026/10.webp",
-      "/photo/vancouver-may-2026/09.webp",
-      "/photo/vancouver-may-2026/07.webp",
-      "/photo/vancouver-may-2026/05.webp",
-      "/photo/vancouver-may-2026/04.webp",
-      "/photo/vancouver-may-2026/03.webp",
-      "/photo/vancouver-may-2026/02.webp",
-      "/photo/vancouver-may-2026/01.webp",
-    ],
-  },
-] as const;
-
-function captureImageAspect(capture: typeof captures[number], imageIndex: number) {
-  return "imageAspects" in capture ? capture.imageAspects[imageIndex] : capture.aspectRatio;
-}
 
 const pileTilts = [-8, 5, -4, 7, -6, 4, -7, 6, -3];
 const pilePeeks = [9, 14, 19, 23, 27, 23, 19, 14, 9];
@@ -160,8 +110,10 @@ function NewLabel({ detail = false }: { detail?: boolean }) {
   </span>;
 }
 
-function PileRow({ title, date, images, index, onClick }: { title: string; date?: string; images: readonly string[]; index: number; onClick: () => void }) {
-  const pile = images.length >= 9 ? images.slice(0, 12) : [...images, ...images].slice(0, 9);
+function PileRow({ title, date, images, index, onClick, capture = false }: { title: string; date?: string; images: readonly string[]; index: number; onClick: () => void; capture?: boolean }) {
+  const pile = images.length >= 9
+    ? images.slice(0, 12)
+    : Array.from({ length: images.length ? 9 : 0 }, (_, photoIndex) => images[photoIndex % images.length]);
   const isOtherWorkPile = pile.length === 12;
   const firstLeft = isOtherWorkPile ? 6 : 9;
   const leftStep = isOtherWorkPile ? 8 : 10.25;
@@ -215,7 +167,7 @@ function PileRow({ title, date, images, index, onClick }: { title: string; date?
             } as CSSProperties}
           >
             <span className={styles.pilePhotoInner}>
-              <Image src={src} alt="" width={92} height={52} sizes="92px" />
+              {capture ? <CaptureImage id={src} thumbnail /> : <Image src={src} alt="" width={92} height={52} sizes="92px" />}
             </span>
           </span>
         ))}
@@ -225,27 +177,25 @@ function PileRow({ title, date, images, index, onClick }: { title: string; date?
 }
 
 function CaptureRow({ capture, index, onClick }: { capture: typeof captures[number]; index: number; onClick: () => void }) {
-  return <PileRow title={capture.title} date={capture.listDate} images={capture.images.slice(0, 9)} index={index} onClick={onClick} />;
+  return <PileRow capture title={capture.title} date={capture.listDate} images={capture.images.slice(0, 9)} index={index} onClick={onClick} />;
 }
 
-function GalleryImage({ src, alt, first, smooth, naturalSize = false }: { src: string; alt: string; first: boolean; smooth: boolean; naturalSize?: boolean }) {
-  const [loadedAspect, setLoadedAspect] = useState<number | null>(null);
+function GalleryImage({ src, alt, first, smooth }: { src: string; alt: string; first: boolean; smooth: boolean }) {
+  const [loaded, setLoaded] = useState(false);
 
   return (
     <div
-      className={`${styles.detailImageFrame} ${smooth ? `${styles.smoothImageFrame} ${styles.workImageFrame}` : ""} ${loadedAspect !== null ? styles.imageLoaded : ""}`}
-      style={naturalSize && loadedAspect !== null ? { "--capture-aspect": loadedAspect } as CSSProperties : undefined}
+      className={`${styles.detailImageFrame} ${smooth ? `${styles.smoothImageFrame} ${styles.workImageFrame}` : ""} ${loaded ? styles.imageLoaded : ""}`}
     >
       <Image
         src={src}
         alt={alt}
         fill
-        sizes="(max-width: 700px) 100vw, 70vw"
+        sizes="(max-width: 940px) calc(100vw - 40px), 900px"
+        unoptimized={src.startsWith("/media/")}
         loading={first ? "eager" : "lazy"}
-        onLoad={(event) => {
-          const { naturalWidth, naturalHeight } = event.currentTarget;
-          if (naturalWidth && naturalHeight) setLoadedAspect(naturalWidth / naturalHeight);
-        }}
+        draggable={false}
+        onLoad={() => setLoaded(true)}
       />
     </div>
   );
@@ -328,15 +278,31 @@ function StoryVideo({ src, label }: { src: string; label: string }) {
   );
 }
 
-function VercelStory() {
+function ThemeToggle({ theme, onToggle, filled = false }: { theme: Theme | null; onToggle: () => void; filled?: boolean }) {
+  return (
+    <button className={visitorFooterStyles.themeButton} type="button"
+      onClick={onToggle} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      aria-pressed={theme === "dark"}>
+      <span className={`${visitorFooterStyles.themeIcon} ${theme === "dark" ? visitorFooterStyles.themeIconVisible : ""}`} aria-hidden="true">
+        <svg viewBox="0 -960 960 960" fill="currentColor">{filled ? <circle cx="480" cy="-480" r="120" /> : null}<path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM80-440q-17 0-28.5-11.5T40-480q0-17 11.5-28.5T80-520h80q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440H80Zm720 0q-17 0-28.5-11.5T760-480q0-17 11.5-28.5T800-520h80q17 0 28.5 11.5T920-480q0 17-11.5 28.5T880-440h-80ZM480-760q-17 0-28.5-11.5T440-800v-80q0-17 11.5-28.5T480-920q17 0 28.5 11.5T520-880v80q0 17-11.5 28.5T480-760Zm0 720q-17 0-28.5-11.5T440-80v-80q0-17 11.5-28.5T480-200q17 0 28.5 11.5T520-160v80q0 17-11.5 28.5T480-40ZM226-678l-43-42q-12-11-11.5-28t11.5-29q12-12 29-12t28 12l42 43q11 12 11 28t-11 28q-11 12-27.5 11.5T226-678Zm494 495-42-43q-11-12-11-28.5t11-27.5q11-12 27.5-11.5T734-282l43 42q12 11 11.5 28T777-183q-12 12-29 12t-28-12Zm-42-495q-12-11-11.5-27.5T678-734l42-43q11-12 28-11.5t29 11.5q12 12 12 29t-12 28l-43 42q-12 11-28 11t-28-11ZM183-183q-12-12-12-29t12-28l43-42q12-11 28.5-11t27.5 11q12 11 11.5 27.5T282-226l-42 43q-11 12-28 11.5T183-183Zm297-297Z"/></svg>
+      </span>
+      <span className={`${visitorFooterStyles.themeIcon} ${theme === "light" ? visitorFooterStyles.themeIconVisible : ""}`} aria-hidden="true">
+        <svg viewBox="0 -960 960 960" fill="currentColor"><path d={filled ? "M480-120q-151 0-255.5-104.5T120-480q0-138 90-239.5T440-838q13-2 23 3.5t16 14.5q6 9 6.5 21t-7.5 23q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q11-7 22.5-6.5T819-479q10 5 15.5 15t3.5 24q-14 138-117.5 229T480-120Z" : "M480-120q-151 0-255.5-104.5T120-480q0-138 90-239.5T440-838q13-2 23 3.5t16 14.5q6 9 6.5 21t-7.5 23q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q11-7 22.5-6.5T819-479q10 5 15.5 15t3.5 24q-14 138-117.5 229T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z"}/></svg>
+      </span>
+    </button>
+  );
+}
+
+function VercelStory({ themeControl, theme }: { themeControl: ReactNode; theme: Theme | null }) {
+  const pickerColor = theme === "dark" ? "#111111" : "#F7F7F7";
   const connectImages = [
-    { src: "/vercel/Vercel 3.png", alt: "Forget Workspace dialog in Vercel Connect" },
-    { src: "/vercel/Vercel 4.png", alt: "Featured connectors in Vercel Connect" },
+    { src: "/media/d1fd3139c915c955.webp", alt: "Forget Workspace dialog in Vercel Connect" },
+    { src: "/media/bba0a4be0a61960a.webp", alt: "Featured connectors in Vercel Connect" },
   ];
   const v0Images = [
-    { src: "/vercel/Vercel 1.png", alt: "The v0 creation screen" },
-    { src: "/vercel/Vercel 2.png", alt: "Models for every kind of work in v0" },
-    { src: "/vercel/Vercel 5.png", alt: "Turn your ideas into production in v0" },
+    { src: "/media/de7b4c62daa02fbb.webp", alt: "The v0 creation screen" },
+    { src: "/media/00506ab5fc874120.webp", alt: "Models for every kind of work in v0" },
+    { src: "/media/dd4fe4a0898843a8.webp", alt: "Turn your ideas into production in v0" },
   ];
 
   return (
@@ -352,10 +318,14 @@ function VercelStory() {
         <figure className={storyStyles.media}>
           <GalleryImage {...connectImages[0]} first smooth />
         </figure>
-        <ColorPicker />
         <figure className={storyStyles.media}>
           <GalleryImage {...connectImages[1]} first={false} smooth />
         </figure>
+        <ColorPicker initialColor={pickerColor} themeControl={themeControl} />
+      </div>
+
+      <div className={`${storyStyles.prose} ${storyStyles.afterMedia}`}>
+        <p>Yes, I designed a colour picker. At Vercel. A company whose favourite colour is black.</p>
       </div>
 
       <hr className={storyStyles.divider} />
@@ -366,7 +336,7 @@ function VercelStory() {
 
       <div className={storyStyles.mediaGroup}>
         <figure className={storyStyles.media}>
-          <StoryVideo src="/vercel/chat-sidebar-interaction.mp4" label="v0 chat sidebar interaction" />
+          <StoryVideo src="/media/59c7435c8dad70e2.mp4" label="v0 chat sidebar interaction" />
         </figure>
         {v0Images.slice(0, 2).map(({ src, alt }) => (
           <figure className={storyStyles.media} key={src}>
@@ -374,7 +344,7 @@ function VercelStory() {
           </figure>
         ))}
         <figure className={storyStyles.media}>
-          <StoryVideo src="/vercel/url.mp4" label="v0 URL interaction" />
+          <StoryVideo src="/media/29cd9eedaa0eace8.mp4" label="v0 URL interaction" />
         </figure>
         {v0Images.slice(2).map(({ src, alt }) => (
           <figure className={storyStyles.media} key={src}>
@@ -392,7 +362,7 @@ function VercelStory() {
       </div>
 
       <hr className={`${storyStyles.divider} ${storyStyles.endDivider}`} />
-      <InternshipPhotos />
+      <InternshipPhotos coverSrc="/photo/vercel-internship/09.webp" />
       <div className={storyStyles.closingNote}>
         <p>I&apos;m incredibly grateful to <a href="https://www.hannahhearth.com/" target="_blank" rel="noopener noreferrer">Hannah</a>, <a href="https://www.tomjohn.design/" target="_blank" rel="noopener noreferrer">Tom</a>, <a href="https://johnpham.net/" target="_blank" rel="noopener noreferrer">John</a>, <a href="https://williambout.me/" target="_blank" rel="noopener noreferrer">William</a>, <a href="https://www.pablostanley.com/" target="_blank" rel="noopener noreferrer">Pablo</a>, and <a href="https://www.linkedin.com/in/robinhlee/" target="_blank" rel="noopener noreferrer">Robin</a> for their guidance and support throughout the summer.</p>
         <p>A special thank you to <a href="https://x.com/HedyZandi" target="_blank" rel="noopener noreferrer">Hedi</a> and <a href="https://x.com/allenzhou101?s=11&amp;t=uebh9AA6PXsSfyVK9Am9pA" target="_blank" rel="noopener noreferrer">Allen</a> on Connect, and <a href="https://www.nmonto.com/" target="_blank" rel="noopener noreferrer">Monto</a> and <a href="https://x.com/fernandorojo" target="_blank" rel="noopener noreferrer">Fernando</a> on v0, for giving me the opportunity to contribute to something greater.</p>
@@ -474,7 +444,7 @@ function MinimumStory() {
       <div className={storyStyles.mediaGroup}>
         {interfaceImages.map((src, index) => (
           <figure className={storyStyles.media} key={src}>
-            <GalleryImage src={src} alt={src === "/minimum/build-interface-framed.png" ? "Minimum frontend build interface with deployment logs" : `Minimum interface exploration ${index + 1}`} first={false} smooth />
+            <GalleryImage src={src} alt={src === "/media/49331317ddb76b7a.webp" ? "Minimum frontend build interface with deployment logs" : `Minimum interface exploration ${index + 1}`} first={false} smooth />
           </figure>
         ))}
       </div>
@@ -486,12 +456,12 @@ function MinimumStory() {
       <div className={storyStyles.mediaGroup}>
         <figure className={storyStyles.media}>
           <span className={storyStyles.screenshotFrame}>
-            <Image src="/minimum/first-dashboard-design-detail.png" alt="Early Minimum dashboard iterations and feedback on a Figma canvas" width={3024} height={1822} sizes="(max-width: 700px) 100vw, 70vw" />
+            <Image unoptimized src="/media/2571427da4fc86ac.webp" alt="Early Minimum dashboard iterations and feedback on a Figma canvas" width={3024} height={1822} sizes="(max-width: 940px) calc(100vw - 40px), 900px" />
           </span>
         </figure>
         <figure className={storyStyles.media}>
           <span className={storyStyles.screenshotFrame}>
-            <Image src="/minimum/later-dashboard-design.png" alt="A later Minimum dashboard showing projects and filters" width={3456} height={2234} sizes="(max-width: 700px) 100vw, 70vw" />
+            <Image unoptimized src="/media/daad9b90817c98e6.webp" alt="A later Minimum dashboard showing projects and filters" width={3456} height={2234} sizes="(max-width: 940px) calc(100vw - 40px), 900px" />
           </span>
         </figure>
       </div>
@@ -511,7 +481,7 @@ function MinimumStory() {
 
       <figure className={`${storyStyles.media} ${storyStyles.singleMedia}`}>
         <span className={storyStyles.screenshotFrame}>
-          <Image src="/minimum/discord-march-2024.png" alt="March 2024 Discord conversation about Minimum's future" width={3024} height={1834} sizes="(max-width: 700px) 100vw, 70vw" />
+          <Image unoptimized src="/media/a1b9df323fb0e6c4.webp" alt="March 2024 Discord conversation about Minimum's future" width={3024} height={1834} sizes="(max-width: 940px) calc(100vw - 40px), 900px" />
         </span>
       </figure>
 
@@ -524,12 +494,12 @@ function MinimumStory() {
       <div className={storyStyles.mediaGroup}>
         <figure className={storyStyles.media}>
           <span className={storyStyles.screenshotFrame}>
-            <Image src="/minimum/minimum-final-website.png" alt="Minimum website with the cloud platform introduction and build logs" width={2880} height={1620} sizes="(max-width: 700px) 100vw, 70vw" />
+            <Image unoptimized src="/media/77838e0c0894129a.webp" alt="Minimum website with the cloud platform introduction and build logs" width={2880} height={1620} sizes="(max-width: 940px) calc(100vw - 40px), 900px" />
           </span>
         </figure>
         <figure className={storyStyles.media}>
           <span className={storyStyles.screenshotFrame}>
-            <Image src="/minimum/discord-october-2025.png" alt="October 2025 Discord message saying rip minimum" width={3024} height={1832} sizes="(max-width: 700px) 100vw, 70vw" />
+            <Image unoptimized src="/media/be75c629e2434cd0.webp" alt="October 2025 Discord message saying rip minimum" width={3024} height={1832} sizes="(max-width: 940px) calc(100vw - 40px), 900px" />
           </span>
         </figure>
       </div>
@@ -605,10 +575,10 @@ function UnordinaryStory() {
   );
 }
 
-function DetailContent({ selection }: { selection: Selection }) {
+function DetailContent({ selection, themeControl, theme }: { selection: Selection; themeControl: ReactNode; theme: Theme | null }) {
   if (selection.kind === "writing") return null;
   if (selection.kind === "work" && work[selection.index].id === "vercel-2026") {
-    return <VercelStory />;
+    return <VercelStory themeControl={themeControl} theme={theme} />;
   }
   if (selection.kind === "work" && work[selection.index].id === "chrono") {
     return <ChronoStory />;
@@ -629,16 +599,19 @@ function DetailContent({ selection }: { selection: Selection }) {
   return (
     <div className={`${styles.gallery} ${selection.kind === "capture" ? styles.captureGallery : ""}`}>
       {images.map((src, index) => (
-        <figure
+        <GalleryPhoto
           className={styles.galleryFigure}
           key={src}
+          motion={selection.kind === "capture"}
           style={selection.kind === "capture" ? {
-            "--capture-tilt": (selection.index + index) % 2 === 0 ? "-0.5deg" : "0.5deg",
             "--capture-aspect": captureImageAspect(captures[selection.index], index),
           } as CSSProperties : undefined}
         >
-          <GalleryImage src={src} alt={`${getTitle(selection)} image ${index + 1}`} first={index === 0} smooth={selection.kind === "work"} naturalSize={selection.kind === "capture"} />
-        </figure>
+          {selection.kind === "capture"
+            ? <div className={styles.detailImageFrame}><CaptureImage id={src} first={index === 0} /></div>
+            : <GalleryImage src={src} alt={`${getTitle(selection)} image ${index + 1}`} first={index === 0} smooth />}
+
+        </GalleryPhoto>
       ))}
     </div>
   );
@@ -679,6 +652,7 @@ function pathFor(selection: Selection | null) {
 }
 
 export default function CanvasExperience({ initialPath = "/" }: { initialPath?: string }) {
+  useGalleryPointerMotion();
   const initialSelection = selectionFromPath(initialPath);
   const [selection, setSelection] = useState<Selection | null>(initialSelection);
   const [phase, setPhase] = useState<"home" | "leavingHome" | "detail" | "leavingDetail">(initialSelection ? "detail" : "home");
@@ -857,16 +831,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
           </div>
         </div>
         <div className={`${visitorFooterStyles.area} ${visitorFooterStyles.controls}`}>
-          <button className={visitorFooterStyles.themeButton} type="button"
-            onClick={toggleTheme} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            aria-pressed={theme === "dark"}>
-            <span className={`${visitorFooterStyles.themeIcon} ${theme === "dark" ? visitorFooterStyles.themeIconVisible : ""}`} aria-hidden="true">
-              <svg viewBox="0 -960 960 960" fill="currentColor"><path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM80-440q-17 0-28.5-11.5T40-480q0-17 11.5-28.5T80-520h80q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440H80Zm720 0q-17 0-28.5-11.5T760-480q0-17 11.5-28.5T800-520h80q17 0 28.5 11.5T920-480q0 17-11.5 28.5T880-440h-80ZM480-760q-17 0-28.5-11.5T440-800v-80q0-17 11.5-28.5T480-920q17 0 28.5 11.5T520-880v80q0 17-11.5 28.5T480-760Zm0 720q-17 0-28.5-11.5T440-80v-80q0-17 11.5-28.5T480-200q17 0 28.5 11.5T520-160v80q0 17-11.5 28.5T480-40ZM226-678l-43-42q-12-11-11.5-28t11.5-29q12-12 29-12t28 12l42 43q11 12 11 28t-11 28q-11 12-27.5 11.5T226-678Zm494 495-42-43q-11-12-11-28.5t11-27.5q11-12 27.5-11.5T734-282l43 42q12 11 11.5 28T777-183q-12 12-29 12t-28-12Zm-42-495q-12-11-11.5-27.5T678-734l42-43q11-12 28-11.5t29 11.5q12 12 12 29t-12 28l-43 42q-12 11-28 11t-28-11ZM183-183q-12-12-12-29t12-28l43-42q12-11 28.5-11t27.5 11q12 11 11.5 27.5T282-226l-42 43q-11 12-28 11.5T183-183Zm297-297Z"/></svg>
-            </span>
-            <span className={`${visitorFooterStyles.themeIcon} ${theme === "light" ? visitorFooterStyles.themeIconVisible : ""}`} aria-hidden="true">
-              <svg viewBox="0 -960 960 960" fill="currentColor"><path d="M480-120q-151 0-255.5-104.5T120-480q0-138 90-239.5T440-838q13-2 23 3.5t16 14.5q6 9 6.5 21t-7.5 23q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q11-7 22.5-6.5T819-479q10 5 15.5 15t3.5 24q-14 138-117.5 229T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z"/></svg>
-            </span>
-          </button>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <SiteFooter omitFinalPeriod listStyle />
         </div>
       </div>
@@ -911,7 +876,7 @@ export default function CanvasExperience({ initialPath = "/" }: { initialPath?: 
             </div>
             {selection.kind !== "workAll" && selection.kind !== "otherWorkAll" && selection.kind !== "captureAll" && selection.kind !== "writingAll" && selection.kind !== "studies" && (
               <div className={`${styles.detailContent} ${selection.kind === "writing" ? styles.writingContent : ""} ${selection.kind === "capture" ? styles.captureContent : ""} ${selection.kind === "work" && ["vercel-2026", "chrono", "minimum", "unordinary"].includes(work[selection.index].id) ? styles.storyContent : ""}`}>
-                <DetailContent selection={selection} />
+                <DetailContent selection={selection} theme={theme} themeControl={<ThemeToggle theme={theme} onToggle={toggleTheme} filled />} />
               </div>
             )}
           </>

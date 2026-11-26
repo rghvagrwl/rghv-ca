@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import styles from "./color-picker.module.css";
@@ -49,8 +49,17 @@ function useHandlePress() {
   return { pressed, press, release };
 }
 
-export default function ColorPicker() {
-  const [color, setColor] = useState<HSV>([0, 0, 0]);
+export default function ColorPicker({ themeControl, initialColor }: { themeControl: ReactNode; initialColor: string }) {
+  return (
+    <figure id="color-picker" className={`${styles.stage} ${GeistSans.className}`} aria-label="Interactive Vercel color picker">
+      <PickerDemo key={initialColor} initialColor={initialColor} />
+      <div className={styles.themeControl}>{themeControl}</div>
+    </figure>
+  );
+}
+
+function PickerDemo({ initialColor }: { initialColor: string }) {
+  const [color, setColor] = useState<HSV>(() => fromHex(initialColor.slice(1), 0));
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<string | null>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -108,49 +117,47 @@ export default function ColorPicker() {
   }
 
   return (
-    <figure id="color-picker" className={`${styles.stage} ${GeistSans.className}`} aria-label="Interactive Vercel color picker">
-      <div className={styles.demo} data-open={open} style={{ "--chosen": hex, "--hue": `hsl(${hue} 100% 50%)` } as CSSProperties}
-        onKeyDown={event => {
-          if (open && event.key === "Escape") {
-            event.stopPropagation();
-            setOpen(false);
-            trigger.current?.focus({ preventScroll: true });
-          }
-        }}>
-        <button ref={trigger} type="button" className={styles.trigger} aria-label={`Choose color, ${hex}`} aria-haspopup="dialog"
-          aria-expanded={open} aria-controls={panelId} onClick={() => setOpen(current => !current)}>
-          <span className={styles.swatch} /><span className={GeistMono.className}>{hex}</span>
-        </button>
-        <div ref={panel} className={styles.popover} id={panelId} role="dialog" aria-label="Color picker" inert={!open}>
-          <div className={styles.spectrum} role="slider" aria-label="Saturation and brightness" tabIndex={0}
-            aria-valuenow={Math.round(saturation * 100)} aria-valuetext={`${Math.round(saturation * 100)}% saturation, ${Math.round(brightness * 100)}% brightness`}
-            onKeyDown={nudge}
+    <div className={styles.demo} data-open={open} style={{ "--chosen": hex, "--hue": `hsl(${hue} 100% 50%)` } as CSSProperties}
+      onKeyDown={event => {
+        if (open && event.key === "Escape") {
+          event.stopPropagation();
+          setOpen(false);
+          trigger.current?.focus({ preventScroll: true });
+        }
+      }}>
+      <button ref={trigger} type="button" className={styles.trigger} aria-label={`Choose color, ${hex}`} aria-haspopup="dialog"
+        aria-expanded={open} aria-controls={panelId} onClick={() => setOpen(current => !current)}>
+        <span className={styles.swatch} /><span className={GeistMono.className}>{hex}</span>
+      </button>
+      <div ref={panel} className={styles.popover} id={panelId} role="dialog" aria-label="Color picker" inert={!open}>
+        <div className={styles.spectrum} role="slider" aria-label="Saturation and brightness" tabIndex={0}
+          aria-valuenow={Math.round(saturation * 100)} aria-valuetext={`${Math.round(saturation * 100)}% saturation, ${Math.round(brightness * 100)}% brightness`}
+          onKeyDown={nudge}
+          onPointerDown={event => {
+            if (!event.isPrimary || event.button !== 0) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            graphHandle.press();
+            pick(event);
+          }}
+          onPointerMove={event => { if (event.currentTarget.hasPointerCapture(event.pointerId)) pick(event); }}
+          onLostPointerCapture={graphHandle.release}>
+          <span className={styles.cursor} data-pressed={graphHandle.pressed} style={{ left: `${saturation * 100}%`, top: `${(1 - brightness) * 100}%` }} />
+        </div>
+        <div className={styles.hueTrack}>
+          <input className={styles.hue} aria-label="Hue" type="range" min="0" max="360" step="0.1" value={hue}
             onPointerDown={event => {
               if (!event.isPrimary || event.button !== 0) return;
               event.currentTarget.setPointerCapture(event.pointerId);
-              graphHandle.press();
-              pick(event);
+              hueHandle.press();
             }}
-            onPointerMove={event => { if (event.currentTarget.hasPointerCapture(event.pointerId)) pick(event); }}
-            onLostPointerCapture={graphHandle.release}>
-            <span className={styles.cursor} data-pressed={graphHandle.pressed} style={{ left: `${saturation * 100}%`, top: `${(1 - brightness) * 100}%` }} />
-          </div>
-          <div className={styles.hueTrack}>
-            <input className={styles.hue} aria-label="Hue" type="range" min="0" max="360" step="0.1" value={hue}
-              onPointerDown={event => {
-                if (!event.isPrimary || event.button !== 0) return;
-                event.currentTarget.setPointerCapture(event.pointerId);
-                hueHandle.press();
-              }}
-              onLostPointerCapture={hueHandle.release}
-              onChange={event => { setColor([Number(event.target.value), saturation, brightness]); setDraft(null); }}/>
-            <span className={styles.hueThumb} data-pressed={hueHandle.pressed} style={{ left: `${hue / 360 * 100}%` }} />
-          </div>
-          <input ref={field} className={`${styles.hex} ${GeistMono.className}`} aria-label="Hex color" value={draft ?? hex}
-            onChange={event => edit(event.target.value)} onFocus={event => event.currentTarget.select()} onBlur={commit}
-            onKeyDown={event => { if (event.key === "Enter") event.currentTarget.blur(); }} spellCheck={false} autoComplete="off" maxLength={7}/>
+            onLostPointerCapture={hueHandle.release}
+            onChange={event => { setColor([Number(event.target.value), saturation, brightness]); setDraft(null); }}/>
+          <span className={styles.hueThumb} data-pressed={hueHandle.pressed} style={{ left: `${hue / 360 * 100}%` }} />
         </div>
+        <input ref={field} className={`${styles.hex} ${GeistMono.className}`} aria-label="Hex color" value={draft ?? hex}
+          onChange={event => edit(event.target.value)} onFocus={event => event.currentTarget.select()} onBlur={commit}
+          onKeyDown={event => { if (event.key === "Enter") event.currentTarget.blur(); }} spellCheck={false} autoComplete="off" maxLength={7}/>
       </div>
-    </figure>
+    </div>
   );
 }

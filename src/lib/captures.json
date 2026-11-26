@@ -1,0 +1,138 @@
+[
+  {
+    "slug": "over-the-bridge",
+    "title": "Over the bridge",
+    "date": "June 20, 2026",
+    "listDate": "Jun 2026",
+    "images": [
+      "/photo/over-the-bridge-june-2026/05.webp",
+      "/photo/over-the-bridge-june-2026/04.webp",
+      "/photo/over-the-bridge-june-2026/03.webp",
+      "/photo/over-the-bridge-june-2026/02.webp",
+      "/photo/over-the-bridge-june-2026/01.webp"
+    ]
+  },
+  {
+    "slug": "vancouver",
+    "title": "A week in Vancouver",
+    "date": "May 2026",
+    "listDate": "May 2026",
+    "images": [
+      "/photo/vancouver-may-2026/12.webp",
+      "/photo/vancouver-may-2026/11.webp",
+      "/photo/vancouver-may-2026/01.webp",
+      "/photo/vancouver-may-2026/02.webp",
+      "/photo/vancouver-may-2026/03.webp",
+      "/photo/vancouver-may-2026/05.webp",
+      "/photo/vancouver-may-2026/04.webp",
+      "vancouver-may-2026-extra-01",
+      "vancouver-may-2026-extra-02",
+      "/photo/vancouver-may-2026/10.webp",
+      "/photo/vancouver-may-2026/09.webp",
+      "/photo/vancouver-may-2026/07.webp"
+    ]
+  },
+  {
+    "slug": "first-time-in-sf",
+    "title": "First time in SF",
+    "date": "March 2026",
+    "listDate": "Mar 2026",
+    "images": [
+      "sf-march-2026-01",
+      "sf-march-2026-25",
+      "sf-march-2026-24",
+      "sf-march-2026-27",
+      "sf-march-2026-22",
+      "sf-march-2026-26",
+      "sf-march-2026-23",
+      "sf-march-2026-02",
+      "sf-march-2026-19",
+      "sf-march-2026-21",
+      "sf-march-2026-20",
+      "sf-march-2026-04",
+      "sf-march-2026-03",
+      "sf-march-2026-05",
+      "sf-march-2026-06",
+      "sf-march-2026-07",
+      "sf-march-2026-15",
+      "sf-march-2026-12",
+      "sf-march-2026-16",
+      "sf-march-2026-13",
+      "sf-march-2026-17",
+      "sf-march-2026-14",
+      "sf-march-2026-18",
+      "sf-march-2026-08",
+      "sf-march-2026-09",
+      "sf-march-2026-11"
+    ]
+  },
+  {
+    "slug": "niagara-to-montreal",
+    "title": "Niagara to Montreal",
+    "date": "August 2025",
+    "listDate": "Aug 2025",
+    "images": [
+      "niagara-montreal-august-2025-01",
+      "niagara-montreal-august-2025-02",
+      "niagara-montreal-august-2025-03",
+      "niagara-montreal-august-2025-04",
+      "niagara-montreal-august-2025-07",
+      "niagara-montreal-august-2025-05",
+      "niagara-montreal-august-2025-06",
+      "niagara-montreal-august-2025-10",
+      "niagara-montreal-august-2025-11",
+      "niagara-montreal-august-2025-09",
+      "niagara-montreal-august-2025-14",
+      "niagara-montreal-august-2025-12",
+      "niagara-montreal-august-2025-08",
+      "niagara-montreal-august-2025-13",
+      "niagara-montreal-august-2025-15"
+    ]
+  },
+  {
+    "slug": "stampede-25",
+    "title": "Stampede",
+    "date": "July 2025",
+    "listDate": "Jul 2025",
+    "images": [
+      "stampede-july-2025-01",
+      "stampede-july-2025-03",
+      "stampede-july-2025-05",
+      "stampede-july-2025-04",
+      "stampede-july-2025-02"
+    ]
+  },
+  {
+    "slug": "yates-mountain",
+    "title": "Yates Mountain",
+    "date": "July 2025",
+    "listDate": "Jul 2025",
+    "images": [
+      "yates-july-2025-01",
+      "yates-july-2025-02",
+      "yates-july-2025-03",
+      "yates-july-2025-04",
+      "yates-july-2025-06",
+      "yates-july-2025-07",
+      "yates-july-2025-05",
+      "yates-july-2025-09",
+      "yates-july-2025-08",
+      "yates-july-2025-10",
+      "yates-july-2025-11",
+      "yates-july-2025-12"
+    ]
+  },
+  {
+    "slug": "surrail-ridge",
+    "title": "Surrail Ridge",
+    "date": "April 2025",
+    "listDate": "Apr 2025",
+    "images": [
+      "surrail-april-2025-02",
+      "surrail-april-2025-01",
+      "surrail-april-2025-04",
+      "surrail-april-2025-05",
+      "surrail-april-2025-03"
+    ]
+  }
+]

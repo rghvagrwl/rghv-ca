@@ -1,0 +1,1762 @@
+{
+  "/photo/over-the-bridge-june-2026/05.webp": {
+    "width": 2559,
+    "height": 1440,
+    "alt": "First-time over the bridge, photograph 05",
+    "sources": [
+      {
+        "src": "/photo/captures/bf9731f7558b-192.webp",
+        "width": 192,
+        "bytes": 1734
+      },
+      {
+        "src": "/photo/captures/215867ba4d05-512.webp",
+        "width": 512,
+        "bytes": 10910
+      },
+      {
+        "src": "/photo/captures/f9a060153e0e-1024.webp",
+        "width": 1024,
+        "bytes": 33980
+      }
+    ]
+  },
+  "/photo/over-the-bridge-june-2026/04.webp": {
+    "width": 2559,
+    "height": 1440,
+    "alt": "First-time over the bridge, photograph 04",
+    "sources": [
+      {
+        "src": "/photo/captures/980de923205b-192.webp",
+        "width": 192,
+        "bytes": 2184
+      },
+      {
+        "src": "/photo/captures/07a6c7813813-512.webp",
+        "width": 512,
+        "bytes": 17386
+      },
+      {
+        "src": "/photo/captures/7ff75a1682a0-1024.webp",
+        "width": 1024,
+        "bytes": 70184
+      }
+    ]
+  },
+  "/photo/over-the-bridge-june-2026/03.webp": {
+    "width": 2559,
+    "height": 1440,
+    "alt": "First-time over the bridge, photograph 03",
+    "sources": [
+      {
+        "src": "/photo/captures/9548f05fa41d-192.webp",
+        "width": 192,
+        "bytes": 1374
+      },
+      {
+        "src": "/photo/captures/736c2ae5edda-512.webp",
+        "width": 512,
+        "bytes": 11964
+      },
+      {
+        "src": "/photo/captures/fd7d144e71a2-1024.webp",
+        "width": 1024,
+        "bytes": 50654
+      }
+    ]
+  },
+  "/photo/over-the-bridge-june-2026/02.webp": {
+    "width": 2559,
+    "height": 1440,
+    "alt": "First-time over the bridge, photograph 02",
+    "sources": [
+      {
+        "src": "/photo/captures/ec3f9be13c76-192.webp",
+        "width": 192,
+        "bytes": 656
+      },
+      {
+        "src": "/photo/captures/2d580a8a2631-512.webp",
+        "width": 512,
+        "bytes": 3066
+      },
+      {
+        "src": "/photo/captures/ff4bb0f360be-1024.webp",
+        "width": 1024,
+        "bytes": 8634
+      }
+    ]
+  },
+  "/photo/over-the-bridge-june-2026/01.webp": {
+    "width": 2559,
+    "height": 1440,
+    "alt": "First-time over the bridge, photograph 01",
+    "sources": [
+      {
+        "src": "/photo/captures/3dc77967286a-192.webp",
+        "width": 192,
+        "bytes": 980
+      },
+      {
+        "src": "/photo/captures/7e9a721d1efc-512.webp",
+        "width": 512,
+        "bytes": 4348
+      },
+      {
+        "src": "/photo/captures/240e8a85fcc8-1024.webp",
+        "width": 1024,
+        "bytes": 11722
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/12.webp": {
+    "width": 2560,
+    "height": 1920,
+    "alt": "A week in Vancouver, photograph 12",
+    "sources": [
+      {
+        "src": "/photo/captures/631ee7dbda57-192.webp",
+        "width": 192,
+        "bytes": 6964
+      },
+      {
+        "src": "/photo/captures/96769ca2b30d-512.webp",
+        "width": 512,
+        "bytes": 58782
+      },
+      {
+        "src": "/photo/captures/c08becb919ab-1024.webp",
+        "width": 1024,
+        "bytes": 213598
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/11.webp": {
+    "width": 2560,
+    "height": 1920,
+    "alt": "A week in Vancouver, photograph 11",
+    "sources": [
+      {
+        "src": "/photo/captures/6b8c26a888e7-192.webp",
+        "width": 192,
+        "bytes": 7246
+      },
+      {
+        "src": "/photo/captures/0cde58e72707-512.webp",
+        "width": 512,
+        "bytes": 59778
+      },
+      {
+        "src": "/photo/captures/28ea61eb33ec-1024.webp",
+        "width": 1024,
+        "bytes": 216240
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/10.webp": {
+    "width": 1280,
+    "height": 959,
+    "alt": "A week in Vancouver, photograph 10",
+    "sources": [
+      {
+        "src": "/photo/captures/897866bc47be-192.webp",
+        "width": 192,
+        "bytes": 7340
+      },
+      {
+        "src": "/photo/captures/0521ab24aed6-512.webp",
+        "width": 512,
+        "bytes": 59976
+      },
+      {
+        "src": "/photo/captures/b111da703f89-1024.webp",
+        "width": 1024,
+        "bytes": 176716
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/09.webp": {
+    "width": 1280,
+    "height": 960,
+    "alt": "A week in Vancouver, photograph 09",
+    "sources": [
+      {
+        "src": "/photo/captures/f84ea3fd62a6-192.webp",
+        "width": 192,
+        "bytes": 1722
+      },
+      {
+        "src": "/photo/captures/5439e40bbc9e-512.webp",
+        "width": 512,
+        "bytes": 11496
+      },
+      {
+        "src": "/photo/captures/aeaecefc25b2-1024.webp",
+        "width": 1024,
+        "bytes": 29256
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/07.webp": {
+    "width": 1280,
+    "height": 960,
+    "alt": "A week in Vancouver, photograph 07",
+    "sources": [
+      {
+        "src": "/photo/captures/cf1a49708011-192.webp",
+        "width": 192,
+        "bytes": 3270
+      },
+      {
+        "src": "/photo/captures/608b38723449-512.webp",
+        "width": 512,
+        "bytes": 19634
+      },
+      {
+        "src": "/photo/captures/e66ed07499c2-1024.webp",
+        "width": 1024,
+        "bytes": 54980
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/05.webp": {
+    "width": 2128,
+    "height": 1198,
+    "alt": "A week in Vancouver, photograph 05",
+    "sources": [
+      {
+        "src": "/photo/captures/1e52d4fec428-192.webp",
+        "width": 192,
+        "bytes": 2296
+      },
+      {
+        "src": "/photo/captures/4341c3fe1f45-512.webp",
+        "width": 512,
+        "bytes": 12740
+      },
+      {
+        "src": "/photo/captures/dd6bd399ef1d-1024.webp",
+        "width": 1024,
+        "bytes": 37008
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/04.webp": {
+    "width": 2128,
+    "height": 1198,
+    "alt": "A week in Vancouver, photograph 04",
+    "sources": [
+      {
+        "src": "/photo/captures/d23bf60b1ab2-192.webp",
+        "width": 192,
+        "bytes": 2148
+      },
+      {
+        "src": "/photo/captures/9edf0dc4d22f-512.webp",
+        "width": 512,
+        "bytes": 15642
+      },
+      {
+        "src": "/photo/captures/dd187d643b08-1024.webp",
+        "width": 1024,
+        "bytes": 58378
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/03.webp": {
+    "width": 2128,
+    "height": 1198,
+    "alt": "A week in Vancouver, photograph 03",
+    "sources": [
+      {
+        "src": "/photo/captures/224dd7ea558b-192.webp",
+        "width": 192,
+        "bytes": 3238
+      },
+      {
+        "src": "/photo/captures/f58b041cc2d3-512.webp",
+        "width": 512,
+        "bytes": 35060
+      },
+      {
+        "src": "/photo/captures/4b5e979fe5b7-1024.webp",
+        "width": 1024,
+        "bytes": 140596
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/02.webp": {
+    "width": 1915,
+    "height": 1078,
+    "alt": "A week in Vancouver, photograph 02",
+    "sources": [
+      {
+        "src": "/photo/captures/99dab7004970-192.webp",
+        "width": 192,
+        "bytes": 3698
+      },
+      {
+        "src": "/photo/captures/ef05b0ec117e-512.webp",
+        "width": 512,
+        "bytes": 34290
+      },
+      {
+        "src": "/photo/captures/e46611886b4b-1024.webp",
+        "width": 1024,
+        "bytes": 123396
+      }
+    ]
+  },
+  "/photo/vancouver-may-2026/01.webp": {
+    "width": 2559,
+    "height": 1440,
+    "alt": "A week in Vancouver, photograph 01",
+    "sources": [
+      {
+        "src": "/photo/captures/a3af05e5251c-192.webp",
+        "width": 192,
+        "bytes": 2382
+      },
+      {
+        "src": "/photo/captures/9b6d8c499634-512.webp",
+        "width": 512,
+        "bytes": 19812
+      },
+      {
+        "src": "/photo/captures/821fb2f05e3f-1024.webp",
+        "width": 1024,
+        "bytes": 84290
+      }
+    ]
+  },
+  "sf-march-2026-01": {
+    "width": 2451,
+    "height": 1634,
+    "alt": "Friends crossing a street in San Francisco",
+    "sources": [
+      {
+        "src": "/photo/captures/37ab63da1ac9-192.webp",
+        "width": 192,
+        "bytes": 5882
+      },
+      {
+        "src": "/photo/captures/af79626c9f7b-512.webp",
+        "width": 512,
+        "bytes": 38344
+      },
+      {
+        "src": "/photo/captures/d065fe981b09-1024.webp",
+        "width": 1024,
+        "bytes": 129560
+      }
+    ]
+  },
+  "sf-march-2026-02": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Friends inside a warmly lit café",
+    "sources": [
+      {
+        "src": "/photo/captures/65c799090cb8-192.webp",
+        "width": 192,
+        "bytes": 4566
+      },
+      {
+        "src": "/photo/captures/1888dbcd80a1-512.webp",
+        "width": 512,
+        "bytes": 30862
+      },
+      {
+        "src": "/photo/captures/3b48d614b2af-1024.webp",
+        "width": 1024,
+        "bytes": 104862
+      }
+    ]
+  },
+  "sf-march-2026-03": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Alcatraz Island across the bay with boats in the foreground",
+    "sources": [
+      {
+        "src": "/photo/captures/45d32a7a52f7-192.webp",
+        "width": 192,
+        "bytes": 2224
+      },
+      {
+        "src": "/photo/captures/a0c392aa3de2-512.webp",
+        "width": 512,
+        "bytes": 18624
+      },
+      {
+        "src": "/photo/captures/3f2aa3859310-1024.webp",
+        "width": 1024,
+        "bytes": 80922
+      }
+    ]
+  },
+  "sf-march-2026-04": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "The Ghirardelli waterfront beneath a pale sky",
+    "sources": [
+      {
+        "src": "/photo/captures/06a0effb89ef-192.webp",
+        "width": 192,
+        "bytes": 2130
+      },
+      {
+        "src": "/photo/captures/6a47fb456d4d-512.webp",
+        "width": 512,
+        "bytes": 15378
+      },
+      {
+        "src": "/photo/captures/ac7c8c44887f-1024.webp",
+        "width": 1024,
+        "bytes": 59838
+      }
+    ]
+  },
+  "sf-march-2026-05": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "The moon above a tree against the blue sky",
+    "sources": [
+      {
+        "src": "/photo/captures/0c92bc3b8bfc-192.webp",
+        "width": 192,
+        "bytes": 4056
+      },
+      {
+        "src": "/photo/captures/4465c6af5870-512.webp",
+        "width": 512,
+        "bytes": 37104
+      },
+      {
+        "src": "/photo/captures/53409ee92cec-1024.webp",
+        "width": 1024,
+        "bytes": 144726
+      }
+    ]
+  },
+  "sf-march-2026-06": {
+    "width": 1193,
+    "height": 1790,
+    "alt": "An In-N-Out sign above the street",
+    "sources": [
+      {
+        "src": "/photo/captures/c65f7e3056d6-192.webp",
+        "width": 192,
+        "bytes": 8420
+      },
+      {
+        "src": "/photo/captures/2523ba005753-512.webp",
+        "width": 512,
+        "bytes": 57480
+      },
+      {
+        "src": "/photo/captures/bb74aa22e2af-1024.webp",
+        "width": 1024,
+        "bytes": 255344
+      }
+    ]
+  },
+  "sf-march-2026-07": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Friends ordering at In-N-Out",
+    "sources": [
+      {
+        "src": "/photo/captures/95bbe3bc1d4d-192.webp",
+        "width": 192,
+        "bytes": 3324
+      },
+      {
+        "src": "/photo/captures/4f428f2a5182-512.webp",
+        "width": 512,
+        "bytes": 21150
+      },
+      {
+        "src": "/photo/captures/b19af85b0f4f-1024.webp",
+        "width": 1024,
+        "bytes": 68842
+      }
+    ]
+  },
+  "sf-march-2026-08": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "The Golden Gate Bridge silhouetted against an orange sunset",
+    "sources": [
+      {
+        "src": "/photo/captures/e76803fb1cee-192.webp",
+        "width": 192,
+        "bytes": 1138
+      },
+      {
+        "src": "/photo/captures/a0e1de410844-512.webp",
+        "width": 512,
+        "bytes": 9122
+      },
+      {
+        "src": "/photo/captures/abb65cf211f4-1024.webp",
+        "width": 1024,
+        "bytes": 44208
+      }
+    ]
+  },
+  "sf-march-2026-09": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "The illuminated Palace of Fine Arts at dusk",
+    "sources": [
+      {
+        "src": "/photo/captures/dc3179f68a35-192.webp",
+        "width": 192,
+        "bytes": 544
+      },
+      {
+        "src": "/photo/captures/8cd5c01ef9bb-512.webp",
+        "width": 512,
+        "bytes": 3618
+      },
+      {
+        "src": "/photo/captures/2e1b6a246674-1024.webp",
+        "width": 1024,
+        "bytes": 18098
+      }
+    ]
+  },
+  "sf-march-2026-11": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Friends gathered by the Golden Gate Bridge at night",
+    "sources": [
+      {
+        "src": "/photo/captures/d692c708742e-192.webp",
+        "width": 192,
+        "bytes": 1290
+      },
+      {
+        "src": "/photo/captures/169fc28a4a17-512.webp",
+        "width": 512,
+        "bytes": 6830
+      },
+      {
+        "src": "/photo/captures/96b8f3df92cd-1024.webp",
+        "width": 1024,
+        "bytes": 20536
+      }
+    ]
+  },
+  "sf-march-2026-12": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Friends watching the sunset at Ocean Beach",
+    "sources": [
+      {
+        "src": "/photo/captures/d8c74c66124a-192.webp",
+        "width": 192,
+        "bytes": 1714
+      },
+      {
+        "src": "/photo/captures/fa1145f731bd-512.webp",
+        "width": 512,
+        "bytes": 9384
+      },
+      {
+        "src": "/photo/captures/9331f7618903-1024.webp",
+        "width": 1024,
+        "bytes": 33340
+      }
+    ]
+  },
+  "sf-march-2026-13": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Beachgoers silhouetted against the ocean at sunset",
+    "sources": [
+      {
+        "src": "/photo/captures/dba0a3855022-192.webp",
+        "width": 192,
+        "bytes": 958
+      },
+      {
+        "src": "/photo/captures/aca7f3624a6e-512.webp",
+        "width": 512,
+        "bytes": 6048
+      },
+      {
+        "src": "/photo/captures/49d34c4ce7a8-1024.webp",
+        "width": 1024,
+        "bytes": 27354
+      }
+    ]
+  },
+  "sf-march-2026-14": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Birds above Ocean Beach with bonfires on the sand",
+    "sources": [
+      {
+        "src": "/photo/captures/b6d1780d3bdf-192.webp",
+        "width": 192,
+        "bytes": 794
+      },
+      {
+        "src": "/photo/captures/5b43ce16311b-512.webp",
+        "width": 512,
+        "bytes": 5764
+      },
+      {
+        "src": "/photo/captures/962cbc6b81f4-1024.webp",
+        "width": 1024,
+        "bytes": 24382
+      }
+    ]
+  },
+  "sf-march-2026-15": {
+    "width": 1193,
+    "height": 1790,
+    "alt": "A friend setting up a camera beside parked cars",
+    "sources": [
+      {
+        "src": "/photo/captures/43f262ddbfd1-192.webp",
+        "width": 192,
+        "bytes": 4128
+      },
+      {
+        "src": "/photo/captures/20f11cc34bb2-512.webp",
+        "width": 512,
+        "bytes": 32126
+      },
+      {
+        "src": "/photo/captures/67e6251437cc-1024.webp",
+        "width": 1024,
+        "bytes": 207510
+      }
+    ]
+  },
+  "sf-march-2026-16": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "The coast and Cliff House in the evening light",
+    "sources": [
+      {
+        "src": "/photo/captures/99a72a5334ca-192.webp",
+        "width": 192,
+        "bytes": 1512
+      },
+      {
+        "src": "/photo/captures/e5445985b3e1-512.webp",
+        "width": 512,
+        "bytes": 8996
+      },
+      {
+        "src": "/photo/captures/63ec1546f2e5-1024.webp",
+        "width": 1024,
+        "bytes": 37280
+      }
+    ]
+  },
+  "sf-march-2026-17": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "A silhouette wearing glasses against the sunset",
+    "sources": [
+      {
+        "src": "/photo/captures/9c3d5935fa51-192.webp",
+        "width": 192,
+        "bytes": 880
+      },
+      {
+        "src": "/photo/captures/bdfc77e019ab-512.webp",
+        "width": 512,
+        "bytes": 4328
+      },
+      {
+        "src": "/photo/captures/ea3e627411ee-1024.webp",
+        "width": 1024,
+        "bytes": 16664
+      }
+    ]
+  },
+  "sf-march-2026-18": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "A silhouette against the last orange light over the ocean",
+    "sources": [
+      {
+        "src": "/photo/captures/ade093c63bf2-192.webp",
+        "width": 192,
+        "bytes": 566
+      },
+      {
+        "src": "/photo/captures/4541944acf15-512.webp",
+        "width": 512,
+        "bytes": 2244
+      },
+      {
+        "src": "/photo/captures/d97e5c111e99-1024.webp",
+        "width": 1024,
+        "bytes": 9654
+      }
+    ]
+  },
+  "sf-march-2026-19": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Two friends beside a wall covered in green leaves",
+    "sources": [
+      {
+        "src": "/photo/captures/ab5aaefcdd7c-192.webp",
+        "width": 192,
+        "bytes": 3390
+      },
+      {
+        "src": "/photo/captures/8075dd59fe01-512.webp",
+        "width": 512,
+        "bytes": 24674
+      },
+      {
+        "src": "/photo/captures/2b963e94d641-1024.webp",
+        "width": 1024,
+        "bytes": 87182
+      }
+    ]
+  },
+  "sf-march-2026-20": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Friends by the water beneath the Bay Bridge",
+    "sources": [
+      {
+        "src": "/photo/captures/e659eea98724-192.webp",
+        "width": 192,
+        "bytes": 2172
+      },
+      {
+        "src": "/photo/captures/df0db186b34b-512.webp",
+        "width": 512,
+        "bytes": 13586
+      },
+      {
+        "src": "/photo/captures/73593944ba1f-1024.webp",
+        "width": 1024,
+        "bytes": 54290
+      }
+    ]
+  },
+  "sf-march-2026-21": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "The San Francisco skyline behind the Bay Bridge",
+    "sources": [
+      {
+        "src": "/photo/captures/205eb17ca6f9-192.webp",
+        "width": 192,
+        "bytes": 2912
+      },
+      {
+        "src": "/photo/captures/88838aef86ce-512.webp",
+        "width": 512,
+        "bytes": 19628
+      },
+      {
+        "src": "/photo/captures/55428dbc99be-1024.webp",
+        "width": 1024,
+        "bytes": 64304
+      }
+    ]
+  },
+  "sf-march-2026-22": {
+    "width": 1193,
+    "height": 1790,
+    "alt": "A sunlit building behind a street signal and overhead wires",
+    "sources": [
+      {
+        "src": "/photo/captures/01d2903e0117-192.webp",
+        "width": 192,
+        "bytes": 8152
+      },
+      {
+        "src": "/photo/captures/f8b9648ebfc3-512.webp",
+        "width": 512,
+        "bytes": 54970
+      },
+      {
+        "src": "/photo/captures/59847ea4dfe8-1024.webp",
+        "width": 1024,
+        "bytes": 253024
+      }
+    ]
+  },
+  "sf-march-2026-23": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "A pedestrian passing the red Chinatown mural",
+    "sources": [
+      {
+        "src": "/photo/captures/8d2266843a4e-192.webp",
+        "width": 192,
+        "bytes": 2544
+      },
+      {
+        "src": "/photo/captures/3b9a0231dde8-512.webp",
+        "width": 512,
+        "bytes": 16058
+      },
+      {
+        "src": "/photo/captures/bf8f2083ff0b-1024.webp",
+        "width": 1024,
+        "bytes": 65504
+      }
+    ]
+  },
+  "sf-march-2026-24": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "A view downhill along a busy Chinatown street",
+    "sources": [
+      {
+        "src": "/photo/captures/8dedda032414-192.webp",
+        "width": 192,
+        "bytes": 4446
+      },
+      {
+        "src": "/photo/captures/45330c92a41f-512.webp",
+        "width": 512,
+        "bytes": 29564
+      },
+      {
+        "src": "/photo/captures/c82fc6fedf9a-1024.webp",
+        "width": 1024,
+        "bytes": 101224
+      }
+    ]
+  },
+  "sf-march-2026-25": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "Sunlit buildings and fire escapes framing a steep street",
+    "sources": [
+      {
+        "src": "/photo/captures/4404dfffb4b0-192.webp",
+        "width": 192,
+        "bytes": 4348
+      },
+      {
+        "src": "/photo/captures/27b511eb11bb-512.webp",
+        "width": 512,
+        "bytes": 29012
+      },
+      {
+        "src": "/photo/captures/2959a4cb4f03-1024.webp",
+        "width": 1024,
+        "bytes": 106514
+      }
+    ]
+  },
+  "sf-march-2026-26": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "A red Wells Fargo sign against the blue sky",
+    "sources": [
+      {
+        "src": "/photo/captures/10545268aefb-192.webp",
+        "width": 192,
+        "bytes": 3722
+      },
+      {
+        "src": "/photo/captures/bb847612d628-512.webp",
+        "width": 512,
+        "bytes": 20676
+      },
+      {
+        "src": "/photo/captures/3798da9ba055-1024.webp",
+        "width": 1024,
+        "bytes": 71376
+      }
+    ]
+  },
+  "sf-march-2026-27": {
+    "width": 2632,
+    "height": 1755,
+    "alt": "A crossing guard beneath trolley wires at a busy intersection",
+    "sources": [
+      {
+        "src": "/photo/captures/8241279dfe77-192.webp",
+        "width": 192,
+        "bytes": 4648
+      },
+      {
+        "src": "/photo/captures/e257d12d8101-512.webp",
+        "width": 512,
+        "bytes": 32290
+      },
+      {
+        "src": "/photo/captures/50080a1f90ca-1024.webp",
+        "width": 1024,
+        "bytes": 117188
+      }
+    ]
+  },
+  "yates-july-2025-01": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Friends on a gravel path beside the lake below forested hills",
+    "sources": [
+      {
+        "src": "/photo/captures/96f035ca2c17-192.webp",
+        "width": 192,
+        "bytes": 3850
+      },
+      {
+        "src": "/photo/captures/6fc4408316d8-512.webp",
+        "width": 512,
+        "bytes": 47684
+      },
+      {
+        "src": "/photo/captures/821c7e0cc909-1008.webp",
+        "width": 1008,
+        "bytes": 244154
+      }
+    ]
+  },
+  "yates-july-2025-02": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Sunlit rocky mountains rising above a dense evergreen forest",
+    "sources": [
+      {
+        "src": "/photo/captures/8aeaa68fb679-192.webp",
+        "width": 192,
+        "bytes": 7450
+      },
+      {
+        "src": "/photo/captures/9bcfe2364631-512.webp",
+        "width": 512,
+        "bytes": 68578
+      },
+      {
+        "src": "/photo/captures/67f33406693e-1008.webp",
+        "width": 1008,
+        "bytes": 306874
+      }
+    ]
+  },
+  "yates-july-2025-03": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Friends photographing the lake and mountains from an overlook",
+    "sources": [
+      {
+        "src": "/photo/captures/d973548f7dd7-192.webp",
+        "width": 192,
+        "bytes": 6872
+      },
+      {
+        "src": "/photo/captures/c6a3d1ea517b-512.webp",
+        "width": 512,
+        "bytes": 50848
+      },
+      {
+        "src": "/photo/captures/33a4282d9bc3-1008.webp",
+        "width": 1008,
+        "bytes": 219316
+      }
+    ]
+  },
+  "yates-july-2025-04": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "A friend taking a photograph from a rocky ledge among pine trees",
+    "sources": [
+      {
+        "src": "/photo/captures/1d3ee17f79ad-192.webp",
+        "width": 192,
+        "bytes": 10856
+      },
+      {
+        "src": "/photo/captures/e7f5df334ce2-512.webp",
+        "width": 512,
+        "bytes": 83286
+      },
+      {
+        "src": "/photo/captures/ac944501ef25-1008.webp",
+        "width": 1008,
+        "bytes": 307756
+      }
+    ]
+  },
+  "yates-july-2025-05": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Two friends on a rocky outcrop above the lake and mountain valley",
+    "sources": [
+      {
+        "src": "/photo/captures/24b8c77d8bff-192.webp",
+        "width": 192,
+        "bytes": 5376
+      },
+      {
+        "src": "/photo/captures/337565cba685-512.webp",
+        "width": 512,
+        "bytes": 40860
+      },
+      {
+        "src": "/photo/captures/1a41bba0a751-1008.webp",
+        "width": 1008,
+        "bytes": 201220
+      }
+    ]
+  },
+  "yates-july-2025-06": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Friends climbing across pale rocks beneath a bright blue sky",
+    "sources": [
+      {
+        "src": "/photo/captures/7556a57af46b-192.webp",
+        "width": 192,
+        "bytes": 11572
+      },
+      {
+        "src": "/photo/captures/de0ffce1f116-512.webp",
+        "width": 512,
+        "bytes": 85028
+      },
+      {
+        "src": "/photo/captures/a7fec0829638-1008.webp",
+        "width": 1008,
+        "bytes": 394286
+      }
+    ]
+  },
+  "yates-july-2025-07": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Four friends gathered on a rocky ridge under an open blue sky",
+    "sources": [
+      {
+        "src": "/photo/captures/50a70a7ebb95-192.webp",
+        "width": 192,
+        "bytes": 8228
+      },
+      {
+        "src": "/photo/captures/286f88fe0a0c-512.webp",
+        "width": 512,
+        "bytes": 58996
+      },
+      {
+        "src": "/photo/captures/64600184ade8-1008.webp",
+        "width": 1008,
+        "bytes": 299520
+      }
+    ]
+  },
+  "yates-july-2025-08": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "A red-roofed summit lookout and antenna among evergreen trees",
+    "sources": [
+      {
+        "src": "/photo/captures/63689820de76-192.webp",
+        "width": 192,
+        "bytes": 10852
+      },
+      {
+        "src": "/photo/captures/c2d8597f6a63-512.webp",
+        "width": 512,
+        "bytes": 90548
+      },
+      {
+        "src": "/photo/captures/2c1316f525fb-1008.webp",
+        "width": 1008,
+        "bytes": 406552
+      }
+    ]
+  },
+  "yates-july-2025-09": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "A panorama of forested ridges and the mountain valley",
+    "sources": [
+      {
+        "src": "/photo/captures/635e8fc01096-192.webp",
+        "width": 192,
+        "bytes": 2172
+      },
+      {
+        "src": "/photo/captures/86f5483b6150-512.webp",
+        "width": 512,
+        "bytes": 16378
+      },
+      {
+        "src": "/photo/captures/aedbe681f84d-1024.webp",
+        "width": 1024,
+        "bytes": 61726
+      }
+    ]
+  },
+  "yates-july-2025-10": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "A friend with a backpack on a red-edged wooden platform",
+    "sources": [
+      {
+        "src": "/photo/captures/928d5cd21e29-192.webp",
+        "width": 192,
+        "bytes": 5792
+      },
+      {
+        "src": "/photo/captures/c861e2b94705-512.webp",
+        "width": 512,
+        "bytes": 45364
+      },
+      {
+        "src": "/photo/captures/2b41fa6d1241-1008.webp",
+        "width": 1008,
+        "bytes": 213180
+      }
+    ]
+  },
+  "yates-july-2025-11": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Friends starting down a rocky trail beside the summit lookout",
+    "sources": [
+      {
+        "src": "/photo/captures/ffc26458778c-192.webp",
+        "width": 192,
+        "bytes": 10278
+      },
+      {
+        "src": "/photo/captures/d381003b9b9a-512.webp",
+        "width": 512,
+        "bytes": 81826
+      },
+      {
+        "src": "/photo/captures/e10b0fa3fa2f-1008.webp",
+        "width": 1008,
+        "bytes": 353726
+      }
+    ]
+  },
+  "yates-july-2025-12": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "A quiet lake beneath layered mountain slopes and an overcast sky",
+    "sources": [
+      {
+        "src": "/photo/captures/f36bc0fcc7c8-192.webp",
+        "width": 192,
+        "bytes": 1914
+      },
+      {
+        "src": "/photo/captures/8d6c5319275c-512.webp",
+        "width": 512,
+        "bytes": 24686
+      },
+      {
+        "src": "/photo/captures/ee0502587fac-1008.webp",
+        "width": 1008,
+        "bytes": 152574
+      }
+    ]
+  },
+  "surrail-april-2025-01": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Sunlit mountain walls rising above green slopes and evergreen trees",
+    "sources": [
+      {
+        "src": "/photo/captures/35e1af98da93-192.webp",
+        "width": 192,
+        "bytes": 7396
+      },
+      {
+        "src": "/photo/captures/0118fac7bd6c-512.webp",
+        "width": 512,
+        "bytes": 50256
+      },
+      {
+        "src": "/photo/captures/cdcb0e296f70-1008.webp",
+        "width": 1008,
+        "bytes": 269438
+      }
+    ]
+  },
+  "surrail-april-2025-02": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Rocky outcrops and scattered trees beneath a clear blue sky",
+    "sources": [
+      {
+        "src": "/photo/captures/ece975f7a342-192.webp",
+        "width": 192,
+        "bytes": 5082
+      },
+      {
+        "src": "/photo/captures/d8df7275acc7-512.webp",
+        "width": 512,
+        "bytes": 35440
+      },
+      {
+        "src": "/photo/captures/c4aa1a750a63-1008.webp",
+        "width": 1008,
+        "bytes": 225784
+      }
+    ]
+  },
+  "surrail-april-2025-03": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "A still alpine lake framed by trees and distant mountain silhouettes",
+    "sources": [
+      {
+        "src": "/photo/captures/3e153ca71d56-192.webp",
+        "width": 192,
+        "bytes": 3184
+      },
+      {
+        "src": "/photo/captures/af4be3f97f1e-512.webp",
+        "width": 512,
+        "bytes": 20688
+      },
+      {
+        "src": "/photo/captures/be9f0f511c1d-1008.webp",
+        "width": 1008,
+        "bytes": 173726
+      }
+    ]
+  },
+  "surrail-april-2025-04": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Turquoise lakes and distant mountain ranges seen from a rocky ridge",
+    "sources": [
+      {
+        "src": "/photo/captures/6a110f5bd738-192.webp",
+        "width": 192,
+        "bytes": 5148
+      },
+      {
+        "src": "/photo/captures/dc9f3dd4d937-512.webp",
+        "width": 512,
+        "bytes": 31196
+      },
+      {
+        "src": "/photo/captures/228c35cca1a0-1008.webp",
+        "width": 1008,
+        "bytes": 223798
+      }
+    ]
+  },
+  "surrail-april-2025-05": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "Sunlight sparkling on a green alpine lake below a steep mountain wall",
+    "sources": [
+      {
+        "src": "/photo/captures/31d7eb74ddb4-192.webp",
+        "width": 192,
+        "bytes": 2598
+      },
+      {
+        "src": "/photo/captures/cfa35c598546-512.webp",
+        "width": 512,
+        "bytes": 18846
+      },
+      {
+        "src": "/photo/captures/62e862378c51-1024.webp",
+        "width": 1024,
+        "bytes": 61296
+      }
+    ]
+  },
+  "vancouver-may-2026-extra-01": {
+    "width": 2632,
+    "height": 1481,
+    "alt": "Friends resting and taking photographs on a rocky mountainside among pine trees",
+    "sources": [
+      {
+        "src": "/photo/captures/56f125ae71db-192.webp",
+        "width": 192,
+        "bytes": 3874
+      },
+      {
+        "src": "/photo/captures/784f9d4a4807-512.webp",
+        "width": 512,
+        "bytes": 27656
+      },
+      {
+        "src": "/photo/captures/3c0c695cd5c3-1024.webp",
+        "width": 1024,
+        "bytes": 96034
+      }
+    ]
+  },
+  "vancouver-may-2026-extra-02": {
+    "width": 2632,
+    "height": 1481,
+    "alt": "A mountain inlet beneath heavy clouds and snow-dusted peaks, viewed from a rocky overlook",
+    "sources": [
+      {
+        "src": "/photo/captures/9882b437b5b9-192.webp",
+        "width": 192,
+        "bytes": 1254
+      },
+      {
+        "src": "/photo/captures/c56befe98513-512.webp",
+        "width": 512,
+        "bytes": 7574
+      },
+      {
+        "src": "/photo/captures/8f66233cac69-1024.webp",
+        "width": 1024,
+        "bytes": 26648
+      }
+    ]
+  },
+  "stampede-july-2025-01": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "A sunlit Ferris wheel rising against a blue sky at the Stampede",
+    "sources": [
+      {
+        "src": "/photo/captures/bc56f850058d-192.webp",
+        "width": 192,
+        "bytes": 9902
+      },
+      {
+        "src": "/photo/captures/9e1f9e09b6d2-512.webp",
+        "width": 512,
+        "bytes": 50214
+      },
+      {
+        "src": "/photo/captures/c644c88d2053-1008.webp",
+        "width": 1008,
+        "bytes": 243858
+      }
+    ]
+  },
+  "stampede-july-2025-02": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Pink and gold fireworks bursting across the night sky",
+    "sources": [
+      {
+        "src": "/photo/captures/73c59c2cac99-192.webp",
+        "width": 192,
+        "bytes": 7746
+      },
+      {
+        "src": "/photo/captures/85914a31ff14-512.webp",
+        "width": 512,
+        "bytes": 42876
+      },
+      {
+        "src": "/photo/captures/d985201df786-1008.webp",
+        "width": 1008,
+        "bytes": 131460
+      }
+    ]
+  },
+  "stampede-july-2025-03": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Riders sweeping past in motion on a colorful midway ride",
+    "sources": [
+      {
+        "src": "/photo/captures/b11dba05cf84-192.webp",
+        "width": 192,
+        "bytes": 11258
+      },
+      {
+        "src": "/photo/captures/9781974ed8b0-512.webp",
+        "width": 512,
+        "bytes": 58998
+      },
+      {
+        "src": "/photo/captures/689ade9b48ae-1008.webp",
+        "width": 1008,
+        "bytes": 285008
+      }
+    ]
+  },
+  "stampede-july-2025-04": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Spectators silhouetted beneath colorful fireworks and glowing smoke",
+    "sources": [
+      {
+        "src": "/photo/captures/896b378310b9-192.webp",
+        "width": 192,
+        "bytes": 3834
+      },
+      {
+        "src": "/photo/captures/367aa59090e4-512.webp",
+        "width": 512,
+        "bytes": 20350
+      },
+      {
+        "src": "/photo/captures/fd9f7975a758-1008.webp",
+        "width": 1008,
+        "bytes": 112792
+      }
+    ]
+  },
+  "stampede-july-2025-05": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "The illuminated Stampede midway and Ferris wheels beside the Saddledome at night",
+    "sources": [
+      {
+        "src": "/photo/captures/d75a0bd3c1a5-192.webp",
+        "width": 192,
+        "bytes": 2826
+      },
+      {
+        "src": "/photo/captures/05197901b6f4-512.webp",
+        "width": 512,
+        "bytes": 16864
+      },
+      {
+        "src": "/photo/captures/ed3769637fca-1024.webp",
+        "width": 1024,
+        "bytes": 45194
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-01": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "Niagara Falls and the arched bridge beneath a pale evening sky",
+    "sources": [
+      {
+        "src": "/photo/captures/16ab8970c1f3-192.webp",
+        "width": 192,
+        "bytes": 1354
+      },
+      {
+        "src": "/photo/captures/39ddb0d61052-512.webp",
+        "width": 512,
+        "bytes": 7914
+      },
+      {
+        "src": "/photo/captures/e5d110dae7d4-1024.webp",
+        "width": 1024,
+        "bytes": 28104
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-02": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "A sightseeing boat passing Niagara Falls beneath pink clouds",
+    "sources": [
+      {
+        "src": "/photo/captures/a20eed7e8852-192.webp",
+        "width": 192,
+        "bytes": 2110
+      },
+      {
+        "src": "/photo/captures/c7d14838c7e1-512.webp",
+        "width": 512,
+        "bytes": 14158
+      },
+      {
+        "src": "/photo/captures/a840195d58b2-1024.webp",
+        "width": 1024,
+        "bytes": 50808
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-03": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "Niagara Falls and rising mist in the blue light of dusk",
+    "sources": [
+      {
+        "src": "/photo/captures/5d87599d1993-192.webp",
+        "width": 192,
+        "bytes": 1220
+      },
+      {
+        "src": "/photo/captures/9cf9ebd3299c-512.webp",
+        "width": 512,
+        "bytes": 7060
+      },
+      {
+        "src": "/photo/captures/ee8f324990e4-1024.webp",
+        "width": 1024,
+        "bytes": 22854
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-04": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "Niagara Falls illuminated red behind the cruise terminal at night",
+    "sources": [
+      {
+        "src": "/photo/captures/d407d10d7009-192.webp",
+        "width": 192,
+        "bytes": 2172
+      },
+      {
+        "src": "/photo/captures/b1cd9e80a9d3-512.webp",
+        "width": 512,
+        "bytes": 13528
+      },
+      {
+        "src": "/photo/captures/3862d7e46cd5-1024.webp",
+        "width": 1024,
+        "bytes": 40730
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-05": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "Sunlit red-brick row houses with green window frames and trailing ivy",
+    "sources": [
+      {
+        "src": "/photo/captures/13f9ada064a5-192.webp",
+        "width": 192,
+        "bytes": 5640
+      },
+      {
+        "src": "/photo/captures/f8e46873f27b-512.webp",
+        "width": 512,
+        "bytes": 43004
+      },
+      {
+        "src": "/photo/captures/c18cc7026354-1024.webp",
+        "width": 1024,
+        "bytes": 160082
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-06": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Boats moored around a round stone tower beneath a blue sky",
+    "sources": [
+      {
+        "src": "/photo/captures/4cbc54491583-192.webp",
+        "width": 192,
+        "bytes": 5246
+      },
+      {
+        "src": "/photo/captures/2cb26adbf0f5-512.webp",
+        "width": 512,
+        "bytes": 44772
+      },
+      {
+        "src": "/photo/captures/8a9e84a04e41-1008.webp",
+        "width": 1008,
+        "bytes": 303206
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-07": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "A car navigation screen during the road trip on a sunny day",
+    "sources": [
+      {
+        "src": "/photo/captures/0d4602eddd0f-192.webp",
+        "width": 192,
+        "bytes": 2820
+      },
+      {
+        "src": "/photo/captures/5247b6881043-512.webp",
+        "width": 512,
+        "bytes": 13956
+      },
+      {
+        "src": "/photo/captures/ce309034ab9d-1024.webp",
+        "width": 1024,
+        "bytes": 39998
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-08": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "Pedestrians entering a narrow street lined with stone buildings in Old Montreal",
+    "sources": [
+      {
+        "src": "/photo/captures/6d7c7ba5b474-192.webp",
+        "width": 192,
+        "bytes": 4142
+      },
+      {
+        "src": "/photo/captures/d2f4e50d4ea9-512.webp",
+        "width": 512,
+        "bytes": 29988
+      },
+      {
+        "src": "/photo/captures/ff31a2cd9b64-1024.webp",
+        "width": 1024,
+        "bytes": 105890
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-09": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "Two people watching a giant outdoor chessboard beside Place des Arts",
+    "sources": [
+      {
+        "src": "/photo/captures/eb3dd7c0fbc7-192.webp",
+        "width": 192,
+        "bytes": 4044
+      },
+      {
+        "src": "/photo/captures/99469633a2c3-512.webp",
+        "width": 512,
+        "bytes": 23856
+      },
+      {
+        "src": "/photo/captures/43fa339bb505-1024.webp",
+        "width": 1024,
+        "bytes": 90904
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-10": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "Gardeners tending a large leafy sculpture of a figure wearing a hat",
+    "sources": [
+      {
+        "src": "/photo/captures/b04ef9e5a740-192.webp",
+        "width": 192,
+        "bytes": 15332
+      },
+      {
+        "src": "/photo/captures/0fb072cdd96b-512.webp",
+        "width": 512,
+        "bytes": 129802
+      },
+      {
+        "src": "/photo/captures/42ff89b51054-1008.webp",
+        "width": 1008,
+        "bytes": 470176
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-11": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "A leafy pedestrian street lined with restaurant terraces in Montreal",
+    "sources": [
+      {
+        "src": "/photo/captures/7bb6da85dd7e-192.webp",
+        "width": 192,
+        "bytes": 5174
+      },
+      {
+        "src": "/photo/captures/9bf64b39ee56-512.webp",
+        "width": 512,
+        "bytes": 45644
+      },
+      {
+        "src": "/photo/captures/e02d4e76d5b2-1024.webp",
+        "width": 1024,
+        "bytes": 178234
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-12": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "An ornate stone building with a clock tower beneath a pink evening sky",
+    "sources": [
+      {
+        "src": "/photo/captures/60d930baeddb-192.webp",
+        "width": 192,
+        "bytes": 2936
+      },
+      {
+        "src": "/photo/captures/691f9a2796b4-512.webp",
+        "width": 512,
+        "bytes": 19656
+      },
+      {
+        "src": "/photo/captures/f06ce2d911f7-1024.webp",
+        "width": 1024,
+        "bytes": 66922
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-13": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "A bustling Old Montreal street with glowing lamps and restaurant signs",
+    "sources": [
+      {
+        "src": "/photo/captures/3baa62789049-192.webp",
+        "width": 192,
+        "bytes": 4612
+      },
+      {
+        "src": "/photo/captures/016b4aae89b8-512.webp",
+        "width": 512,
+        "bytes": 32276
+      },
+      {
+        "src": "/photo/captures/6274c8affa59-1024.webp",
+        "width": 1024,
+        "bytes": 104594
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-14": {
+    "width": 1008,
+    "height": 1790,
+    "alt": "A silver-domed stone building rising above trees and a cobbled street",
+    "sources": [
+      {
+        "src": "/photo/captures/eaa94cbbe9b8-192.webp",
+        "width": 192,
+        "bytes": 8130
+      },
+      {
+        "src": "/photo/captures/b817b0da7690-512.webp",
+        "width": 512,
+        "bytes": 62066
+      },
+      {
+        "src": "/photo/captures/9b3896d2f3bc-1008.webp",
+        "width": 1008,
+        "bytes": 271512
+      }
+    ]
+  },
+  "niagara-montreal-august-2025-15": {
+    "width": 2632,
+    "height": 1483,
+    "alt": "A landscaped urban garden with curved planting beds in golden evening light",
+    "sources": [
+      {
+        "src": "/photo/captures/61e29cd31e9e-192.webp",
+        "width": 192,
+        "bytes": 3424
+      },
+      {
+        "src": "/photo/captures/bf716fced401-512.webp",
+        "width": 512,
+        "bytes": 23272
+      },
+      {
+        "src": "/photo/captures/10a37e35775b-1024.webp",
+        "width": 1024,
+        "bytes": 80034
+      }
+    ]
+  }
+}

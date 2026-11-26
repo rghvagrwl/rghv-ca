@@ -10,6 +10,7 @@
 .dialog::backdrop { background: var(--polaroid-backdrop, #eeeeee80); backdrop-filter: blur(14px); animation: backdropIn 400ms both; }
 .dialog[data-closing="true"]::backdrop { animation: backdropOut 560ms both; }
 .enlarged { width: min(430px, 78vw, 49dvh); aspect-ratio: 1; cursor: zoom-out; }
+.enlarged .image { outline: .35px solid rgb(0 0 0 / 12%); outline-offset: -.35px; }
 .close { position: absolute; right: 24px; top: 20px; border: none; background: none; color: var(--polaroid-close, #0008); font: 14px system-ui, sans-serif; cursor: pointer; padding: 10px; }
 .thumbnail:focus-visible, .enlarged:focus-visible, .close:focus-visible { outline: 2px solid var(--polaroid-focus, #0006); outline-offset: 6px; }
 @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
